@@ -4,6 +4,7 @@ import app.revanced.patcher.extensions.addInstructions
 import app.revanced.patcher.extensions.fieldReference
 import app.revanced.patcher.extensions.getInstruction
 import app.revanced.patcher.patch.bytecodePatch
+import app.revanced.patches.dcinside.misc.settings.settingsPatch
 import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 
 @Suppress("unused")
@@ -15,6 +16,10 @@ val disablePostPumOptionPatch = bytecodePatch(
         "com.dcinside.app.android"(
             "5.3.2"
         )
+    )
+
+    dependsOn(
+        settingsPatch,
     )
 
     apply {

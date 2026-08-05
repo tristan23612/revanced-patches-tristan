@@ -32,7 +32,6 @@ public class QuickPostControlPatch {
     private static String TAG = "ReVanced_DCInside";
 
     public static void hookGalleryID(String id) {
-        Log.d(TAG, "gallery id: " + id);
         galleryId = id;
     }
 
@@ -40,7 +39,6 @@ public class QuickPostControlPatch {
         if (key == null || value == null) {
             return;
         }
-        Log.d(TAG, "[PARAM] " + key + " = " + value);
 
         if ("app_id".equals(key)) {
             appId = value;

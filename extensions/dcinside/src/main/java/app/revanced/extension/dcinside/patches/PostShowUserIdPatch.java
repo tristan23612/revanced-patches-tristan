@@ -16,10 +16,6 @@ public class PostShowUserIdPatch {
 
     private static final String TAG = "ReVanced_DCInside";
 
-    public static void setUserId(View rootView, String userId) {
-        setUserId(rootView, userId, null);
-    }
-
     public static void setUserId(View view, String userId, CharSequence charSequence) {
         if (view == null) return;
 
@@ -38,7 +34,6 @@ public class PostShowUserIdPatch {
             if (!TextUtils.isEmpty(userId)) {
                 userIdTextView.setText("(" + userId + ") ");
                 int color = extractMemoColor(charSequence);
-                Log.d(TAG, "memo color: " + color);
                 userIdTextView.setTextColor(color != 0 ? color : DEFAULT_USER_ID_COLOR);
                 userIdTextView.setVisibility(View.VISIBLE);
             } else {
@@ -50,7 +45,10 @@ public class PostShowUserIdPatch {
     }
 
     public static String addUserId(String userName, String userId, String userIp) {
-        return userName + " (" + userId + userIp + ")";
+        if (!TextUtils.isEmpty(userId) || !TextUtils.isEmpty(userIp)) {
+            return userName + " (" + userId + userIp + ")";
+        }
+        return userName;
     }
 
     private static int extractMemoColor(CharSequence charSequence) {
