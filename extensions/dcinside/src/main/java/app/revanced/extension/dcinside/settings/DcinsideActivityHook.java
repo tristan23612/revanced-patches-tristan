@@ -65,7 +65,6 @@ public class DcinsideActivityHook extends BaseActivityHook {
         if (color != null) {
             return color;
         }
-        Log.d("ReVanced_DCInside", "Failed to get dcToolbarColor");
         return Utils.getAppBackgroundColor();
     }
 

@@ -14,4 +14,5 @@ import app.revanced.extension.shared.settings.BooleanSetting;
  */
 public class Settings extends BaseSettings {
     public static final BooleanSetting HIDE_ADS = new BooleanSetting("revanced_hide_ads", TRUE, TRUE);
+    public static final BooleanSetting DISABLE_POST_PUM_OPTION = new BooleanSetting("revanced_disable_post_pum_option", TRUE, FALSE);
 }

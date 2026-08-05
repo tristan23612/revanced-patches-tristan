@@ -236,5 +236,10 @@ Second \"item\" text"</string>
             <string name="revanced_hide_ads_summary_on">광고가 표시되지 않습니다.</string>
             <string name="revanced_hide_ads_summary_off">광고가 표시됩니다.</string>
         </patch>
+        <patch id="post.write.pum.disablePostPumOptionPatch">
+            <string name="revanced_disable_post_pum_option_title">게시글 작성 시 펌 금지</string>
+            <string name="revanced_disable_post_pum_option_summary_on">게시글 작성 시 펌 금지 옵션이 기본적으로 활성화됩니다.</string>
+            <string name="revanced_disable_post_pum_option_summary_off">게시글 작성 시 펌 금지 옵션이 기본적으로 비활성화됩니다.</string>
+        </patch>
     </app>
 </resources>
