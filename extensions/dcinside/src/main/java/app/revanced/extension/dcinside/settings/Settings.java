@@ -15,4 +15,9 @@ import app.revanced.extension.shared.settings.BooleanSetting;
 public class Settings extends BaseSettings {
     public static final BooleanSetting HIDE_ADS = new BooleanSetting("revanced_hide_ads", TRUE, TRUE);
     public static final BooleanSetting DISABLE_POST_PUM_OPTION = new BooleanSetting("revanced_disable_post_pum_option", TRUE, FALSE);
+    public static final BooleanSetting HIDE_DCBEST = new BooleanSetting("revanced_hide_dcbest", TRUE, TRUE);
+    public static final BooleanSetting HIDE_RECOMMENDED_GALLERIES = new BooleanSetting("revanced_hide_recommended_galleries", TRUE, TRUE);
+    public static final BooleanSetting HIDE_CROWD = new BooleanSetting("revanced_hide_crowd", TRUE, TRUE);
+    public static final BooleanSetting HIDE_NEW_GALLERIES = new BooleanSetting("revanced_hide_new_galleries", TRUE, TRUE);
+    public static final BooleanSetting HIDE_RECENT = new BooleanSetting("revanced_hide_recent", TRUE, TRUE);
 }

@@ -17,7 +17,7 @@ private const val EXTENSION_CLASS_DESCRIPTOR = "Lapp/revanced/extension/dcinside
 @Suppress("unused")
 val disablePostPumOptionPatch = bytecodePatch(
     name = "Disable post Pum option",
-    description = "Disables the Pum option by default when opening the post write screen.",
+    description = "Add option to disables the Pum option by default when opening the post write screen.",
 ) {
     compatibleWith(
         "com.dcinside.app.android"(

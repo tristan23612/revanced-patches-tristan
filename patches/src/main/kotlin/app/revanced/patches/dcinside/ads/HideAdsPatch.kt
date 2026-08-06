@@ -15,7 +15,7 @@ private const val EXTENSION_CLASS_DESCRIPTOR = "Lapp/revanced/extension/dcinside
 @Suppress("unused")
 val hideAdsPatch = bytecodePatch(
     name = "Hide ads",
-    description = "Hide ads across the app.",
+    description = "Add option to hide ads across the app.",
 ) {
     compatibleWith("com.dcinside.app.android")
 
