@@ -22,4 +22,6 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting HIDE_RECENT = new BooleanSetting("revanced_hide_recent", TRUE, TRUE);
     public static final BooleanSetting SHOW_USER_ID = new BooleanSetting("revanced_show_user_id", TRUE, FALSE);
     public static final BooleanSetting ENABLE_QUICK_POST_MANAGEMENT = new BooleanSetting("revanced_enable_quick_post_management", FALSE, FALSE);
+    public static final BooleanSetting HIDE_ADMINISTRATOR_NOTICE = new BooleanSetting("revanced_hide_administrator_notice", TRUE, FALSE);
+    public static final BooleanSetting HIDE_MUST_READ_NOTICE = new BooleanSetting("revanced_hide_must_read_notice", TRUE, FALSE);
 }

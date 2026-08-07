@@ -2,6 +2,7 @@ package app.revanced.extension.dcinside.patches.hook.patch;
 
 import android.util.Log;
 import app.revanced.extension.dcinside.patches.hook.json.BaseJsonHook;
+import app.revanced.extension.dcinside.settings.Settings;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -15,6 +16,8 @@ public final class HideMustReadNoticeHook extends BaseJsonHook {
 
     @Override
     public String apply(String json) {
+        if (json == null || !Settings.HIDE_MUST_READ_NOTICE.get()) return json;
+
         try {
             JSONArray root = new JSONArray(json);
             JSONObject response = root.getJSONObject(0);
