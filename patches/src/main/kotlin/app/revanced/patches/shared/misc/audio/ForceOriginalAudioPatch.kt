@@ -43,7 +43,7 @@ internal fun forceOriginalAudioPatch(
     preferenceScreen: BasePreferenceScreen.Screen,
 ) = bytecodePatch(
     name = "Force original audio",
-    description = "Adds an option to always use the original audio track.",
+    description = "Adds option to always use the original audio track.",
 ) {
     block()
 
