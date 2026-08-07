@@ -1,4 +1,4 @@
-package app.revanced.extension.dcinside.patches;
+package app.revanced.extension.dcinside.patches.post.list;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -23,8 +23,9 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 import app.revanced.extension.dcinside.patches.hook.json.JsonHookPatch;
+import app.revanced.extension.dcinside.settings.Settings;
 
-public class QuickPostControlPatch {
+public class QuickPostManagementPatch {
     private static String galleryId = "";
     private static String appId = "";
     private static String userId = "";
@@ -52,7 +53,7 @@ public class QuickPostControlPatch {
         itemView.setClickable(true);
         itemView.setLongClickable(true);
 
-        if (!JsonHookPatch.ManagerSkill) {
+        if (!JsonHookPatch.ManagerSkill || !Settings.ENABLE_QUICK_POST_MANAGEMENT.get()) {
             return;
         }
 

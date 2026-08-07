@@ -258,5 +258,15 @@ Second \"item\" text"</string>
             <string name="revanced_hide_recent_summary_on">홈 화면의 갤러리 바로가기(최근, 즐겨찾기)가 숨겨집니다.</string>
             <string name="revanced_hide_recent_summary_off">홈 화면의 갤러리 바로가기(최근, 즐겨찾기)가 숨겨지지 않습니다.</string>
         </patch>
+        <patch id="post.userId.showUserIdPatch">
+            <string name="revanced_show_user_id_title">식별 코드 표시</string>
+            <string name="revanced_show_user_id_summary_on">반고닉과 고닉 유저의 식별 코드가 표시됩니다.</string>
+            <string name="revanced_show_user_id_summary_off">반고닉과 고닉 유저의 식별 코드가 표시되지 않습니다.</string>
+        </patch>
+        <patch id="post.list.quickPostManagementPatch">
+            <string name="revanced_enable_quick_post_management_title">빠른 게시글 관리</string>
+            <string name="revanced_enable_quick_post_management_summary_on">게시글 목록에서 긴 터치를 통해 게시글 차단 및 삭제 팝업을 띄웁니다.</string>
+            <string name="revanced_enable_quick_post_management_summary_off">게시글 목록에서 긴 터치를 통해 게시글 차단 및 삭제 팝업을 띄우지 않습니다.</string>
+        </patch>
     </app>
 </resources>

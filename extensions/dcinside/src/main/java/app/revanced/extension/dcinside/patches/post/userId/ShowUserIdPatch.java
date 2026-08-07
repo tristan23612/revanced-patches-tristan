@@ -1,23 +1,24 @@
-package app.revanced.extension.dcinside.patches;
+package app.revanced.extension.dcinside.patches.post.userId;
 
-import android.util.Log;
 import android.content.Context;
 import android.graphics.Color;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import app.revanced.extension.dcinside.settings.Settings;
 
-public class PostShowUserIdPatch {
-    private PostShowUserIdPatch() {}
+public class ShowUserIdPatch {
+    private ShowUserIdPatch() {}
 
     private static final int DEFAULT_USER_ID_COLOR = Color.parseColor("#9E9E9E");
 
     private static final String TAG = "ReVanced_DCInside";
 
     public static void setUserId(View view, String userId, CharSequence charSequence) {
-        if (view == null) return;
+        if (view == null || !Settings.SHOW_USER_ID.get()) return;
 
         try {
             Context context = view.getContext();
@@ -45,15 +46,14 @@ public class PostShowUserIdPatch {
     }
 
     public static String addUserId(String userName, String userId, String userIp) {
-        if (!TextUtils.isEmpty(userId) || !TextUtils.isEmpty(userIp)) {
+        if ((!TextUtils.isEmpty(userId) || !TextUtils.isEmpty(userIp)) && Settings.SHOW_USER_ID.get()) {
             return userName + " (" + userId + userIp + ")";
         }
         return userName;
     }
 
     private static int extractMemoColor(CharSequence charSequence) {
-        if (!(charSequence instanceof Spanned)) return 0;
-        Spanned spanned = (Spanned) charSequence;
+        if (!(charSequence instanceof Spanned spanned)) return 0;
         ForegroundColorSpan[] spans = spanned.getSpans(0, spanned.length(), ForegroundColorSpan.class);
         if (spans.length == 0) return 0;
         return spans[0].getForegroundColor();

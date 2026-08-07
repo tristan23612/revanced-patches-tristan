@@ -1,8 +1,6 @@
-package app.revanced.patches.dcinside.post.view
+package app.revanced.patches.dcinside.post.userId
 
-import app.revanced.com.android.tools.smali.dexlib2.mutable.MutableField.Companion.toMutable
 import app.revanced.patcher.extensions.addInstructions
-import app.revanced.patcher.extensions.fieldReference
 import app.revanced.patcher.extensions.getInstruction
 import app.revanced.patcher.extensions.methodReference
 import app.revanced.patcher.extensions.reference
@@ -10,9 +8,13 @@ import app.revanced.patcher.firstClassDef
 import app.revanced.patcher.patch.ResourcePatchContext
 import app.revanced.patcher.patch.bytecodePatch
 import app.revanced.patcher.patch.resourcePatch
+import app.revanced.patches.all.misc.resources.addResources
+import app.revanced.patches.all.misc.resources.addResourcesPatch
 import app.revanced.patches.dcinside.misc.extension.sharedExtensionPatch
+import app.revanced.patches.dcinside.misc.settings.PreferenceScreen
+import app.revanced.patches.dcinside.misc.settings.settingsPatch
+import app.revanced.patches.shared.misc.settings.preference.SwitchPreference
 import app.revanced.util.doRecursively
-import app.revanced.util.findFreeRegister
 import app.revanced.util.getFreeRegisterProvider
 import app.revanced.util.indexOfFirstInstructionOrThrow
 import com.android.tools.smali.dexlib2.iface.ClassDef
@@ -21,7 +23,7 @@ import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.value.StringEncodedValue
 import org.w3c.dom.Element
 
-private const val POST_SHOW_USER_ID_EXTENSION_CLASS_DESCRIPTOR = "Lapp/revanced/extension/dcinside/patches/PostShowUserIdPatch;"
+private const val SHOW_USER_ID_PATCH_EXTENSION_CLASS_DESCRIPTOR = "Lapp/revanced/extension/dcinside/patches/post/userId/ShowUserIdPatch;"
 private const val POST_ITEM_CLASS_DESCRIPTOR = "Lcom/dcinside/app/model/PostInfo;"
 
 context(context: ResourcePatchContext)
@@ -53,11 +55,9 @@ private fun injectUserIdTextView(
         val targetLeft = leftElement ?: return@use
         val targetRight = rightElement ?: return@use
 
-        /* [Anchor Re-linking] 좌우 앵커 사이 제약 조건을 신규 주입할 View ID로 재연결 */
         targetLeft.setAttribute("app:layout_constraintEnd_toStartOf", "@+id/custom_user_id")
         targetRight.setAttribute("app:layout_constraintStart_toEndOf", "@+id/custom_user_id")
 
-        /* [DOM Injection] user_id 표시용 TextView 생성 및 Constraint/Style 속성 할당 */
         val userIdElement = document.createElement(viewClass).apply {
             setAttribute("android:textAppearance", "?attr/textTypeSub")
             setAttribute("android:textColor", textColorAttr)
@@ -75,8 +75,32 @@ private fun injectUserIdTextView(
             extraAttributes.forEach { (key, value) -> setAttribute(key, value) }
         }
 
-        /* [DOM Insertion] 좌측 앵커 노드와 우측 앵커 노드 사이에 삽입 */
         targetLeft.parentNode?.insertBefore(userIdElement, targetRight)
+    }
+}
+
+private val postListShowUserIdResourcePatch = resourcePatch {
+    compatibleWith("com.dcinside.app.android")
+
+    apply {
+        listOf(
+            "res/layout/view_post_list_item_basic.xml",
+            "res/layout/view_post_list_item_split.xml",
+        ).forEach { layoutPath ->
+            injectUserIdTextView(
+                layoutPath = layoutPath,
+                leftAnchorId = "post_list_item_member_ic",
+                rightAnchorId = "post_list_item_counts",
+                verticalAnchorId = "post_list_item_nic",
+                viewClass = "com.dcinside.app.view.ResizeTextView",
+                textColorAttr = "?attr/dcPostReadSubColor",
+                height = "wrap_content",
+                extraAttributes = mapOf(
+                    "android:gravity" to "center_vertical",
+                    "app:layout_constraintTop_toTopOf" to "@+id/post_list_item_nic",
+                ),
+            )
+        }
     }
 }
 
@@ -100,19 +124,17 @@ private val postHeaderShowUserIdResourcePatch = resourcePatch {
     }
 }
 
-private val replyLayoutHeights = mapOf(
-    "res/layout/view_reply_item_text.xml" to "26dp",
-    "res/layout/view_reply_item_image.xml" to "31dp",
-    "res/layout/view_reply_item_image_big.xml" to "31dp",
-    "res/layout/view_reply_item_voice.xml" to "26dp",
-    "res/layout/view_reply_item_voice2.xml" to "26dp",
-)
-
 private val replyShowUserIdResourcePatch = resourcePatch {
     compatibleWith("com.dcinside.app.android")
 
     apply {
-        replyLayoutHeights.forEach { (layoutPath, height) ->
+        mapOf(
+            "res/layout/view_reply_item_text.xml" to "26dp",
+            "res/layout/view_reply_item_image.xml" to "31dp",
+            "res/layout/view_reply_item_image_big.xml" to "31dp",
+            "res/layout/view_reply_item_voice.xml" to "26dp",
+            "res/layout/view_reply_item_voice2.xml" to "26dp",
+        ).forEach { (layoutPath, height) ->
             injectUserIdTextView(
                 layoutPath = layoutPath,
                 leftAnchorId = "reply_member_ic",
@@ -131,19 +153,88 @@ private val replyShowUserIdResourcePatch = resourcePatch {
 }
 
 @Suppress("unused")
-val postViewShowUserIdPatch = bytecodePatch(
+val showUserIdPatch = bytecodePatch(
     name = "Show user ID",
-    description = "Shows the user ID in the various places."
+    description = "Adds an option to show the user ID.",
 ) {
     compatibleWith("com.dcinside.app.android")
 
     dependsOn(
         sharedExtensionPatch,
+        settingsPatch,
+        addResourcesPatch,
+        postListShowUserIdResourcePatch,
         postHeaderShowUserIdResourcePatch,
         replyShowUserIdResourcePatch,
     )
 
     apply {
+        addResources("dcinside", "post.userId.showUserIdPatch")
+
+        PreferenceScreen.GENERAL.addPreferences(
+            SwitchPreference("revanced_show_user_id"),
+        )
+
+        postItemBindMethodMatch.let {
+            it.method.apply {
+                val postItemIndex = it[1]
+                val postItemRegister = getInstruction<OneRegisterInstruction>(postItemIndex).registerA
+
+                val userIdMethodReference = getInstruction(it[3]).methodReference
+
+                val spannableIndex = it[-1]
+                val spannableRegister = getInstruction<OneRegisterInstruction>(spannableIndex).registerA
+
+                val registerProvider = getFreeRegisterProvider(spannableIndex, 2, spannableRegister)
+                val viewRegister = registerProvider.getFreeRegister()
+                val userIdRegister = registerProvider.getFreeRegister()
+
+                val insertIndex = spannableIndex + 1
+                var insertSmali = $$"""
+                    move-object/from16 v$$viewRegister, p1
+                    iget-object v$$viewRegister, v$$viewRegister, Landroidx/recyclerview/widget/RecyclerView$ViewHolder;->itemView:Landroid/view/View;
+                    
+                    invoke-virtual {v$$postItemRegister}, $$userIdMethodReference
+                    move-result-object v$$userIdRegister
+                    
+                    invoke-static {v$$viewRegister, v$$userIdRegister, v$$spannableRegister}, $$SHOW_USER_ID_PATCH_EXTENSION_CLASS_DESCRIPTOR->setUserId(Landroid/view/View;Ljava/lang/String;Ljava/lang/CharSequence;)V
+                """
+
+                addInstructions(insertIndex, insertSmali)
+            }
+        }
+
+        postSearchItemBindMethodMatch.let {
+            it.method.apply {
+                val postItemIndex = it[1]
+                val postItemRegister = getInstruction<OneRegisterInstruction>(postItemIndex).registerA
+
+                val userIdMethodReference = getInstruction(it[6]).methodReference
+
+                val spannableIndex = it[-1]
+                val spannableRegister = getInstruction<OneRegisterInstruction>(spannableIndex).registerA
+
+                val registerProvider = getFreeRegisterProvider(postItemIndex, 2, postItemRegister)
+                val viewRegister = registerProvider.getFreeRegister()
+                val userIdRegister = registerProvider.getFreeRegister()
+
+                val insertIndex = spannableIndex + 1
+                addInstructions(
+                    insertIndex,
+                    $$"""
+                        move-object/from16 v$$viewRegister, p1
+                        iget-object v$$viewRegister, v$$viewRegister, Landroidx/recyclerview/widget/RecyclerView$ViewHolder;->itemView:Landroid/view/View;
+                        
+                        invoke-virtual { v$$postItemRegister }, $$userIdMethodReference
+                        move-result-object v$$userIdRegister
+                        
+                        invoke-static { v$$viewRegister, v$$userIdRegister, v$$spannableRegister }, $$SHOW_USER_ID_PATCH_EXTENSION_CLASS_DESCRIPTOR->setUserId(Landroid/view/View;Ljava/lang/String;Ljava/lang/CharSequence;)V
+                    """
+                )
+            }
+        }
+
+
         postHeaderSetupMethodMatch.let {
             it.method.apply {
                 val userIdIndex = it[2]
@@ -165,7 +256,7 @@ val postViewShowUserIdPatch = bytecodePatch(
                         invoke-virtual { v$userIdRegister }, $userIdReference
                         move-result-object v$userIdRegister
                         
-                        invoke-static { v$viewRegister , v$userIdRegister, v$charSequenceRegister }, $POST_SHOW_USER_ID_EXTENSION_CLASS_DESCRIPTOR->setUserId(Landroid/view/View;Ljava/lang/String;Ljava/lang/CharSequence;)V
+                        invoke-static { v$viewRegister , v$userIdRegister, v$charSequenceRegister }, $SHOW_USER_ID_PATCH_EXTENSION_CLASS_DESCRIPTOR->setUserId(Landroid/view/View;Ljava/lang/String;Ljava/lang/CharSequence;)V
                     """
                 )
             }
@@ -196,7 +287,7 @@ val postViewShowUserIdPatch = bytecodePatch(
                         invoke-virtual { v$userIdRegister }, $userIdReference
                         move-result-object v$userIdRegister
                         
-                        invoke-static { v$viewRegister , v$userIdRegister, v$charSequenceRegister }, $POST_SHOW_USER_ID_EXTENSION_CLASS_DESCRIPTOR->setUserId(Landroid/view/View;Ljava/lang/String;Ljava/lang/CharSequence;)V
+                        invoke-static { v$viewRegister , v$userIdRegister, v$charSequenceRegister }, $SHOW_USER_ID_PATCH_EXTENSION_CLASS_DESCRIPTOR->setUserId(Landroid/view/View;Ljava/lang/String;Ljava/lang/CharSequence;)V
                     """
                 )
             }
@@ -233,7 +324,7 @@ val postViewShowUserIdPatch = bytecodePatch(
                         move-result-object v$userIdRegister
                         invoke-virtual {p2}, $userIpGetterMethodReference
                         move-result-object v$userIpRegister
-                        invoke-static {v$userNameRegister, v$userIdRegister, v$userIpRegister }, $POST_SHOW_USER_ID_EXTENSION_CLASS_DESCRIPTOR->addUserId(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+                        invoke-static {v$userNameRegister, v$userIdRegister, v$userIpRegister }, $SHOW_USER_ID_PATCH_EXTENSION_CLASS_DESCRIPTOR->addUserId(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
                         move-result-object v$userNameRegister
                     """
                 )
