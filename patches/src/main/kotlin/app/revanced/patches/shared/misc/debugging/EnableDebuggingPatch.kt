@@ -1,27 +1,16 @@
 package app.revanced.patches.shared.misc.debugging
 
-import app.revanced.patcher.accessFlags
 import app.revanced.patcher.classDef
 import app.revanced.patcher.extensions.addInstructions
-import app.revanced.patcher.firstMethodDeclaratively
 import app.revanced.patcher.immutableClassDef
-import app.revanced.patcher.instructions
-import app.revanced.patcher.method
-import app.revanced.patcher.parameterTypes
 import app.revanced.patcher.patch.BytecodePatchBuilder
 import app.revanced.patcher.patch.BytecodePatchContext
-import app.revanced.patcher.patch.Patch
-import app.revanced.patcher.patch.PatchException
 import app.revanced.patcher.patch.bytecodePatch
 import app.revanced.patcher.patch.resourcePatch
-import app.revanced.patcher.returnType
 import app.revanced.patches.all.misc.resources.addResources
-import app.revanced.patches.all.misc.resources.addResourcesPatch
 import app.revanced.patches.shared.misc.settings.preference.*
 import app.revanced.patches.shared.misc.settings.preference.PreferenceScreenPreference.Sorting
 import app.revanced.util.*
-import com.android.tools.smali.dexlib2.AccessFlags
-import com.android.tools.smali.dexlib2.Opcode
 
 private const val EXTENSION_CLASS_DESCRIPTOR =
     "Lapp/revanced/extension/shared/patches/EnableDebuggingPatch;"

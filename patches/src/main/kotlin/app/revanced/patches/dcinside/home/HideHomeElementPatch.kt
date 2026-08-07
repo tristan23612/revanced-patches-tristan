@@ -1,117 +1,121 @@
 package app.revanced.patches.dcinside.home
 
 import app.revanced.patcher.extensions.addInstructions
-import app.revanced.patcher.patch.booleanOption
+import app.revanced.patcher.extensions.getInstruction
 import app.revanced.patcher.patch.bytecodePatch
-import app.revanced.patcher.patch.resourcePatch
+import app.revanced.patches.all.misc.resources.addResources
+import app.revanced.patches.all.misc.resources.addResourcesPatch
 import app.revanced.patches.dcinside.misc.extension.sharedExtensionPatch
-import app.revanced.util.doRecursively
-import org.w3c.dom.Element
+import app.revanced.patches.dcinside.misc.settings.PreferenceScreen
+import app.revanced.patches.dcinside.misc.settings.settingsPatch
+import app.revanced.patches.shared.misc.settings.preference.SwitchPreference
+import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 
-internal val hideDcbest = booleanOption(
-    default = true,
-    name = "Hide dcbest",
-    description = "Permanently hide tab of dcbest",
-)
-internal val hideRecommendedGalleries = booleanOption(
-    default = true,
-    name = "Hide recommended galleries",
-    description = "Permanently hide recommended galleries",
-)
-internal val hideCrowdGalleries = booleanOption(
-    default = true,
-    name = "Hide crowd galleries",
-    description = "Permanently hide crowd galleries",
-)
-internal val hideNewGallery = booleanOption(
-    default = true,
-    name = "Hide new gallery",
-    description = "Permanently hide new gallery",
-)
-internal val hideShortcutGalleries = booleanOption(
-    default = false,
-    name = "Hide shortcut galleries",
-    description = "Permanently hide shortcut galleries",
-)
+private const val EXTENSION_CLASS_DESCRIPTOR = "Lapp/revanced/extension/dcinside/patches/home/HideHomeElementPatch;"
 
 @Suppress("unused")
-private val hideHomeElementBytecodePatch = bytecodePatch {
-    compatibleWith("com.dcinside.app.android")
-    apply {
-        val hideNewGallery by hideNewGallery
-
-        if (hideNewGallery!!) {
-            mainSetNewGalleriesMethod.addInstructions(
-                0,
-                """
-                    invoke-static {}, Ljava/util/Collections;->emptyList()Ljava/util/List;
-                    move-result-object p1
-                """
-            )
-        }
-    }
-}
-
-@Suppress("unused")
-val hideHomeElementResourcePatch = resourcePatch(
+val hideHomeElementPatch = bytecodePatch(
     name = "Hide home elements",
-    description = "Hide home elements of app permanently. DCbest is hidden by default.",
-    use = false
+    description = "Add options to hide home elements of main feed.",
 ) {
     compatibleWith("com.dcinside.app.android")
+
     dependsOn(
         sharedExtensionPatch,
-        hideHomeElementBytecodePatch,
+        settingsPatch,
+        addResourcesPatch,
     )
-    val hideDcbest by hideDcbest
-    val hideRecommendedGalleries by hideRecommendedGalleries
-    val hideCrowdGalleries by hideCrowdGalleries
-    val hideNewGallery by hideNewGallery
-
-    val hideShortcutGalleries by hideShortcutGalleries
 
     apply {
-        fun Element.hideElement() {
-            this.setAttribute("android:visibility", "gone")
-            this.setAttribute("android:layout_height", "0dp")
-            this.setAttribute("android:layout_width", "0dp")
-            this.setAttribute("android:maxHeight", "0dp")
-            this.setAttribute("android:maxWidth", "0dp")
-        }
+        addResources("dcinside", "home.hideHomeElementPatch")
 
-        if (hideDcbest!!) {
-            listOf(
-                "res/layout/view_main_best_filter.xml", // dcbest filter
-                "res/layout/view_live_best_item.xml", // dcbest posts
-                "res/layout/view_main_live_best_more.xml", // dcbest shortcut
-                "res/layout/view_main_bottom.xml", // main bottom
-            ).forEach { document(it).use { document -> document.documentElement.hideElement() } }
-        }
+        PreferenceScreen.FEED.addPreferences(
+            SwitchPreference("revanced_hide_dcbest"),
+            SwitchPreference("revanced_hide_recommended_galleries"),
+            SwitchPreference("revanced_hide_crowd"),
+            SwitchPreference("revanced_hide_new_galleries"),
+            SwitchPreference("revanced_hide_recent"),
+        )
 
-        if (hideRecommendedGalleries!!) {
-            document("res/layout/view_recommend_galleries.xml").use { document -> document.documentElement.hideElement() }
-        }
-
-        if (hideCrowdGalleries!!) {
-            document("res/layout/view_crowd.xml").use { document ->
-                val root = document.documentElement ?: return@use
-
-                root.doRecursively { node ->
-                    if (node is Element) {
-                        node.hideElement()
-                    }
-                }
+        mainBestFilterMethodMatch.let {
+            it.method.apply {
+                addInstructions(
+                    it[-1],
+                    $$"""
+                        iget-object v0, p0, Landroidx/recyclerview/widget/RecyclerView$ViewHolder;->itemView:Landroid/view/View;
+                        invoke-static {v0}, $$EXTENSION_CLASS_DESCRIPTOR->hideDcbestView(Landroid/view/View;)V
+                    """
+                )
             }
         }
 
-        listOf(
-            "res/layout/view_recent_basic.xml",
-            "res/layout/view_recent_split.xml",
-        ).forEach {
-            document(it).use { document ->
-                if (hideShortcutGalleries!!) {
-                    document.documentElement.hideElement()
-                }
+        liveBestItemMethodMatch.let {
+            it.method.apply {
+                addInstructions(
+                    it[-1],
+                    $$"""
+                        iget-object v0, p0, Landroidx/recyclerview/widget/RecyclerView$ViewHolder;->itemView:Landroid/view/View;
+                        invoke-static { v0 }, $$EXTENSION_CLASS_DESCRIPTOR->hideDcbestView(Landroid/view/View;)V
+                    """
+                )
+            }
+        }
+
+        mainLiveBestMoreMethodMatch.let {
+            it.method.apply {
+                val viewIndex = it[-1]
+                val viewRegister = getInstruction<OneRegisterInstruction>(viewIndex).registerA
+
+                addInstructions(
+                    viewIndex + 1,
+                    $$"""
+                        invoke-static/range { v$$viewRegister .. v$$viewRegister }, $$EXTENSION_CLASS_DESCRIPTOR->hideDcbestView(Landroid/view/View;)V
+                    """
+                )
+            }
+        }
+
+        mainRecommendGalleriesMethodMatch.let {
+            it.method.apply {
+                val viewIndex = it[-1]
+                val viewRegister = getInstruction<OneRegisterInstruction>(viewIndex).registerA
+
+                addInstructions(
+                    viewIndex + 1,
+                    $$"""
+                        invoke-static/range { v$$viewRegister .. v$$viewRegister }, $$EXTENSION_CLASS_DESCRIPTOR->hideRecommendedGalleriesView(Landroid/view/View;)V
+                    """
+                )
+            }
+        }
+
+        mainCrowdMethodMatch.let {
+            it.method.apply {
+                addInstructions(
+                    it[-1],
+                    $$"""
+                        invoke-static { p0 }, $$EXTENSION_CLASS_DESCRIPTOR->hideCrowdView(Landroid/view/View;)V
+                    """
+                )
+            }
+        }
+
+        mainSetNewGalleriesMethod.addInstructions(
+            0,
+            $$"""
+                invoke-static {p1}, $$EXTENSION_CLASS_DESCRIPTOR->hideNewGalleries(Ljava/util/List;)Ljava/util/List;
+                move-result-object p1
+            """
+        )
+
+        mainRecentMethodMatch.let {
+            it.method.apply {
+                addInstructions(
+                    it[-1],
+                    $$"""
+                        invoke-static/range { p0 .. p0 }, $$EXTENSION_CLASS_DESCRIPTOR->hideRecentView(Landroid/view/View;)V
+                    """
+                )
             }
         }
     }
