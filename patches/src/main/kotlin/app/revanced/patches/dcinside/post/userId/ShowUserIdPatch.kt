@@ -155,7 +155,7 @@ private val replyShowUserIdResourcePatch = resourcePatch {
 @Suppress("unused")
 val showUserIdPatch = bytecodePatch(
     name = "Show user ID",
-    description = "Adds an option to show the user ID.",
+    description = "Adds option to show the user ID.",
 ) {
     compatibleWith("com.dcinside.app.android")
 

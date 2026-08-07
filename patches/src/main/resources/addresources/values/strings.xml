@@ -276,5 +276,15 @@ Second \"item\" text"</string>
             <string name="revanced_hide_must_read_notice_summary_on">게시글 목록 상단의 공지가 숨겨집니다.</string>
             <string name="revanced_hide_must_read_notice_summary_off">게시글 목록 상단의 공지가 숨겨지지 않습니다.</string>
         </patch>
+        <patch id="misc.update.disableUpdateCheckPatch">
+            <string name="revanced_disable_update_check_title">업데이트 알림 비활성화하기</string>
+            <string name="revanced_disable_update_check_summary_on">업데이트 알림이 비활성화 됩니다.</string>
+            <string name="revanced_disable_update_check_summary_off">업데이트 알림이 비활성화되지 않습니다.</string>
+        </patch>
+        <patch id="post.view.hideBottomLikePostsPatch">
+            <string name="revanced_disable_update_check_title">업데이트 알림 비활성화하기</string>
+            <string name="revanced_disable_update_check_summary_on">업데이트 알림이 비활성화 됩니다.</string>
+            <string name="revanced_disable_update_check_summary_off">업데이트 알림이 비활성화되지 않습니다.</string>
+        </patch>
     </app>
 </resources>

@@ -22,7 +22,7 @@ private const val QUICK_POST_MANAGEMENT_PATCH_EXTENSION_CLASS_DESCRIPTOR = "Lapp
 @Suppress("unused")
 val quickPostManagementPatch = bytecodePatch(
     name = "Quick post management",
-    description = "Adds an option to manage posts using manager permission.",
+    description = "Adds option to manage posts using manager permission.",
 ) {
     compatibleWith("com.dcinside.app.android")
 
