@@ -130,6 +130,13 @@ private val settingsResourcePatch = resourcePatch {
             rootLinearLayout.insertBefore(header, firstChild)
             rootLinearLayout.insertBefore(group, firstChild)
         }
+
+        document("res/values/strings.xml").use { document ->
+            document.documentElement.childNodes.findElementByAttributeValueOrThrow(
+                "name",
+                "setting_license"
+            ).textContent = "ReVanced 설정"
+        }
     }
 }
 
