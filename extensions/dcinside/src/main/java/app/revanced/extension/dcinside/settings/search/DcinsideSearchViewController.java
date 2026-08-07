@@ -1,17 +1,13 @@
 package app.revanced.extension.dcinside.settings.search;
 
 import android.app.Activity;
-import android.app.Dialog;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.preference.Preference;
 import android.preference.PreferenceScreen;
-import android.util.Pair;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
+import android.graphics.drawable.Drawable;
 import android.widget.*;
 
 import app.revanced.extension.dcinside.settings.DcinsideActivityHook;
@@ -95,11 +91,13 @@ public class DcinsideSearchViewController extends BaseSearchViewController {
         Integer secondaryColor = DcinsideActivityHook.resolveAndroidThemeColorAttr(activity, android.R.attr.textColorSecondary);
         if (primaryColor == null) return;
 
-        applyTextColorToViewGroup(overlayContainer, primaryColor, secondaryColor);
+        DcinsideActivityHook.applyTextColorToViewGroup(overlayContainer, primaryColor, secondaryColor);
     }
 
     /**
      * 개별 및 전체 검색 기록 삭제 클릭 시 CustomDialog 구조를 유지하며 테마를 적용합니다.
+     * 테마 적용은 {@link CustomDialog#themeApplier} 훅을 통해 자동으로 처리되므로,
+     * 여기서는 다이얼로그 생성 및 액션 바인딩만 담당합니다.
      */
     private void setupSearchHistoryDialogs() {
         // 1. 전체 검색 기록 삭제 버튼 핸들러
@@ -107,14 +105,21 @@ public class DcinsideSearchViewController extends BaseSearchViewController {
                 Utils.getResourceIdentifierOrThrow(ResourceType.ID, "clear_history_button")
         );
         if (clearAllButton != null) {
-            clearAllButton.setOnClickListener(v -> showThemedCustomDialog(
+            clearAllButton.setOnClickListener(v -> CustomDialog.create(
+                    activity,
                     "검색 기록 삭제",
                     "전체 검색 기록을 삭제하시겠습니까?",
+                    null,
+                    null,
                     () -> {
                         searchHistoryManager.clearAllSearchHistory();
                         showSearchHistory();
-                    }
-            ));
+                    },
+                    () -> {},
+                    null,
+                    null,
+                    true
+            ).first.show());
         }
 
         // 2. 개별 검색 기록 항목 삭제 아이콘 클릭 리스너 재바인딩
@@ -133,85 +138,22 @@ public class DcinsideSearchViewController extends BaseSearchViewController {
                 if (deleteIcon != null && historyTextView != null) {
                     String query = historyTextView.getText().toString();
                     // 동적으로 생성된 개별 삭제 버튼의 기존 클릭 이벤트 덮어쓰기
-                    deleteIcon.setOnClickListener(v -> showThemedCustomDialog(
+                    deleteIcon.setOnClickListener(v -> CustomDialog.create(
+                            activity,
                             query,
                             "검색 기록에서 삭제하시겠습니까?",
+                            null,
+                            null,
                             () -> {
                                 searchHistoryManager.removeSearchQuery(query);
                                 showSearchHistory(); // UI 갱신 및 재바인딩
-                            }
-                    ));
+                            },
+                            () -> {},
+                            null,
+                            null,
+                            true
+                    ).first.show());
                 }
-            }
-        }
-    }
-
-    /**
-     * 기존 CustomDialog 구조를 유지하면서 디시인사이드 테마 색상(배경, 텍스트)을 주입합니다.
-     */
-    private void showThemedCustomDialog(String title, String message, Runnable onConfirm) {
-        Pair<Dialog, LinearLayout> dialogPair = CustomDialog.create(
-                activity,
-                title,
-                message,
-                null,
-                null,
-                onConfirm,
-                () -> {},
-                null,
-                null,
-                true
-        );
-
-        Dialog dialog = dialogPair.first;
-        LinearLayout container = dialogPair.second;
-
-        // 테마 색상 해소
-        Integer bgColor = DcinsideActivityHook.resolveThemeColorAttr(activity, "windowBackgroundColor");
-        if (bgColor == null) {
-            bgColor = DcinsideActivityHook.resolveAndroidThemeColorAttr(activity, android.R.attr.windowBackground);
-        }
-        Integer textColor = DcinsideActivityHook.resolveAndroidThemeColorAttr(activity, android.R.attr.textColorPrimary);
-        Integer secondaryTextColor = DcinsideActivityHook.resolveAndroidThemeColorAttr(activity, android.R.attr.textColorSecondary);
-
-        // container 레이아웃에 직접 배경색 및 둥근 모서리 적용
-        if (container != null && bgColor != null) {
-            GradientDrawable containerBackground = new GradientDrawable();
-            containerBackground.setShape(GradientDrawable.RECTANGLE);
-            containerBackground.setColor(bgColor);
-            containerBackground.setCornerRadius(Dim.dp(12));
-            container.setBackground(containerBackground);
-
-            if (dialog.getWindow() != null) {
-                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-            }
-        }
-
-        // CustomDialog 내부 본문 텍스트 색상만 주입 (버튼 스타일 유지)
-        if (container != null && textColor != null) {
-            applyTextColorToViewGroup(container, textColor, secondaryTextColor);
-        }
-
-        dialog.show();
-    }
-
-    private void applyTextColorToViewGroup(ViewGroup group, int primaryColor, Integer secondaryColor) {
-        for (int i = 0; i < group.getChildCount(); i++) {
-            View child = group.getChildAt(i);
-            if (child instanceof TextView tv) {
-                // 클릭 가능한 버튼 뷰는 기존 고정 배경 및 원본 텍스트 색상을 유지하도록 바인딩 대상에서 제외
-                if (tv.isClickable()) {
-                    continue;
-                }
-
-                // 서머리 및 서브 텍스트는 secondaryColor, 나머지는 primaryColor 적용
-                if (secondaryColor != null && (tv.getId() == android.R.id.summary || tv.getAlpha() < 1.0f)) {
-                    tv.setTextColor(secondaryColor);
-                } else {
-                    tv.setTextColor(primaryColor);
-                }
-            } else if (child instanceof ViewGroup vg) {
-                applyTextColorToViewGroup(vg, primaryColor, secondaryColor);
             }
         }
     }

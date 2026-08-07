@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ShapeDrawable;
 import android.os.Build;
 import android.preference.PreferenceFragment;
 import android.util.Log;
@@ -25,6 +26,7 @@ import java.util.Map;
 
 import app.revanced.extension.shared.Utils;
 import app.revanced.extension.shared.settings.BaseActivityHook;
+import app.revanced.extension.shared.ui.CustomDialog;
 import app.revanced.extension.dcinside.settings.preference.DcinsidePreferenceFragment;
 import app.revanced.extension.dcinside.settings.search.DcinsideSearchViewController;
 
@@ -47,6 +49,10 @@ public class DcinsideActivityHook extends BaseActivityHook {
     @SuppressWarnings("unused")
     public static void initialize(Activity parentActivity) {
         currentActivity = parentActivity;
+        // Register the CustomDialog theme hook so every CustomDialog.create() call
+        // (restart dialog, setting confirmation dialog, search history dialogs, etc.)
+        // automatically picks up dcinside's theme attrs instead of the generic Utils colors.
+        CustomDialog.themeApplier = DcinsideActivityHook::applyDialogTheme;
         BaseActivityHook.initialize(new DcinsideActivityHook(), parentActivity);
     }
 
@@ -229,6 +235,62 @@ public class DcinsideActivityHook extends BaseActivityHook {
         if (view instanceof ViewGroup group) {
             for (int i = 0; i < group.getChildCount(); i++) {
                 tintTextViewsRecursively(group.getChildAt(i), textColor);
+            }
+        }
+    }
+
+    /**
+     * Theme hook registered on {@link CustomDialog#themeApplier}. Invoked for every dialog
+     * built via {@link CustomDialog#create}, including ones triggered from shared code
+     * (e.g. AbstractPreferenceFragment's restart/confirmation dialogs) that dcinside cannot
+     * otherwise override, since CustomDialog's own colors come from generic Utils calls that
+     * know nothing about dcinside's custom theme attrs.
+     */
+    public static void applyDialogTheme(Context context, LinearLayout mainLayout) {
+        Integer bgColor = resolveThemeColorAttr(context, "windowBackgroundColor");
+        if (bgColor == null) {
+            bgColor = resolveAndroidThemeColorAttr(context, android.R.attr.windowBackground);
+        }
+        if (bgColor != null) {
+            // mainLayout already has a rounded ShapeDrawable background set by CustomDialog;
+            // recolor it in place instead of replacing the shape, to keep the rounded corners.
+            Drawable background = mainLayout.getBackground();
+            if (background instanceof ShapeDrawable shape) {
+                shape.getPaint().setColor(bgColor);
+            } else {
+                mainLayout.setBackgroundColor(bgColor);
+            }
+        }
+
+        Integer textColor = resolveAndroidThemeColorAttr(context, android.R.attr.textColorPrimary);
+        Integer secondaryTextColor = resolveAndroidThemeColorAttr(context, android.R.attr.textColorSecondary);
+        if (textColor != null) {
+            applyTextColorToViewGroup(mainLayout, textColor, secondaryTextColor);
+        }
+    }
+
+    /**
+     * Recursively applies theme text colors to a ViewGroup. Shared between the CustomDialog
+     * theme hook and the search overlay (moved here from DcinsideSearchViewController so both
+     * can reuse the same logic).
+     * <p>
+     * Clickable TextViews (e.g. dialog buttons) are skipped to preserve their own fixed
+     * background/text styling, such as CustomDialog's OK/Cancel button inversion.
+     */
+    public static void applyTextColorToViewGroup(ViewGroup group, int primaryColor, @Nullable Integer secondaryColor) {
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
+            if (child instanceof TextView tv) {
+                if (tv.isClickable()) {
+                    continue;
+                }
+                if (secondaryColor != null && (tv.getId() == android.R.id.summary || tv.getAlpha() < 1.0f)) {
+                    tv.setTextColor(secondaryColor);
+                } else {
+                    tv.setTextColor(primaryColor);
+                }
+            } else if (child instanceof ViewGroup vg) {
+                applyTextColorToViewGroup(vg, primaryColor, secondaryColor);
             }
         }
     }

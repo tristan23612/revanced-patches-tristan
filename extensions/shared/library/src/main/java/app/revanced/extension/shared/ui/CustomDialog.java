@@ -37,6 +37,15 @@ public class CustomDialog {
     private final LinearLayout mainLayout;
 
     /**
+     * Optional app-specific theme hook, invoked after the dialog's layout is fully built
+     * but before it is shown. Allows apps with custom theme attrs (e.g. dcinside) to
+     * override the default Utils-based colors without CustomDialog knowing about them.
+     * Left null by default (no-op) so other apps sharing this class are unaffected.
+     */
+    @Nullable
+    public static java.util.function.BiConsumer<Context, LinearLayout> themeApplier;
+
+    /**
      * Creates a custom dialog with a styled layout, including a title, message, buttons, and an optional EditText.
      * The dialog's appearance adapts to the app's dark mode setting, with rounded corners and customizable button actions.
      * Buttons adjust dynamically to their text content and are arranged in a single row if they fit within 80% of the
@@ -95,6 +104,10 @@ public class CustomDialog {
         addTitle(title);
         addContent(message, editText);
         addButtons(okButtonText, onOkClick, onCancelClick, neutralButtonText, onNeutralClick, dismissDialogOnNeutralClick);
+
+        if (themeApplier != null) {
+            themeApplier.accept(context, mainLayout);
+        }
 
         // Set dialog content and window attributes.
         dialog.setContentView(mainLayout);
