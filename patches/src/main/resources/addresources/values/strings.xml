@@ -236,11 +236,6 @@ Second \"item\" text"</string>
             <string name="revanced_hide_ads_summary_on">광고가 표시되지 않습니다.</string>
             <string name="revanced_hide_ads_summary_off">광고가 표시됩니다.</string>
         </patch>
-        <patch id="post.write.pum.disablePostPumOptionPatch">
-            <string name="revanced_disable_post_pum_option_title">게시글 작성 시 펌 금지</string>
-            <string name="revanced_disable_post_pum_option_summary_on">게시글 작성 시 펌 금지 옵션이 기본적으로 활성화됩니다.</string>
-            <string name="revanced_disable_post_pum_option_summary_off">게시글 작성 시 펌 금지 옵션이 기본적으로 비활성화됩니다.</string>
-        </patch>
         <patch id="home.hideHomeElementPatch">
             <string name="revanced_hide_dcbest_title">홈 화면 실시간 베스트 숨기기</string>
             <string name="revanced_hide_dcbest_summary_on">홈 화면의 실시간 베스트가 숨겨집니다.</string>
@@ -258,6 +253,11 @@ Second \"item\" text"</string>
             <string name="revanced_hide_recent_summary_on">홈 화면의 갤러리 바로가기(최근, 즐겨찾기)가 숨겨집니다.</string>
             <string name="revanced_hide_recent_summary_off">홈 화면의 갤러리 바로가기(최근, 즐겨찾기)가 숨겨지지 않습니다.</string>
         </patch>
+        <patch id="post.write.pum.disablePostPumOptionPatch">
+            <string name="revanced_disable_post_pum_option_title">게시글 작성 시 펌 금지</string>
+            <string name="revanced_disable_post_pum_option_summary_on">게시글 작성 시 펌 금지 옵션이 기본적으로 활성화됩니다.</string>
+            <string name="revanced_disable_post_pum_option_summary_off">게시글 작성 시 펌 금지 옵션이 기본적으로 비활성화됩니다.</string>
+        </patch>
         <patch id="post.userId.showUserIdPatch">
             <string name="revanced_show_user_id_title">식별 코드 표시</string>
             <string name="revanced_show_user_id_summary_on">반고닉과 고닉 유저의 식별 코드가 표시됩니다.</string>
@@ -268,6 +268,11 @@ Second \"item\" text"</string>
             <string name="revanced_enable_quick_post_management_summary_on">게시글 목록에서 긴 터치를 통해 게시글 차단 및 삭제 팝업을 띄웁니다.</string>
             <string name="revanced_enable_quick_post_management_summary_off">게시글 목록에서 긴 터치를 통해 게시글 차단 및 삭제 팝업을 띄우지 않습니다.</string>
         </patch>
+        <patch id="post.view.hideBottomLikePostsPatch">
+            <string name="revanced_hide_bottom_like_posts_title">게시글 하단 추천 게시글 목록 숨기기</string>
+            <string name="revanced_hide_bottom_like_posts_summary_on">게시글 하단의 추천 게시글 목록이 숨겨집니다.</string>
+            <string name="revanced_hide_bottom_like_posts_summary_off">게시글 하단의 추천 게시글 목록이 숨겨지지 않습니다.</string>
+        </patch>
         <patch id="misc.hook.hookPatch">
             <string name="revanced_hide_administrator_notice_title">운영자 공지 숨기기</string>
             <string name="revanced_hide_administrator_notice_summary_on">공지 탭에서 운영자 공지가 숨겨집니다.</string>
@@ -277,11 +282,6 @@ Second \"item\" text"</string>
             <string name="revanced_hide_must_read_notice_summary_off">게시글 목록 상단의 공지가 숨겨지지 않습니다.</string>
         </patch>
         <patch id="misc.update.disableUpdateCheckPatch">
-            <string name="revanced_disable_update_check_title">업데이트 알림 비활성화하기</string>
-            <string name="revanced_disable_update_check_summary_on">업데이트 알림이 비활성화 됩니다.</string>
-            <string name="revanced_disable_update_check_summary_off">업데이트 알림이 비활성화되지 않습니다.</string>
-        </patch>
-        <patch id="post.view.hideBottomLikePostsPatch">
             <string name="revanced_disable_update_check_title">업데이트 알림 비활성화하기</string>
             <string name="revanced_disable_update_check_summary_on">업데이트 알림이 비활성화 됩니다.</string>
             <string name="revanced_disable_update_check_summary_off">업데이트 알림이 비활성화되지 않습니다.</string>
