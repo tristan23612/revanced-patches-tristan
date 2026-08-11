@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.1.0...v1.1.1) (2026-08-11)
+
+
+### Bug Fixes
+
+* **dcinside - HideHomeElementPatch:** add resource patch to modify home divider ([23fca7f](https://github.com/tristan23612/revanced-patches-tristan/commit/23fca7fcf769e0cedb934350c71da43d30e33e23))
+
 ## [1.1.1-dev.1](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.1.0...v1.1.1-dev.1) (2026-08-09)
 
 
