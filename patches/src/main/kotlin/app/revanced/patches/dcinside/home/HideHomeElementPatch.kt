@@ -3,15 +3,28 @@ package app.revanced.patches.dcinside.home
 import app.revanced.patcher.extensions.addInstructions
 import app.revanced.patcher.extensions.getInstruction
 import app.revanced.patcher.patch.bytecodePatch
+import app.revanced.patcher.patch.resourcePatch
 import app.revanced.patches.all.misc.resources.addResources
 import app.revanced.patches.all.misc.resources.addResourcesPatch
 import app.revanced.patches.dcinside.misc.extension.sharedExtensionPatch
 import app.revanced.patches.dcinside.misc.settings.PreferenceScreen
 import app.revanced.patches.dcinside.misc.settings.settingsPatch
 import app.revanced.patches.shared.misc.settings.preference.SwitchPreference
+import app.revanced.util.findElementByAttributeValueOrThrow
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 
 private const val EXTENSION_CLASS_DESCRIPTOR = "Lapp/revanced/extension/dcinside/patches/home/HideHomeElementPatch;"
+
+private val hideHomeElementResourcePatch = resourcePatch {
+    apply {
+        document("res/values/dimens.xml").use { document ->
+            document.documentElement.childNodes.findElementByAttributeValueOrThrow(
+                "name",
+                "divider"
+            ).textContent = "0dp"
+        }
+    }
+}
 
 @Suppress("unused")
 val hideHomeElementPatch = bytecodePatch(
@@ -24,6 +37,7 @@ val hideHomeElementPatch = bytecodePatch(
         sharedExtensionPatch,
         settingsPatch,
         addResourcesPatch,
+        hideHomeElementResourcePatch,
     )
 
     apply {
