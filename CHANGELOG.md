@@ -1,3 +1,11 @@
+## [1.1.2](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.1.1...v1.1.2) (2026-08-11)
+
+
+### Bug Fixes
+
+* **strings:** update title for hiding top notice in post list ([6106987](https://github.com/tristan23612/revanced-patches-tristan/commit/6106987f1925b38eae72fa63e97035559dae774b))
+* **strings:** update title for hiding top notice in post list ([8e0aa3d](https://github.com/tristan23612/revanced-patches-tristan/commit/8e0aa3d226f71a1b847076f15d3fe54a64f171b4))
+
 ## [1.1.1](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.1.0...v1.1.1) (2026-08-11)
 
 
