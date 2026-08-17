@@ -21,13 +21,3 @@ internal val BytecodePatchContext.postItemBindMethodMatch by composingFirstMetho
         Opcode.RETURN_VOID(),
     )
 }
-
-internal val BytecodePatchContext.addQueryParameterHookMethod by gettingFirstMethodDeclaratively {
-    accessFlags(AccessFlags.PUBLIC, AccessFlags.FINAL)
-    definingClass($$"Lokhttp3/HttpUrl$Builder;")
-    name("addQueryParameter")
-}
-
-internal val BytecodePatchContext.jsonApiPostListHookMethod by gettingFirstMethodDeclaratively {
-    strings("api_postList")
-}

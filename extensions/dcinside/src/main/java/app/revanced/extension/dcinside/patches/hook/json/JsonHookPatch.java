@@ -16,6 +16,28 @@ public final class JsonHookPatch {
 
     private static final List<JsonHook> hooks;
 
+    public static String galleryId = "";
+
+    public static String appId = "";
+
+    public static String userId = "";
+
+    public static void hookGalleryID(String id) {
+        galleryId = id;
+    }
+
+    public static void hookParam(String key, String value) {
+        if (key == null || value == null) {
+            return;
+        }
+
+        if ("app_id".equals(key)) {
+            appId = value;
+        } else if ("user_id".equals(key) || "confirm_id".equals(key)) {
+            userId = value;
+        }
+    }
+
     static {
         hooks = new ArrayList<>();
         hooks.add(DummyHook.INSTANCE);

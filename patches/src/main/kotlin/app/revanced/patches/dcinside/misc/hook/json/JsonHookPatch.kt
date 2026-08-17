@@ -55,6 +55,24 @@ val jsonHookPatch = bytecodePatch(
                 move-result-object p12
             """
         )
+
+        jsonApiPostListHookMethod.apply {
+            addInstructions(
+                0,
+                $$"""
+                    invoke-static/range {p0 .. p0}, $$JSON_HOOK_PATCH_CLASS_DESCRIPTOR->hookGalleryID(Ljava/lang/String;)V
+                """
+            )
+        }
+
+        addQueryParameterHookMethod.addInstructions(
+            0,
+            $$"""
+                move-object/from16 v0, p1
+                move-object/from16 v1, p2
+                invoke-static {v0, v1}, $$JSON_HOOK_PATCH_CLASS_DESCRIPTOR->hookParam(Ljava/lang/String;Ljava/lang/String;)V
+            """
+        )
     }
 
     afterDependents {

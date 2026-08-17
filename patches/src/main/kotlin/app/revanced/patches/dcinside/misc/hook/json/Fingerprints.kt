@@ -1,6 +1,7 @@
 package app.revanced.patches.dcinside.misc.hook.json
 
 import app.revanced.patcher.accessFlags
+import app.revanced.patcher.definingClass
 import app.revanced.patcher.firstImmutableClassDef
 import app.revanced.patcher.firstMethodComposite
 import app.revanced.patcher.gettingFirstMethodDeclaratively
@@ -24,4 +25,14 @@ internal val BytecodePatchContext.jsonHookPatchMethodMatch by ReadOnlyProperty {
 
 internal val BytecodePatchContext.jsonHookMethod by gettingFirstMethodDeclaratively {
     strings("%s%s")
+}
+
+internal val BytecodePatchContext.addQueryParameterHookMethod by gettingFirstMethodDeclaratively {
+    accessFlags(AccessFlags.PUBLIC, AccessFlags.FINAL)
+    definingClass($$"Lokhttp3/HttpUrl$Builder;")
+    name("addQueryParameter")
+}
+
+internal val BytecodePatchContext.jsonApiPostListHookMethod by gettingFirstMethodDeclaratively {
+    strings("api_postList")
 }
