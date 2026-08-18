@@ -273,6 +273,10 @@ Second \"item\" text"</string>
             <string name="revanced_hide_bottom_like_posts_summary_on">게시글 하단의 추천 게시글 목록이 숨겨집니다.</string>
             <string name="revanced_hide_bottom_like_posts_summary_off">게시글 하단의 추천 게시글 목록이 숨겨지지 않습니다.</string>
         </patch>
+        <patch id ="misc.dcBanList.dcBanListPatch">
+            <string name="revanced_dc_ban_list_title">DC BanList용 구글 로그인하기</string>
+            <string name="revanced_dc_ban_list_summary">GAS에 접속하기 위한 구글 계정 로그인 웹뷰를 엽니다.</string>
+        </patch>
         <patch id="misc.hook.hookPatch">
             <string name="revanced_hide_administrator_notice_title">운영자 공지 숨기기</string>
             <string name="revanced_hide_administrator_notice_summary_on">공지 탭에서 운영자 공지가 숨겨집니다.</string>
