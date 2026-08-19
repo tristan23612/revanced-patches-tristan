@@ -4,6 +4,7 @@ dependencies {
     compileOnly(libs.okhttp)
 
     implementation(libs.hiddenapibypass)
+    implementation(libs.jsoup)
 }
 
 android {

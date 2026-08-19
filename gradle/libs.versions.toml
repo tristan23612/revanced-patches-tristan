@@ -15,6 +15,7 @@ protobuf = "0.10.0"
 protoc = "4.35.1"
 shadow = "9.4.0"
 hiddenapibypass = "6.1"
+jsoup = "1.17.2"
 
 [libraries]
 annotation = { module = "androidx.annotation:annotation", version.ref = "annotation" }
@@ -26,6 +27,7 @@ apksig = { group = "com.android.tools.build", name = "apksig", version.ref = "ap
 protobuf-javalite = { module = "com.google.protobuf:protobuf-javalite", version.ref = "protoc" }
 protobuf-protoc = { module = "com.google.protobuf:protoc", version.ref = "protoc" }
 hiddenapibypass = { module = "org.lsposed.hiddenapibypass:hiddenapibypass", version.ref = "hiddenapibypass" }
+jsoup = { group = "org.jsoup", name = "jsoup", version.ref = "jsoup" }
 
 [plugins]
 android-library = { id = "com.android.library" }

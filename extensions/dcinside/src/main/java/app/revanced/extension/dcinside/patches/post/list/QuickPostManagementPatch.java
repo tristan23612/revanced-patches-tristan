@@ -34,7 +34,7 @@ public class QuickPostManagementPatch {
         itemView.setClickable(true);
         itemView.setLongClickable(true);
 
-        if (!JsonHookPatch.ManagerSkill || !Settings.ENABLE_QUICK_POST_MANAGEMENT.get()) {
+        if (!JsonHookPatch.managerSkill || !Settings.ENABLE_QUICK_POST_MANAGEMENT.get()) {
             return;
         }
 

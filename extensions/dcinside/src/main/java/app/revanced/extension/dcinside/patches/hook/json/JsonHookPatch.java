@@ -11,10 +11,11 @@ public final class JsonHookPatch {
     public static final JsonHookPatch INSTANCE = new JsonHookPatch();
 
     private static final String TAG = "ReVanced_DCInside";
-
-    public static boolean ManagerSkill = false;
-
     private static final List<JsonHook> hooks;
+
+    public static boolean managerSkill = false;
+
+    public static String galleryType = "";
 
     public static String galleryId = "";
 
@@ -53,7 +54,16 @@ public final class JsonHookPatch {
 
             if (response.has("gall_info")) {
                 JSONObject gallInfo = response.getJSONArray("gall_info").getJSONObject(0);
-                JsonHookPatch.ManagerSkill = gallInfo.optBoolean("managerskill", false);
+
+                managerSkill = gallInfo.optBoolean("managerskill", false);
+
+                if (gallInfo.optBoolean("is_minor", false)) {
+                    galleryType = "mgallery";
+                } else if (gallInfo.optBoolean("is_mini", false)) {
+                    galleryType = "mini";
+                } else {
+                    galleryType = "gallery";
+                }
             }
         } catch (Exception e) {
             Log.e(TAG, "jsonHook: failed to parse JSON", e);
