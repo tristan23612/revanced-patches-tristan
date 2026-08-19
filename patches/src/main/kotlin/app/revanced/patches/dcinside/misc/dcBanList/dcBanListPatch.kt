@@ -10,12 +10,15 @@ import app.revanced.patches.dcinside.misc.extension.sharedExtensionPatch
 import app.revanced.patches.dcinside.misc.hook.json.jsonHookPatch
 import app.revanced.patches.dcinside.misc.settings.PreferenceScreen
 import app.revanced.patches.dcinside.misc.settings.settingsPatch
+import app.revanced.patches.shared.misc.settings.preference.InputType
 import app.revanced.patches.shared.misc.settings.preference.NonInteractivePreference
+import app.revanced.patches.shared.misc.settings.preference.SwitchPreference
+import app.revanced.patches.shared.misc.settings.preference.TextPreference
 import app.revanced.util.asSequence
 import app.revanced.util.findFreeRegister
 import org.w3c.dom.Element
 
-private const val DC_BAN_LIST_BUTTON_ID_NAME = "revanced_dcinside_dc_ban_list_export"
+private const val DC_BAN_LIST_BUTTON_ID_NAME = "revanced_dcinside_dc_ban_list_button"
 
 private const val DC_BAN_LIST_EXTENSION_CLASS_DESCRIPTOR = "Lapp/revanced/extension/dcinside/patches/misc/dcBanList/DcBanListPatch;"
 
@@ -119,11 +122,16 @@ val dcBanListPatch = bytecodePatch(
         addResources("dcinside", "misc.dcBanList.dcBanListPatch")
 
         PreferenceScreen.MISC.addPreferences(
+            SwitchPreference("revanced_show_dc_ban_list_button"),
             NonInteractivePreference(
-                key = "revanced_dc_ban_list",
+                key = "revanced_dc_ban_list_google_login_webview",
                 tag = "app.revanced.extension.dcinside.settings.preference.GoogleLoginWebViewPreference",
                 selectable = true,
-            )
+            ),
+            TextPreference(
+                key = "revanced_dc_ban_list_sheet_id_map",
+                inputType = InputType.TEXT_MULTI_LINE,
+            ),
         )
 
         apply {

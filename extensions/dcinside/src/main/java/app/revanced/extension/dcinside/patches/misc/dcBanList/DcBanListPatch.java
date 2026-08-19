@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import app.revanced.extension.dcinside.settings.Settings;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -43,7 +44,7 @@ public class DcBanListPatch {
     private static final Pattern HEADER_PATTERN = Pattern.compile("^([\\s\\S]+?)\\s*(?:\\(([^)]+)\\))?$");
 
     public static void setDcBanListButtonVisibility(View targetView, boolean visible, String dcBanListButtonIdName) {
-        if (targetView == null) return;
+        if (targetView == null || !Settings.SHOW_DC_BAN_LIST_BUTTON.get()) return;
 
         View rootView = targetView.getRootView();
         int resId = rootView.getContext().getResources().getIdentifier(
@@ -60,7 +61,7 @@ public class DcBanListPatch {
     }
 
     public static void setupDcBanListButton(View view, String dcBanListButtonIdName) {
-        if (view == null) return;
+        if (view == null || !Settings.SHOW_DC_BAN_LIST_BUTTON.get()) return;
 
         int resId = view.getContext().getResources().getIdentifier(
                 dcBanListButtonIdName,
@@ -138,13 +139,15 @@ public class DcBanListPatch {
                         .setNegativeButton("취소", null);
 
                 case CHECKING_AUTH -> builder
-                        .setMessage("구글 계정 권한을 확인하고 있습니다..."); // 추가: 검증 대기 UI
+                        .setMessage("구글 계정 권한을 확인하고 있습니다...");
 
                 case SHEET_ID_CONFIRMATION -> {
                     EditText input = new EditText(context);
                     input.setHint("스프레드시트 ID 입력");
-                    if (!targetSheetId.isEmpty()) {
-                        input.setText(targetSheetId);
+                    input.setHintTextColor(0xFF9E9E9E);
+                    String prefill = targetSheetId.isEmpty() ? loadSavedSheetId() : targetSheetId;
+                    if (!prefill.isEmpty()) {
+                        input.setText(prefill);
                     }
 
                     FrameLayout container = new FrameLayout(context);
@@ -162,6 +165,7 @@ public class DcBanListPatch {
                                     return;
                                 }
                                 targetSheetId = id;
+                                saveSheetIdToMap(id);
                                 transitionTo(Step.FETCHING_LAST_RECORD);
                             })
                             .setNegativeButton("취소", null);
@@ -549,6 +553,29 @@ public class DcBanListPatch {
                     transitionTo(Step.ERROR);
                 }
             }).start();
+        }
+
+        private String loadSavedSheetId() {
+            try {
+                String json = Settings.DC_BAN_LIST_SHEET_ID_MAP.get();
+                if (json.isEmpty()) return "";
+                JSONObject map = new JSONObject(json);
+                return map.optString(JsonHookPatch.galleryId, "");
+            } catch (JSONException e) {
+                Log.w(TAG, "sheetId 맵 파싱 실패", e);
+                return "";
+            }
+        }
+
+        private void saveSheetIdToMap(String sheetId) {
+            try {
+                String json = Settings.DC_BAN_LIST_SHEET_ID_MAP.get();
+                JSONObject map = json.isEmpty() ? new JSONObject() : new JSONObject(json);
+                map.put(JsonHookPatch.galleryId, sheetId);
+                Settings.DC_BAN_LIST_SHEET_ID_MAP.save(map.toString());
+            } catch (JSONException e) {
+                Log.e(TAG, "sheetId 맵 저장 실패", e);
+            }
         }
     }
 }

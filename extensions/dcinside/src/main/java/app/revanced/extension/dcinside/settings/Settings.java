@@ -5,6 +5,7 @@ import static java.lang.Boolean.TRUE;
 
 import app.revanced.extension.shared.settings.BaseSettings;
 import app.revanced.extension.shared.settings.BooleanSetting;
+import app.revanced.extension.shared.settings.StringSetting;
 
 /**
  * Settings specific to the DCInside app.
@@ -30,4 +31,6 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting HIDE_MUST_READ_NOTICE = new BooleanSetting("revanced_hide_must_read_notice", TRUE, FALSE);
     public static final BooleanSetting DISABLE_UPDATE_CHECK = new BooleanSetting("revanced_disable_update_check", FALSE, FALSE);
     public static final BooleanSetting HIDE_BOTTOM_LIKE_POSTS = new BooleanSetting("revanced_hide_bottom_like_posts", TRUE, FALSE);
+    public static final BooleanSetting SHOW_DC_BAN_LIST_BUTTON = new BooleanSetting("revanced_show_dc_ban_list_button", FALSE, TRUE);
+    public static final StringSetting DC_BAN_LIST_SHEET_ID_MAP = new StringSetting("revanced_dc_ban_list_sheet_id_map", "");
 }

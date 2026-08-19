@@ -22,22 +22,19 @@ public class GasApiClient {
             .build();
 
     /**
-     * GET 요청 (상태/인증 확인 등)
+     * GET 요청
      */
     public static void sendGet(String queryString, Callback callback) {
         executeRequest("GET", queryString, null, callback);
     }
 
     /**
-     * POST 요청 (데이터 업로드 등)
+     * POST 요청
      */
     public static void sendPost(String queryString, String jsonPayload, Callback callback) {
         executeRequest("POST", queryString, jsonPayload, callback);
     }
 
-    /**
-     * 공통 요청 캡슐화 (중복 로직 제거 및 HTTP Method 분기)
-     */
     private static void executeRequest(String method, String queryString, String jsonPayload, Callback callback) {
         CookieManager cookieManager = CookieManager.getInstance();
 
@@ -56,12 +53,11 @@ public class GasApiClient {
             requestBuilder.addHeader("Cookie", googleCookie);
         }
 
-        // HTTP Method 지정
         if ("POST".equalsIgnoreCase(method)) {
             RequestBody body = RequestBody.create(jsonPayload != null ? jsonPayload : "", JSON_MEDIA_TYPE);
             requestBuilder.post(body);
         } else {
-            requestBuilder.get(); // GET 방식 명시
+            requestBuilder.get();
         }
 
         HTTP_CLIENT.newCall(requestBuilder.build()).enqueue(callback);

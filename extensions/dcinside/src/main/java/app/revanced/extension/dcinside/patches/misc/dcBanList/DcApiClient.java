@@ -19,11 +19,10 @@ public class DcApiClient {
             .build();
 
     /**
-     * 모바일 차단내역 페이지 1건 요청.
-     *
+     * 모바일 차단내역 페이지 요청.
      * @param galleryType JsonHookPatch.galleryType ("mini" | "mgallery")
-     * @param galleryId   갤러리 ID
-     * @param page        요청할 페이지 번호 (1부터 시작)
+     * @param galleryId 갤러리 ID
+     * @param page 요청할 페이지 번호
      */
     public static void fetchBanListPage(String galleryType, String galleryId, int page, Callback callback) {
         HTTP_CLIENT.newCall(buildRequest(galleryType, galleryId, page)).enqueue(callback);
