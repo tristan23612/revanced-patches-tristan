@@ -15,7 +15,9 @@ import app.revanced.patches.shared.misc.settings.preference.NonInteractivePrefer
 import app.revanced.patches.shared.misc.settings.preference.PreferenceScreenPreference
 import app.revanced.patches.shared.misc.settings.preference.SwitchPreference
 import app.revanced.patches.shared.misc.settings.preference.TextPreference
+import app.revanced.util.ResourceGroup
 import app.revanced.util.asSequence
+import app.revanced.util.copyResources
 import app.revanced.util.findFreeRegister
 import org.w3c.dom.Element
 
@@ -27,6 +29,14 @@ private val dcBanListResourcePatch = resourcePatch {
     compatibleWith("com.dcinside.app.android")
 
     apply {
+        copyResources(
+            "dcinside/dcBanList",
+            ResourceGroup(
+                "drawable",
+                "revanced_dc_ban_list_button.png"
+            )
+        )
+
         document("res/values/ids.xml").use { document ->
             val resources = document.documentElement
             val exists = document.getElementsByTagName("id")
@@ -93,8 +103,10 @@ private val dcBanListResourcePatch = resourcePatch {
                     .mapNotNull { it as? Element }
                     .firstOrNull { it.tagName == "androidx.appcompat.widget.AppCompatImageView" }
                     ?.apply {
-                        setAttribute("android:padding", "9.0dp")
-                        setAttribute("android:src", "@drawable/ic_side_notification")
+                        setAttribute("android:padding", "6.0dp")
+                        setAttribute("android:src", "@drawable/revanced_dc_ban_list_button")
+                        removeAttribute("android:tint")
+                        removeAttribute("app:tint")
                     }
 
                 // LinearLayout 내부 제일 상단(또는 하단)에 추가
@@ -124,7 +136,7 @@ val dcBanListPatch = bytecodePatch(
 
         PreferenceScreen.MISC.addPreferences(
             PreferenceScreenPreference(
-                key = "revanced_show_dc_ban_list_screen_title",
+                key = "revanced_show_dc_ban_list_screen",
                 sorting = PreferenceScreenPreference.Sorting.UNSORTED,
                 preferences = setOf(
                     SwitchPreference("revanced_show_dc_ban_list_button"),
