@@ -12,6 +12,7 @@ import app.revanced.patches.dcinside.misc.settings.PreferenceScreen
 import app.revanced.patches.dcinside.misc.settings.settingsPatch
 import app.revanced.patches.shared.misc.settings.preference.InputType
 import app.revanced.patches.shared.misc.settings.preference.NonInteractivePreference
+import app.revanced.patches.shared.misc.settings.preference.PreferenceScreenPreference
 import app.revanced.patches.shared.misc.settings.preference.SwitchPreference
 import app.revanced.patches.shared.misc.settings.preference.TextPreference
 import app.revanced.util.asSequence
@@ -122,16 +123,22 @@ val dcBanListPatch = bytecodePatch(
         addResources("dcinside", "misc.dcBanList.dcBanListPatch")
 
         PreferenceScreen.MISC.addPreferences(
-            SwitchPreference("revanced_show_dc_ban_list_button"),
-            NonInteractivePreference(
-                key = "revanced_dc_ban_list_google_login_webview",
-                tag = "app.revanced.extension.dcinside.settings.preference.GoogleLoginWebViewPreference",
-                selectable = true,
-            ),
-            TextPreference(
-                key = "revanced_dc_ban_list_sheet_id_map",
-                inputType = InputType.TEXT_MULTI_LINE,
-            ),
+            PreferenceScreenPreference(
+                key = "revanced_show_dc_ban_list_screen_title",
+                sorting = PreferenceScreenPreference.Sorting.UNSORTED,
+                preferences = setOf(
+                    SwitchPreference("revanced_show_dc_ban_list_button"),
+                    TextPreference(
+                        key = "revanced_dc_ban_list_sheet_id_map",
+                        inputType = InputType.TEXT_MULTI_LINE,
+                    ),
+                    NonInteractivePreference(
+                        key = "revanced_dc_ban_list_google_login_webview",
+                        tag = "app.revanced.extension.dcinside.settings.preference.GoogleLoginWebViewPreference",
+                        selectable = true,
+                    ),
+                ),
+            )
         )
 
         apply {
