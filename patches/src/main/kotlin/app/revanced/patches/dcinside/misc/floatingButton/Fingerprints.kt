@@ -1,11 +1,10 @@
-package app.revanced.patches.dcinside.misc.dcBanList
+package app.revanced.patches.dcinside.misc.floatingButton
 
 import app.revanced.patcher.*
 import app.revanced.patcher.patch.BytecodePatchContext
 import com.android.tools.smali.dexlib2.AccessFlags
-import com.android.tools.smali.dexlib2.Opcode
 
-internal val BytecodePatchContext.quickWriteVisibilityMethodMatch by composingFirstMethod {
+internal val BytecodePatchContext.floatingButtonVisibilityMethodMatch by composingFirstMethod {
     accessFlags(AccessFlags.PUBLIC, AccessFlags.FINAL)
     parameterTypes("Z")
     returnType("V")
@@ -15,6 +14,7 @@ internal val BytecodePatchContext.quickWriteVisibilityMethodMatch by composingFi
 }
 
 internal val BytecodePatchContext.postListOnViewCreatedMethodMatch by composingFirstMethod("postListQuickWrite") {
+    name("onViewCreated")
     accessFlags(AccessFlags.PUBLIC)
     parameterTypes("Landroid/view/View;", "Landroid/os/Bundle;")
     returnType("V")

@@ -1,4 +1,4 @@
-package app.revanced.extension.dcinside.patches.misc.dcBanList;
+package app.revanced.extension.dcinside.patches.misc.floatingButton.dcBanList;
 
 import java.util.concurrent.TimeUnit;
 
