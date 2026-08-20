@@ -165,8 +165,13 @@ val floatingButtonPatch = bytecodePatch(
                                 inputType = InputType.TEXT_MULTI_LINE,
                             ),
                             NonInteractivePreference(
-                                key = "revanced_${settingId}_google_login_webview",
-                                tag = "app.revanced.extension.dcinside.settings.preference.GoogleLoginWebViewPreference",
+                                key = "revanced_${settingId}_gas_authorization_webview",
+                                tag = "app.revanced.extension.dcinside.settings.preference.GasAuthorizationWebViewPreference",
+                                selectable = true,
+                            ),
+                            NonInteractivePreference(
+                                key = "revanced_${settingId}_google_account_manage_webview",
+                                tag = "app.revanced.extension.dcinside.settings.preference.GoogleAccountManageWebViewPreference",
                                 selectable = true,
                             ),
                         )

@@ -2,7 +2,9 @@ package app.revanced.extension.dcinside.patches.misc.floatingButton.dcBanList;
 
 import android.webkit.CookieManager;
 import java.util.concurrent.TimeUnit;
-import app.revanced.extension.dcinside.settings.preference.GoogleLoginWebViewPreference;
+
+import app.revanced.extension.dcinside.settings.Settings;
+import app.revanced.extension.dcinside.settings.preference.GoogleWebViewDialogHelper;
 import okhttp3.Callback;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -12,7 +14,6 @@ import okhttp3.RequestBody;
 public class GasApiClient {
 
     private static final MediaType JSON_MEDIA_TYPE = MediaType.parse("application/json; charset=utf-8");
-    private static final String GAS_URL = "https://script.google.com/macros/s/AKfycbwemheJRFnqqM7NAN3kZ_P_3Cc0Q9F4YTXplxChghon3VEm0oLhS_RtsJ57ocfEP2s/exec";
 
     private static final OkHttpClient HTTP_CLIENT = new OkHttpClient.Builder()
             .connectTimeout(15, TimeUnit.SECONDS)
@@ -43,11 +44,11 @@ public class GasApiClient {
             googleCookie = cookieManager.getCookie("https://accounts.google.com");
         }
 
-        String fullUrl = (queryString != null && !queryString.isEmpty()) ? GAS_URL + queryString : GAS_URL;
+        String fullUrl = (queryString != null && !queryString.isEmpty()) ? Settings.DC_BAN_LIST_GAS_URL.get() + queryString : Settings.DC_BAN_LIST_GAS_URL.get();
 
         Request.Builder requestBuilder = new Request.Builder()
                 .url(fullUrl)
-                .addHeader("User-Agent", GoogleLoginWebViewPreference.MOBILE_CHROME_USER_AGENT);
+                .addHeader("User-Agent", GoogleWebViewDialogHelper.MOBILE_CHROME_USER_AGENT);
 
         if (googleCookie != null && !googleCookie.isEmpty()) {
             requestBuilder.addHeader("Cookie", googleCookie);

@@ -94,6 +94,7 @@ public class DcBanListPatch {
         private enum Step {
             OAUTH_CONFIRMATION,
             CHECKING_AUTH,
+            NEED_TO_AUTHORIZE,
             SHEET_ID_CONFIRMATION,
             FETCHING_LAST_RECORD,
             CREATE_SHEET_CONFIRMATION,
@@ -109,6 +110,7 @@ public class DcBanListPatch {
         private Step currentStep = Step.OAUTH_CONFIRMATION;
         private AlertDialog currentDialog;
 
+        private boolean autoProcess = false;
         private String targetSheetId = "";
         private JSONArray banListJsonArray = new JSONArray();
         private JSONObject lastKnownRecord;
@@ -122,6 +124,10 @@ public class DcBanListPatch {
         }
 
         private void renderStep() {
+            if (autoProcess && tryAutoAdvance()) {
+                return;
+            }
+
             if (currentDialog != null && currentDialog.isShowing()) {
                 currentDialog.dismiss();
             }
@@ -135,11 +141,22 @@ public class DcBanListPatch {
             switch (currentStep) {
                 case OAUTH_CONFIRMATION -> builder
                         .setMessage("구글 권한 확인 및 계정 연동 상태를 검증합니다.")
+                        .setNeutralButton("자동 진행", (d, w) -> {
+                            autoProcess = true;
+                            transitionTo(Step.OAUTH_CONFIRMATION); // renderStep 재진입 → tryAutoAdvance가 가로챔
+                        })
                         .setPositiveButton("권한 확인", (d, w) -> checkAuthStatus()) // 수정: 비동기 검증 실행
                         .setNegativeButton("취소", null);
 
                 case CHECKING_AUTH -> builder
                         .setMessage("구글 계정 권한을 확인하고 있습니다...");
+
+                case NEED_TO_AUTHORIZE -> builder
+                        .setMessage("""
+                                GAS 인증에 실패하였습니다.
+                                아래 경로에서 인증을 진행해주세요.
+                                설정 > ReVanced 설정 > 기타 > 플로팅 버튼 > DC BanList > GAS 인증""")
+                        .setNegativeButton("취소", null);
 
                 case SHEET_ID_CONFIRMATION -> {
                     EditText input = new EditText(context);
@@ -157,7 +174,7 @@ public class DcBanListPatch {
 
                     builder.setMessage("연동할 구글 스프레드시트 ID를 입력하세요.")
                             .setView(container)
-                            .setPositiveButton("내보내기", (d, w) -> {
+                            .setPositiveButton("확인", (d, w) -> {
                                 String id = input.getText().toString().trim();
                                 if (id.isEmpty()) {
                                     Toast.makeText(context, "시트 ID를 입력해주세요.", Toast.LENGTH_SHORT).show();
@@ -232,12 +249,42 @@ public class DcBanListPatch {
             }
         }
 
+        private boolean tryAutoAdvance() {
+            return switch (currentStep) {
+                case OAUTH_CONFIRMATION -> {
+                    checkAuthStatus();
+                    yield true;
+                }
+                case SHEET_ID_CONFIRMATION -> {
+                    String savedSheetId = loadSavedSheetId();
+                    if (savedSheetId.isEmpty()) {
+                        yield false; // 저장된 값 없으면 사용자 입력 필요 → 다이얼로그 띄움
+                    }
+                    targetSheetId = savedSheetId;
+                    transitionTo(Step.FETCHING_LAST_RECORD);
+                    yield true;
+                }
+                case CREATE_SHEET_CONFIRMATION -> {
+                    transitionTo(Step.PARSING);
+                    yield true;
+                }
+                case UPLOAD_CONFIRMATION -> {
+                    transitionTo(Step.UPLOAD_IN_PROGRESS);
+                    yield true;
+                }
+                case UPLOAD_COMPLETE -> {
+                    // 최종 성공 알림은 그래도 보여주고 싶다면 false로 두고, 완전 무인이면 dismiss 처리
+                    yield false;
+                }
+                default -> false; // CHECKING_AUTH, PARSING, UPLOAD_IN_PROGRESS, ERROR 등은 원래도 버튼 없는 진행 단계
+            };
+        }
+
         private void transitionTo(Step nextStep) {
             this.currentStep = nextStep;
             mainHandler.post(this::renderStep);
         }
 
-        // 핵심 로직: GAS 권한 검증 요청
         private void checkAuthStatus() {
             transitionTo(Step.CHECKING_AUTH);
 
@@ -254,13 +301,13 @@ public class DcBanListPatch {
                         if (response.isSuccessful()) {
                             String responseText = response.body().string().trim();
 
-                            if (responseText.contains("AUTH_OK") || response.code() == 200) {
+                            if (responseText.contains("AUTH_OK")) {
                                 transitionTo(Step.SHEET_ID_CONFIRMATION);
                                 return;
                             }
                         }
                         Log.e(TAG, "GAS Auth check unauthorized. Code: " + response.code());
-                        transitionTo(Step.ERROR);
+                        transitionTo(Step.NEED_TO_AUTHORIZE);
                     }
                 }
             });
