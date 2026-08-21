@@ -16,8 +16,7 @@ import java.util.regex.Pattern;
 final class DcBanListHtmlParser {
     private static final Pattern HEADER_PATTERN = Pattern.compile("^([\\s\\S]+?)\\s*(?:\\(([^)]+)\\))?$");
 
-    private DcBanListHtmlParser() {
-    }
+    private DcBanListHtmlParser() {}
 
     static JSONArray parsePage(Document doc) throws JSONException {
         JSONArray records = new JSONArray();

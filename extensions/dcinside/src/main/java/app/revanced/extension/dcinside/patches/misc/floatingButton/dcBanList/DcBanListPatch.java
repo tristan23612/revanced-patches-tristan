@@ -56,7 +56,7 @@ public class DcBanListPatch {
 
     @SuppressLint("DiscouragedApi")
     public static void setupDcBanListButton(View view, String dcBanListButtonIdName) {
-        if (view == null || !Settings.SHOW_DC_BAN_LIST_BUTTON.get()) return;
+        if (view == null) return;
 
         int resId = view.getContext().getResources().getIdentifier(
                 dcBanListButtonIdName,
@@ -66,7 +66,10 @@ public class DcBanListPatch {
 
         View dcBanListButton = view.findViewById(resId);
         if (dcBanListButton != null) {
-            dcBanListButton.setOnClickListener(buttonView -> showExportDialog(buttonView.getContext()));
+            dcBanListButton.setOnClickListener(buttonView -> {
+                if (!Settings.SHOW_DC_BAN_LIST_BUTTON.get()) return;
+                showExportDialog(buttonView.getContext());
+            });
         }
     }
 

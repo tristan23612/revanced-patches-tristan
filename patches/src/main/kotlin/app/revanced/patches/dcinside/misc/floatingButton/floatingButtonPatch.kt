@@ -10,6 +10,7 @@ import app.revanced.patches.dcinside.misc.extension.sharedExtensionPatch
 import app.revanced.patches.dcinside.misc.hook.json.jsonHookPatch
 import app.revanced.patches.dcinside.misc.settings.PreferenceScreen
 import app.revanced.patches.dcinside.misc.settings.settingsPatch
+import app.revanced.patches.shared.misc.settings.preference.BasePreference
 import app.revanced.patches.shared.misc.settings.preference.InputType
 import app.revanced.patches.shared.misc.settings.preference.NonInteractivePreference
 import app.revanced.patches.shared.misc.settings.preference.PreferenceScreenPreference
@@ -117,8 +118,32 @@ private fun addFloatingButtonResource(
     }
 }
 
+private data class FloatingButtonDefinition(
+    val patchName: String,
+    val settingId: String,
+    val extraPreferences: (settingId: String) -> Set<BasePreference>,
+)
+
 private val floatingButtonDefinitions = listOf(
-    "dcBanList" to "dc_ban_list"
+    FloatingButtonDefinition("dcBanList", "dc_ban_list") { settingId ->
+        setOf(
+            TextPreference(
+                key = "revanced_${settingId}_sheet_id_map",
+                inputType = InputType.TEXT_MULTI_LINE,
+            ),
+            NonInteractivePreference(
+                key = "revanced_${settingId}_gas_authorization_webview",
+                tag = "app.revanced.extension.dcinside.settings.preference.GasAuthorizationWebViewPreference",
+                selectable = true,
+            ),
+            NonInteractivePreference(
+                key = "revanced_${settingId}_google_account_manage_webview",
+                tag = "app.revanced.extension.dcinside.settings.preference.GoogleAccountManageWebViewPreference",
+                selectable = true,
+            ),
+        )
+    },
+    FloatingButtonDefinition("gallScope", "gall_scope") { emptySet() },
 )
 
 private val floatingButtonResourcePatch = resourcePatch {
@@ -154,27 +179,13 @@ val floatingButtonPatch = bytecodePatch(
             PreferenceScreenPreference(
                 key = "revanced_floating_button_screen",
                 sorting = PreferenceScreenPreference.Sorting.UNSORTED,
-                preferences = floatingButtonDefinitions.map { (_, settingId) ->
+                preferences = floatingButtonDefinitions.map { def ->
                     PreferenceScreenPreference(
-                        key = "revanced_${settingId}_screen",
+                        key = "revanced_${def.settingId}_screen",
                         sorting = PreferenceScreenPreference.Sorting.UNSORTED,
                         preferences = setOf(
-                            SwitchPreference("revanced_show_${settingId}_button"),
-                            TextPreference(
-                                key = "revanced_${settingId}_sheet_id_map",
-                                inputType = InputType.TEXT_MULTI_LINE,
-                            ),
-                            NonInteractivePreference(
-                                key = "revanced_${settingId}_gas_authorization_webview",
-                                tag = "app.revanced.extension.dcinside.settings.preference.GasAuthorizationWebViewPreference",
-                                selectable = true,
-                            ),
-                            NonInteractivePreference(
-                                key = "revanced_${settingId}_google_account_manage_webview",
-                                tag = "app.revanced.extension.dcinside.settings.preference.GoogleAccountManageWebViewPreference",
-                                selectable = true,
-                            ),
-                        )
+                            SwitchPreference("revanced_show_${def.settingId}_button"),
+                        ) + def.extraPreferences(def.settingId)
                     )
                 }.toSet(),
             )
