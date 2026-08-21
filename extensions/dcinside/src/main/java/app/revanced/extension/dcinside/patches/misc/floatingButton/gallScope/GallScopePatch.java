@@ -67,8 +67,7 @@ public class GallScopePatch {
     }
 
     /**
-     * 게시글 화면 등 외부에서 식별코드를 이미 알고 있을 때 바로 페이지 범위 입력부터 시작하기 위한 진입점.
-     * (추후 게시글 진입 상태에서 유저 검색 연결 시 사용)
+     * 게시글 화면 등 외부에서 식별코드를 이미 알고 있을 때 바로 페이지 범위 입력부터 시작
      */
     public static void showGallScopeDialogWithUserId(Context context, String prefillUserId) {
         new GallScopeSession(context, prefillUserId).start();

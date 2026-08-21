@@ -1,5 +1,6 @@
 package app.revanced.extension.dcinside.patches.post.userId;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.text.Spanned;
@@ -17,6 +18,7 @@ public class ShowUserIdPatch {
 
     private static final String TAG = "ReVanced_DCInside";
 
+    @SuppressLint({"DiscouragedApi", "SetTextI18n"})
     public static void setUserId(View view, String userId, CharSequence charSequence) {
         if (view == null || !Settings.SHOW_USER_ID.get()) return;
 
