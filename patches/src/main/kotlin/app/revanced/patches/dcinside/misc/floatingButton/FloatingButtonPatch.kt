@@ -143,7 +143,13 @@ private val floatingButtonDefinitions = listOf(
             ),
         )
     },
-    FloatingButtonDefinition("gallScope", "gall_scope") { emptySet() },
+    FloatingButtonDefinition("gallScope", "gall_scope") { settingId ->
+        setOf(
+            NonInteractivePreference(
+                key = "revanced_${settingId}_post_header_interaction_guide"
+            )
+        )
+    },
 )
 
 private val floatingButtonResourcePatch = resourcePatch {
