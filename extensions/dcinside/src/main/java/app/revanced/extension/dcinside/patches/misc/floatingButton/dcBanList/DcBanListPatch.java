@@ -92,7 +92,7 @@ public class DcBanListPatch {
         private enum Step {
             OAUTH_CONFIRMATION,
             CHECKING_AUTH,
-            NEED_TO_AUTHORIZE,
+            NEED_AUTHORIZATION,
             SHEET_ID_CONFIRMATION,
             FETCHING_LAST_RECORD,
             CREATE_SHEET_CONFIRMATION,
@@ -100,6 +100,7 @@ public class DcBanListPatch {
             UPLOAD_CONFIRMATION,
             UPLOAD_IN_PROGRESS,
             UPLOAD_COMPLETE,
+            UPLOAD_UNNECESSARY,
             ERROR
         }
 
@@ -149,7 +150,7 @@ public class DcBanListPatch {
                 case CHECKING_AUTH -> builder
                         .setMessage("구글 계정 권한을 확인하고 있습니다...");
 
-                case NEED_TO_AUTHORIZE -> builder
+                case NEED_AUTHORIZATION -> builder
                         .setMessage("""
                                 GAS 인증에 실패하였습니다.
                                 아래 경로에서 인증을 진행해주세요.
@@ -213,6 +214,10 @@ public class DcBanListPatch {
 
                 case UPLOAD_COMPLETE -> builder
                         .setMessage("성공적으로 업로드되었습니다.")
+                        .setPositiveButton("확인", null);
+
+                case UPLOAD_UNNECESSARY -> builder
+                        .setMessage("0건의 데이터가 수집되었습니다.\n업로드가 필요하지 않습니다.")
                         .setPositiveButton("확인", null);
 
                 case ERROR -> builder
@@ -306,7 +311,7 @@ public class DcBanListPatch {
                             }
                         }
                         Log.e(TAG, "GAS Auth check unauthorized. Code: " + response.code());
-                        transitionTo(Step.NEED_TO_AUTHORIZE);
+                        transitionTo(Step.NEED_AUTHORIZATION);
                     }
                 }
             });
@@ -427,6 +432,10 @@ public class DcBanListPatch {
         }
 
         private void finishParsing(JSONArray collected) {
+            if (collected.length() == 0) {
+                transitionTo(Step.UPLOAD_UNNECESSARY);
+            }
+
             banListJsonArray = collected;
             transitionTo(Step.UPLOAD_CONFIRMATION);
         }
