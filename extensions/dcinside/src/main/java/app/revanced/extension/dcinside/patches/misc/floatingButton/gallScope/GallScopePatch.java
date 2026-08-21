@@ -251,9 +251,10 @@ public class GallScopePatch {
                     }
 
                     ListView listView = getListView(snapshot);
+                    LinearLayout container = wrapWithPadding(listView);
 
                     builder.setMessage(targetUserId + " 스코프 결과: " + snapshot.size() + "건 (" + firstSearchedPage + "~" + endPage + "페이지)")
-                            .setView(listView)
+                            .setView(container)
                             .setNeutralButton("복사", (d, w) -> copyResultsToClipboard(snapshot))
                             .setPositiveButton("계속 검색", (d, w) -> {
                                 startPage = endPage + 1;
@@ -440,20 +441,33 @@ public class GallScopePatch {
             if (nextPageToLaunch.get() <= endPage) {
                 mainHandler.postDelayed(this::launchNextPage, 500);
             } else if (done >= totalPagesInBatch) {
+                sortResultsByPostNoDesc();
                 transitionTo(Step.RESULT);
             }
         }
 
+        private void sortResultsByPostNoDesc() {
+            synchronized (resultsList) {
+                resultsList.sort((a, b) -> {
+                    int postNoA = a.optInt("postNo", 0);
+                    int postNoB = b.optInt("postNo", 0);
+                    return Integer.compare(postNoB, postNoA); // 내림차순
+                });
+            }
+        }
+
         private void copyResultsToClipboard(List<JSONObject> snapshot) {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(targetUserId).append(" 스코프 결과\n");
+            stringBuilder.append(snapshot.size()).append("개의 글을 찾았습니다.\n");
             for (JSONObject item : snapshot) {
-                sb.append(item.optString("date", "")).append("\t")
+                stringBuilder.append(item.optString("date", "")).append("\t")
                         .append(item.optString("title", "")).append("\t")
                         .append(item.optString("url", "")).append("\n");
             }
 
             ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-            clipboard.setPrimaryClip(ClipData.newPlainText("GallScope Results", sb.toString()));
+            clipboard.setPrimaryClip(ClipData.newPlainText("GallScope Results", stringBuilder.toString()));
             Toast.makeText(context, "결과가 클립보드에 복사되었습니다.", Toast.LENGTH_SHORT).show();
         }
     }
