@@ -38,7 +38,7 @@ public class DcBanListPatch {
 
     @SuppressLint("DiscouragedApi")
     public static void setDcBanListButtonVisibility(View targetView, boolean visible, String dcBanListButtonIdName) {
-        if (targetView == null || !Settings.SHOW_DC_BAN_LIST_BUTTON.get()) return;
+        if (targetView == null) return;
 
         View rootView = targetView.getRootView();
         int resId = rootView.getContext().getResources().getIdentifier(
@@ -50,7 +50,7 @@ public class DcBanListPatch {
         View dcBanListButton = rootView.findViewById(resId);
         if (dcBanListButton != null) {
             // boolean 조건에 따라 가시성 플래그 매핑
-            dcBanListButton.setVisibility(visible ? View.VISIBLE : View.GONE);
+            dcBanListButton.setVisibility(visible && Settings.SHOW_DC_BAN_LIST_BUTTON.get() ? View.VISIBLE : View.GONE);
         }
     }
 
