@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Insets;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -18,15 +19,9 @@ import android.widget.Toast;
 import app.revanced.extension.dcinside.settings.Settings;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import androidx.annotation.NonNull;
 import okhttp3.Call;
@@ -41,8 +36,7 @@ import app.revanced.extension.dcinside.patches.hook.json.JsonHookPatch;
 public class DcBanListPatch {
     private static final String TAG = "ReVanced_DCInside";
 
-    private static final Pattern HEADER_PATTERN = Pattern.compile("^([\\s\\S]+?)\\s*(?:\\(([^)]+)\\))?$");
-
+    @SuppressLint("DiscouragedApi")
     public static void setDcBanListButtonVisibility(View targetView, boolean visible, String dcBanListButtonIdName) {
         if (targetView == null || !Settings.SHOW_DC_BAN_LIST_BUTTON.get()) return;
 
@@ -60,6 +54,7 @@ public class DcBanListPatch {
         }
     }
 
+    @SuppressLint("DiscouragedApi")
     public static void setupDcBanListButton(View view, String dcBanListButtonIdName) {
         if (view == null || !Settings.SHOW_DC_BAN_LIST_BUTTON.get()) return;
 
@@ -228,23 +223,28 @@ public class DcBanListPatch {
 
             if (currentDialog.getWindow() != null) {
                 currentDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-                currentDialog.getWindow().setDecorFitsSystemWindows(false);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    currentDialog.getWindow().setDecorFitsSystemWindows(false);
+                }
 
                 View rootView = currentDialog.findViewById(android.R.id.content);
                 rootView.setOnApplyWindowInsetsListener((view, insets) -> {
                     // Framework API 직접 사용
-                    Insets imeInsets = insets.getInsets(WindowInsets.Type.ime());
-                    Insets systemBarsInsets = insets.getInsets(WindowInsets.Type.systemBars());
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        Insets imeInsets = insets.getInsets(WindowInsets.Type.ime());
+                        Insets systemBarsInsets = insets.getInsets(WindowInsets.Type.systemBars());
 
-                    int bottomPadding = Math.max(imeInsets.bottom, systemBarsInsets.bottom);
-                    view.setPadding(
-                            systemBarsInsets.left,
-                            systemBarsInsets.top,
-                            systemBarsInsets.right,
-                            bottomPadding
-                    );
+                        int bottomPadding = Math.max(Objects.requireNonNull(imeInsets).bottom, Objects.requireNonNull(systemBarsInsets).bottom);
+                        view.setPadding(
+                                systemBarsInsets.left,
+                                systemBarsInsets.top,
+                                systemBarsInsets.right,
+                                bottomPadding
+                        );
 
-                    return WindowInsets.CONSUMED;
+                        return WindowInsets.CONSUMED;
+                    }
+                    return insets;
                 });
             }
         }
@@ -271,10 +271,6 @@ public class DcBanListPatch {
                 case UPLOAD_CONFIRMATION -> {
                     transitionTo(Step.UPLOAD_IN_PROGRESS);
                     yield true;
-                }
-                case UPLOAD_COMPLETE -> {
-                    // 최종 성공 알림은 그래도 보여주고 싶다면 false로 두고, 완전 무인이면 dismiss 처리
-                    yield false;
                 }
                 default -> false; // CHECKING_AUTH, PARSING, UPLOAD_IN_PROGRESS, ERROR 등은 원래도 버튼 없는 진행 단계
             };
@@ -380,7 +376,7 @@ public class DcBanListPatch {
 
             try {
                 // 1페이지 요청
-                Response firstResponse = DcApiClient.fetchBanListPageSync(galleryType, galleryId, 1);
+                Response firstResponse = DcBanListApiClient.fetchBanListPageSync(galleryType, galleryId, 1);
                 String firstHtml;
                 try (firstResponse) {
                     if (!firstResponse.isSuccessful()) {
@@ -392,16 +388,16 @@ public class DcBanListPatch {
                 }
 
                 Document firstDoc = Jsoup.parse(firstHtml);
-                int totalPages = extractTotalPages(firstDoc);
+                int totalPages = DcBanListHtmlParser.extractTotalPages(firstDoc);
 
-                boolean shouldStop = appendRecordsUntilDuplicate(collected, parsePage(firstDoc));
+                boolean shouldStop = appendRecordsUntilDuplicate(collected, DcBanListHtmlParser.parsePage(firstDoc));
                 if (shouldStop || totalPages <= 1) {
                     finishParsing(collected);
                     return;
                 }
 
                 for (int page = 2; page <= totalPages; page++) {
-                    Response response = DcApiClient.fetchBanListPageSync(galleryType, galleryId, page);
+                    Response response = DcBanListApiClient.fetchBanListPageSync(galleryType, galleryId, page);
                     String html;
                     try (response) {
                         if (!response.isSuccessful()) {
@@ -413,7 +409,7 @@ public class DcBanListPatch {
                     }
 
                     Document doc = Jsoup.parse(html);
-                    shouldStop = appendRecordsUntilDuplicate(collected, parsePage(doc));
+                    shouldStop = appendRecordsUntilDuplicate(collected, DcBanListHtmlParser.parsePage(doc));
                     if (shouldStop) break;
                 }
 
@@ -448,7 +444,7 @@ public class DcBanListPatch {
             return false;
         }
 
-        private boolean isSameEntry(JSONObject a, JSONObject b) throws JSONException {
+        private boolean isSameEntry(JSONObject a, JSONObject b) {
             return eq(a, b, "nickname")
                     && eq(a, b, "identifier")
                     && eq(a, b, "content")
@@ -460,97 +456,6 @@ public class DcBanListPatch {
 
         private boolean eq(JSONObject a, JSONObject b, String key) {
             return a.optString(key, "").equals(b.optString(key, ""));
-        }
-
-        private JSONArray parsePage(Document doc) throws JSONException {
-            JSONArray records = new JSONArray();
-            Elements rows = doc.select("li .item");
-
-            for (Element row : rows) {
-                records.put(parseMobileRow(row));
-            }
-
-            return records;
-        }
-
-        private JSONObject parseMobileRow(Element row) throws JSONException {
-            Elements captions = row.select(".mg-block-caption");
-
-            String headerText = captions.isEmpty() ? "" : text(captions.get(0), ".tit");
-            String ipText = captions.isEmpty() ? "" : text(captions.get(0), ".ip");
-
-            Matcher matcher = HEADER_PATTERN.matcher(headerText);
-            String nickname = "";
-            String identifierFromHeader = "";
-            if (matcher.matches()) {
-                nickname = matcher.group(1) != null ? Objects.requireNonNull(matcher.group(1)).trim() : "";
-                identifierFromHeader = matcher.group(2) != null ? Objects.requireNonNull(matcher.group(2)).trim() : "";
-            }
-            String identifier = (identifierFromHeader + " " + ipText).trim();
-
-            // 동적 캡션(2번째 항목부터)을 label -> value Element 맵으로 구성
-            Map<String, Element> captionMap = new LinkedHashMap<>();
-            for (int i = 1; i < captions.size(); i++) {
-                Element cap = captions.get(i);
-                Element titEl = cap.selectFirst(".tit");
-                Element txtEl = cap.selectFirst(".txt");
-                if (titEl != null && txtEl != null) {
-                    captionMap.put(titEl.text().trim(), txtEl);
-                }
-            }
-
-            String contentType = captionMap.containsKey("게시글") ? "게시글"
-                    : (captionMap.containsKey("댓글") ? "댓글" : "");
-            Element contentEl = captionMap.containsKey("게시글") ? captionMap.get("게시글") : captionMap.get("댓글");
-
-            String contentTitle = "";
-            if (contentEl != null) {
-                Element lnkgo = contentEl.selectFirst(".lnkgo");
-                contentTitle = (lnkgo != null ? lnkgo.text() : contentEl.text()).trim();
-            }
-            String content = contentType.isEmpty() ? contentTitle : "[" + contentType + "] " + contentTitle;
-
-            JSONObject record = new JSONObject();
-            record.put("nickname", nickname);
-            record.put("identifier", identifier);
-            record.put("content", content);
-            record.put("reason", captionText(captionMap, "사유"));
-            record.put("duration", captionText(captionMap, "기간"));
-            record.put("dateTime", captionText(captionMap, "처리 일시"));
-            record.put("manager", captionText(captionMap, "처리자"));
-
-            return record;
-        }
-
-        private String captionText(Map<String, Element> captionMap, String label) {
-            Element el = captionMap.get(label);
-            return el != null ? el.text().trim() : "";
-        }
-
-        private String text(Element parent, String selector) {
-            Element el = parent.selectFirst(selector);
-            return el != null ? el.text().trim() : "";
-        }
-
-        private int extractTotalPages(Document doc) {
-            int total = parseIntSafe(inputValue(doc, "#total"), 0);
-            int slidePage = parseIntSafe(inputValue(doc, "#slidePage"), 100);
-            if (slidePage <= 0) slidePage = 100;
-            int totalPages = (int) Math.ceil((double) total / slidePage);
-            return Math.max(totalPages, 1);
-        }
-
-        private String inputValue(Document doc, String selector) {
-            Element el = doc.selectFirst(selector);
-            return el != null ? el.attr("value") : "";
-        }
-
-        private int parseIntSafe(String value, int fallback) {
-            try {
-                return Integer.parseInt(value.trim());
-            } catch (Exception e) {
-                return fallback;
-            }
         }
 
         private void executeUploadTask() {
