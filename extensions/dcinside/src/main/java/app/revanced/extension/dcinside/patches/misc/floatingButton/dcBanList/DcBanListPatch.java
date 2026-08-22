@@ -49,7 +49,6 @@ public class DcBanListPatch {
 
         View dcBanListButton = rootView.findViewById(resId);
         if (dcBanListButton != null) {
-            // boolean 조건에 따라 가시성 플래그 매핑
             dcBanListButton.setVisibility(visible && Settings.SHOW_DC_BAN_LIST_BUTTON.get() && JsonHookPatch.managerSkill ? View.VISIBLE : View.GONE);
         }
     }

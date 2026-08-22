@@ -22,17 +22,44 @@ import app.revanced.util.copyResources
 import app.revanced.util.findFreeRegister
 import org.w3c.dom.Element
 
-private const val FLOATING_BUTTON_CONTAINER_ID_NAME = "revanced_floating_button_container"
-
 private fun String.toPascalCase() = replaceFirstChar { it.uppercase() }
 
 private fun extensionClassDescriptorFor(patchName: String) =
     "Lapp/revanced/extension/dcinside/patches/misc/floatingButton/$patchName/${patchName.toPascalCase()}Patch;"
 
+private const val FLOATING_BUTTON_TOGGLE_PATCH_EXTENSION_CLASS_DESCRIPTOR =
+    "Lapp/revanced/extension/dcinside/patches/misc/floatingButton/FloatingButtonTogglePatch;"
+
+private const val FLOATING_BUTTON_CONTAINER_ID_PREFIX= "revanced_floating_button"
+
 private val floatingButtonContainerResourcePatch = resourcePatch {
     compatibleWith("com.dcinside.app.android")
 
     apply {
+        copyResources(
+            "dcinside/floatingButton",
+            ResourceGroup(
+                "drawable",
+                "revanced_floating_button_toggle.xml",
+            )
+        )
+
+
+        document("res/values/ids.xml").use { document ->
+            listOf(
+                "${FLOATING_BUTTON_CONTAINER_ID_PREFIX}_container",
+                "${FLOATING_BUTTON_CONTAINER_ID_PREFIX}_sub_container",
+                "${FLOATING_BUTTON_CONTAINER_ID_PREFIX}_toggle",
+            ).forEach { idName ->
+                document.documentElement.appendChild(
+                    document.createElement("item").apply {
+                        setAttribute("type", "id")
+                        setAttribute("name", idName)
+                    }
+                )
+            }
+        }
+
         document("res/layout/fragment_post_list.xml").use { document ->
             val quickWrite = document.getElementsByTagName("androidx.constraintlayout.widget.ConstraintLayout")
                 .asSequence()
@@ -41,7 +68,7 @@ private val floatingButtonContainerResourcePatch = resourcePatch {
                 ?: error("Could not find post_list_quick_write in fragment_post_list.xml")
 
             val container = document.createElement("LinearLayout").apply {
-                setAttribute("android:id", "@+id/$FLOATING_BUTTON_CONTAINER_ID_NAME")
+                setAttribute("android:id", "@+id/${FLOATING_BUTTON_CONTAINER_ID_PREFIX}_container")
                 setAttribute("android:layout_width", "wrap_content")
                 setAttribute("android:layout_height", "wrap_content")
                 setAttribute("android:layout_gravity", "end|bottom")
@@ -49,6 +76,36 @@ private val floatingButtonContainerResourcePatch = resourcePatch {
                 setAttribute("android:layout_marginEnd", "15.0dp")
                 setAttribute("android:orientation", "vertical")
             }
+
+            val subContainer = document.createElement("LinearLayout").apply {
+                setAttribute("android:id", "@+id/${FLOATING_BUTTON_CONTAINER_ID_PREFIX}_sub_container")
+                setAttribute("android:layout_width", "wrap_content")
+                setAttribute("android:layout_height", "wrap_content")
+                setAttribute("android:orientation", "vertical")
+                setAttribute("android:visibility", "gone")
+            }
+            container.appendChild(subContainer)
+
+            val toggleButton = quickWrite.cloneNode(true) as Element
+            toggleButton.apply {
+                setAttribute("android:id", "@+id/${FLOATING_BUTTON_CONTAINER_ID_PREFIX}_toggle")
+                removeAttribute("android:layout_gravity")
+                removeAttribute("android:layout_marginBottom")
+                removeAttribute("android:layout_marginEnd")
+                setAttribute("android:layout_marginTop", "10.0dp")
+            }
+
+            toggleButton.childNodes.asSequence()
+                .mapNotNull { it as? Element }
+                .firstOrNull { it.tagName == "androidx.appcompat.widget.AppCompatImageView" }
+                ?.apply {
+                    setAttribute("android:padding", "6.0dp")
+                    setAttribute("android:src", "@drawable/revanced_floating_button_toggle")
+                    removeAttribute("android:tint")
+                    removeAttribute("app:tint")
+                }
+
+            container.appendChild(toggleButton)
 
             quickWrite.parentNode.insertBefore(container, quickWrite.nextSibling)
         }
@@ -90,7 +147,7 @@ private fun addFloatingButtonResource(
                 .mapNotNull { it as? Element }
                 .firstOrNull {
                     val id = it.getAttribute("android:id")
-                    id == "@id/$FLOATING_BUTTON_CONTAINER_ID_NAME" || id == "@+id/$FLOATING_BUTTON_CONTAINER_ID_NAME"
+                    id == "@id/${FLOATING_BUTTON_CONTAINER_ID_PREFIX}_sub_container" || id == "@+id/${FLOATING_BUTTON_CONTAINER_ID_PREFIX}_sub_container"
                 }
 
             val floatingButton = quickWrite.cloneNode(true) as Element
@@ -112,7 +169,6 @@ private fun addFloatingButtonResource(
                     removeAttribute("app:tint")
                 }
 
-            // LinearLayout 내부 제일 상단(또는 하단)에 추가
             container?.appendChild(floatingButton)
         }
     }
@@ -215,6 +271,11 @@ val floatingButtonPatch = bytecodePatch(
                         """
                     }
 
+                    insertSmali += $$"""
+                        const-string v$$register, "$$FLOATING_BUTTON_CONTAINER_ID_PREFIX"
+                        invoke-static { v0, p1, v$$register }, $$FLOATING_BUTTON_TOGGLE_PATCH_EXTENSION_CLASS_DESCRIPTOR->setFloatingButtonToggleVisibility(Landroid/view/View;ZLjava/lang/String;)V
+                    """
+
                     addInstructions(insertIndex, insertSmali)
                 }
             }
@@ -234,6 +295,11 @@ val floatingButtonPatch = bytecodePatch(
                             invoke-static { p1, v$$register }, $$descriptor->setup$${pascalName}Button(Landroid/view/View;Ljava/lang/String;)V
                         """
                     }
+
+                    insertSmali += $$"""
+                        const-string v$$register, "$$FLOATING_BUTTON_CONTAINER_ID_PREFIX"
+                        invoke-static { p1, v$$register }, $$FLOATING_BUTTON_TOGGLE_PATCH_EXTENSION_CLASS_DESCRIPTOR->setupFloatingButtonToggle(Landroid/view/View;Ljava/lang/String;)V
+                    """
 
                     addInstructions(onViewCreatedIndex + 1, insertSmali)
                 }
