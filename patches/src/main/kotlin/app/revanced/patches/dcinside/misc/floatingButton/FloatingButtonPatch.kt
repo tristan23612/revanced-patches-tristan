@@ -238,19 +238,25 @@ val floatingButtonPatch = bytecodePatch(
     apply {
         addResources("dcinside", "misc.floatingButton.floatingButtonPatch")
 
+        val floatingButtonGuidePreference = NonInteractivePreference(
+            key = "revanced_floating_button_guide"
+        )
+
+        val floatingButtonScreens = floatingButtonDefinitions.map { def ->
+            PreferenceScreenPreference(
+                key = "revanced_${def.settingId}_screen",
+                sorting = PreferenceScreenPreference.Sorting.UNSORTED,
+                preferences = setOf(
+                    SwitchPreference("revanced_show_${def.settingId}_button"),
+                ) + def.extraPreferences(def.settingId)
+            )
+        }.toSet()
+
         PreferenceScreen.MISC.addPreferences(
             PreferenceScreenPreference(
                 key = "revanced_floating_button_screen",
                 sorting = PreferenceScreenPreference.Sorting.UNSORTED,
-                preferences = floatingButtonDefinitions.map { def ->
-                    PreferenceScreenPreference(
-                        key = "revanced_${def.settingId}_screen",
-                        sorting = PreferenceScreenPreference.Sorting.UNSORTED,
-                        preferences = setOf(
-                            SwitchPreference("revanced_show_${def.settingId}_button"),
-                        ) + def.extraPreferences(def.settingId)
-                    )
-                }.toSet(),
+                preferences = setOf(floatingButtonGuidePreference) + floatingButtonScreens,
             )
         )
 

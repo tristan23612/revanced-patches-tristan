@@ -275,7 +275,11 @@ Second \"item\" text"</string>
         </patch>
         <patch id ="misc.floatingButton.floatingButtonPatch">
             <string name="revanced_floating_button_screen_title">플로팅 버튼</string>
-            <string name="revanced_floating_button_screen_summary">게시글 목록 페이지의 플로팅 버튼 관련 설정을 할 수 있습니다.</string>
+            <string name="revanced_floating_button_screen_summary">퀵쓰기 버튼 상단에 추가되는 플로팅 버튼 관련 설정을 할 수 있습니다.</string>
+            <string name="revanced_floating_button_guide_title">플로팅 버튼 안내</string>
+            <string name="revanced_floating_button_guide_summary">"퀵쓰기 버튼 위에 + 모양의 토글 버튼이 추가됩니다.
+이 버튼을 누르면 아래에서 활성화한 플로팅 버튼들이 나타나거나 숨겨집니다.
+활성화된 버튼이 하나도 없으면 토글 버튼 자체가 표시되지 않습니다."</string>
             <string name="revanced_dc_ban_list_screen_title">DC BanList</string>
             <string name="revanced_dc_ban_list_screen_summary">DC BanList 관련 설정을 할 수 있습니다.</string>
             <string name="revanced_show_dc_ban_list_button_title">DC BanList 아이콘 표시하기</string>
@@ -292,8 +296,8 @@ Second \"item\" text"</string>
             <string name="revanced_show_gall_scope_button_title">Gall Scope 아이콘 표시하기</string>
             <string name="revanced_show_gall_scope_button_summary_on">Gall Scope 아이콘이 퀵쓰기 버튼 위에 추가됩니다.</string>
             <string name="revanced_show_gall_scope_button_summary_off">Gall Scope 아이콘이 퀵쓰기 버튼 위에 추가되지 않습니다.</string>
-            <string name="revanced_gall_scope_post_header_interaction_guide_title">게시글 내에서 스코프 바로 열기 안내</string>
-            <string name="revanced_gall_scope_post_header_interaction_guide_summary">식별 코드 표시 옵션이 켜진 경우 게시글 내에서 식별 코드를 눌러 해당 유저에 대한 스코프를 바로 열 수 있습니다.</string>
+            <string name="revanced_gall_scope_post_header_interaction_guide_title">게시글 내에서 작성자 스코프 바로 열기</string>
+            <string name="revanced_gall_scope_post_header_interaction_guide_summary">식별 코드 표시 옵션이 켜진 경우 게시글 내에서 작성자의 식별 코드를 눌러 스코프를 바로 열 수 있습니다.</string>
         </patch>
         <patch id="misc.hook.hookPatch">
             <string name="revanced_hide_administrator_notice_title">운영자 공지 숨기기</string>
