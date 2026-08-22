@@ -275,7 +275,7 @@ Second \"item\" text"</string>
         </patch>
         <patch id ="misc.floatingButton.floatingButtonPatch">
             <string name="revanced_floating_button_screen_title">플로팅 버튼</string>
-            <string name="revanced_floating_button_screen_summary">퀵쓰기 버튼 상단에 추가되는 플로팅 버튼 관련 설정을 할 수 있습니다.</string>
+            <string name="revanced_floating_button_screen_summary">퀵쓰기 버튼 위에 추가되는 플로팅 버튼 관련 설정을 할 수 있습니다.</string>
             <string name="revanced_floating_button_guide_title">플로팅 버튼 안내</string>
             <string name="revanced_floating_button_guide_summary">"퀵쓰기 버튼 위에 + 모양의 토글 버튼이 추가됩니다.
 이 버튼을 누르면 아래에서 활성화한 플로팅 버튼들이 나타나거나 숨겨집니다.

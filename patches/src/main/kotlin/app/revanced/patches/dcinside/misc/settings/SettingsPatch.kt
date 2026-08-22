@@ -71,6 +71,14 @@ private val settingsResourcePatch = resourcePatch {
             ),
         )
 
+        copyResources(
+            "dcinside/settings",
+            ResourceGroup(
+                "layout",
+                "preference_with_icon.xml"
+            )
+        )
+
         document("AndroidManifest.xml").use { document ->
             val licenseElement = document.childNodes.findElementByAttributeValueOrThrow(
                 "android:name",
@@ -242,33 +250,33 @@ internal fun modifyActivityForSettingsInjection(
 }
 
 object PreferenceScreen : BasePreferenceScreen() {
-
     val ADS = Screen(
         key = "revanced_settings_screen_01_ads",
         summaryKey = null,
         icon = "@drawable/revanced_settings_screen_01_ads",
         iconBold = "@drawable/revanced_settings_screen_01_ads_bold",
+        layout = "@layout/preference_with_icon",
     )
-
     val FEED = Screen(
         key = "revanced_settings_screen_03_feed",
         summaryKey = null,
         icon = "@drawable/revanced_settings_screen_03_feed",
         iconBold = "@drawable/revanced_settings_screen_03_feed_bold",
+        layout = "@layout/preference_with_icon",
     )
-
     val GENERAL = Screen(
         key = "revanced_settings_screen_04_general",
         summaryKey = null,
         icon = "@drawable/revanced_settings_screen_04_general",
         iconBold = "@drawable/revanced_settings_screen_04_general_bold",
+        layout = "@layout/preference_with_icon",
     )
-
     val MISC = Screen(
         key = "revanced_settings_screen_11_misc",
         summaryKey = null,
         icon = "@drawable/revanced_settings_screen_11_misc",
         iconBold = "@drawable/revanced_settings_screen_11_misc_bold",
+        layout = "@layout/preference_with_icon",
     )
 
     override fun commit(screen: PreferenceScreenPreference) {
