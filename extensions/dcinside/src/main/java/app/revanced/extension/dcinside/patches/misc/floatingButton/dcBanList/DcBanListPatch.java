@@ -212,7 +212,7 @@ public class DcBanListPatch {
                 }
 
                 case UPLOAD_COMPLETE -> builder
-                        .setMessage("성공적으로 업로드되었습니다.")
+                        .setMessage(banListJsonArray.length() + "건의 신규 차단내역이 성공적으로 업로드되었습니다.")
                         .setPositiveButton("확인", null);
 
                 case UPLOAD_UNNECESSARY -> builder
@@ -275,10 +275,8 @@ public class DcBanListPatch {
                     transitionTo(Step.PARSING);
                     yield true;
                 }
-                case UPLOAD_CONFIRMATION -> {
-                    transitionTo(Step.UPLOAD_IN_PROGRESS);
-                    yield true;
-                }
+                case UPLOAD_CONFIRMATION -> false;
+                case UPLOAD_COMPLETE -> false;
                 default -> false; // CHECKING_AUTH, PARSING, UPLOAD_IN_PROGRESS, ERROR 등은 원래도 버튼 없는 진행 단계
             };
         }
