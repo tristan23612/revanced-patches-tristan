@@ -52,17 +52,14 @@ public class GallScopePatch {
 
     @SuppressLint("DiscouragedApi")
     public static void setupGallScopeButton(View view, String gallScopeButtonIdName) {
-        if (view == null || !Settings.SHOW_GALL_SCOPE_BUTTON.get()) return;
+        if (view == null) return;
 
         int resId = view.getContext().getResources().getIdentifier(
                 gallScopeButtonIdName, "id", view.getContext().getPackageName());
 
         View button = view.findViewById(resId);
         if (button != null) {
-            button.setOnClickListener(buttonView -> {
-                if (!Settings.SHOW_GALL_SCOPE_BUTTON.get()) return;
-                new GallScopeSession(buttonView.getContext(), null).start();
-            });
+            button.setOnClickListener(buttonView -> new GallScopeSession(buttonView.getContext(), null).start());
         }
     }
 
@@ -138,6 +135,9 @@ public class GallScopePatch {
 
             switch (currentStep) {
                 case IDENTIFIER_INPUT -> {
+                    TextView message = new TextView(context);
+                    message.setText("검색할 유저의 식별코드를 입력하세요.");
+
                     EditText input = new EditText(context);
                     input.setHint("식별코드 또는 IP 입력");
                     input.setHintTextColor(0xFF9E9E9E);
@@ -156,10 +156,9 @@ public class GallScopePatch {
                     row.addView(input, inputParams);
                     row.addView(new View(context), spacerParams);
 
-                    LinearLayout container = wrapWithPadding(row);
+                    LinearLayout container = wrapWithPadding(message, row);
 
-                    builder.setMessage("검색할 유저의 식별코드를 입력하세요.")
-                            .setView(container)
+                    builder.setView(container)
                             .setPositiveButton("다음", (d, w) -> {
                                 String id = input.getText().toString().trim();
                                 if (id.isEmpty()) {
@@ -174,6 +173,9 @@ public class GallScopePatch {
                 }
 
                 case PAGE_RANGE_INPUT -> {
+                    TextView message = new TextView(context);
+                    message.setText("검색할 페이지 범위를 입력하세요.\n(" + targetUserId + ")");
+
                     EditText startInput = new EditText(context);
                     startInput.setHint("시작 페이지");
                     startInput.setHintTextColor(0xFF9E9E9E);
@@ -199,7 +201,7 @@ public class GallScopePatch {
 
                     int rowHeightPx = (int) (36 * context.getResources().getDisplayMetrics().density);
 
-                    LinearLayout.LayoutParams inputParams = new LinearLayout.LayoutParams(0, rowHeightPx, 1f);
+                    LinearLayout.LayoutParams inputParams = new LinearLayout.LayoutParams(0, rowHeightPx, 2f);
                     LinearLayout.LayoutParams spacerParams = new LinearLayout.LayoutParams(0, rowHeightPx, 1f);
                     LinearLayout.LayoutParams tildeParams = new LinearLayout.LayoutParams(0, rowHeightPx, 1f);
 
@@ -209,10 +211,9 @@ public class GallScopePatch {
                     row.addView(endInput, inputParams);
                     row.addView(new View(context), spacerParams);
 
-                    LinearLayout container = wrapWithPadding(row);
+                    LinearLayout container = wrapWithPadding(message, row);
 
-                    builder.setMessage("검색할 페이지 범위를 입력하세요. (" + targetUserId + ")")
-                            .setView(container)
+                    builder.setView(container)
                             .setPositiveButton("검색 시작", (d, w) -> {
                                 int startPage, endPage;
                                 try {
@@ -250,11 +251,14 @@ public class GallScopePatch {
                         snapshot = new ArrayList<>(resultsList);
                     }
 
-                    ListView listView = getListView(snapshot);
-                    LinearLayout container = wrapWithPadding(listView);
+                    TextView message = new TextView(context);
+                    message.setText(targetUserId + " 스코프 결과: " + snapshot.size() + "건 (" + firstSearchedPage + "~" + endPage + "페이지)");
 
-                    builder.setMessage(targetUserId + " 스코프 결과: " + snapshot.size() + "건 (" + firstSearchedPage + "~" + endPage + "페이지)")
-                            .setView(container)
+                    ListView listView = getListView(snapshot);
+
+                    LinearLayout container = wrapWithPadding(message, listView);
+
+                    builder.setView(container)
                             .setNeutralButton("복사", (d, w) -> copyResultsToClipboard(snapshot))
                             .setPositiveButton("계속 검색", (d, w) -> {
                                 startPage = endPage + 1;
@@ -356,13 +360,53 @@ public class GallScopePatch {
             return listView;
         }
 
-        private LinearLayout wrapWithPadding(View child) {
+        private LinearLayout wrapWithPadding(View... children) {
             LinearLayout container = new LinearLayout(context);
             container.setOrientation(LinearLayout.VERTICAL);
-            int padding = (int) (16 * context.getResources().getDisplayMetrics().density);
-            container.setPadding(padding, padding, padding, 0);
-            container.addView(child);
+
+            int padding = resolveDialogPreferredPadding(context);
+            container.setPadding(padding, 0, padding, 0);
+
+            for (View child : children) {
+                ViewGroup.LayoutParams existingParams = child.getLayoutParams();
+                boolean hasOwnParams = existingParams instanceof LinearLayout.LayoutParams;
+
+                LinearLayout.LayoutParams params = hasOwnParams
+                        ? (LinearLayout.LayoutParams) existingParams
+                        : new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                if (!hasOwnParams) {
+                    params.topMargin = padding / 2;
+                }
+
+                container.addView(child, params);
+            }
+
             return container;
+        }
+
+        private static int resolveDialogPreferredPadding(Context context) {
+            TypedValue typedValue = new TypedValue();
+
+            // AppCompat 테마가 정의하는 attr 우선 시도
+            int appcompatAttrId = context.getResources().getIdentifier(
+                    "dialogPreferredPadding", "attr", context.getPackageName());
+            if (appcompatAttrId != 0 &&
+                    context.getTheme().resolveAttribute(appcompatAttrId, typedValue, true)) {
+                return TypedValue.complexToDimensionPixelSize(
+                        typedValue.data, context.getResources().getDisplayMetrics());
+            }
+
+            // 프레임워크 기본 attr로 폴백
+            if (context.getTheme().resolveAttribute(
+                    android.R.attr.dialogPreferredPadding, typedValue, true)) {
+                return TypedValue.complexToDimensionPixelSize(
+                        typedValue.data, context.getResources().getDisplayMetrics());
+            }
+
+            // 최후 폴백 (attr 자체가 없는 극히 드문 경우)
+            return (int) (16 * context.getResources().getDisplayMetrics().density);
         }
 
         private void transitionTo(Step nextStep) {

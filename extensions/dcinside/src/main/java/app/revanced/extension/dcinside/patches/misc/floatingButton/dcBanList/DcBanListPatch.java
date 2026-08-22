@@ -65,10 +65,7 @@ public class DcBanListPatch {
 
         View dcBanListButton = view.findViewById(resId);
         if (dcBanListButton != null) {
-            dcBanListButton.setOnClickListener(buttonView -> {
-                if (!Settings.SHOW_DC_BAN_LIST_BUTTON.get()) return;
-                showExportDialog(buttonView.getContext());
-            });
+            dcBanListButton.setOnClickListener(buttonView -> showExportDialog(buttonView.getContext()));
         }
     }
 
