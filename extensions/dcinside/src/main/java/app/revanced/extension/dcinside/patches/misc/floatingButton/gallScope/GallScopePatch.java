@@ -33,10 +33,10 @@ import okhttp3.Response;
 import app.revanced.extension.dcinside.patches.hook.json.JsonHookPatch;
 import app.revanced.extension.dcinside.settings.Settings;
 
+@SuppressLint({"DiscouragedApi", "SetTextI18n"})
 public class GallScopePatch {
     private static final int BATCH_SIZE = 5;
 
-    @SuppressLint("DiscouragedApi")
     public static void setGallScopeButtonVisibility(View targetView, boolean visible, String gallScopeButtonIdName) {
         if (targetView == null) return;
 
@@ -44,13 +44,13 @@ public class GallScopePatch {
         int resId = rootView.getContext().getResources().getIdentifier(
                 gallScopeButtonIdName, "id", rootView.getContext().getPackageName());
 
-        View button = rootView.findViewById(resId);
-        if (button != null) {
-            button.setVisibility(visible && Settings.SHOW_GALL_SCOPE_BUTTON.get() ? View.VISIBLE : View.GONE);
+        View gallScopeButton = rootView.findViewById(resId);
+        if (gallScopeButton != null) {
+            gallScopeButton.setOnClickListener(buttonView -> new GallScopeSession(buttonView.getContext(), null).start());
+            gallScopeButton.setVisibility(visible && Settings.SHOW_GALL_SCOPE_BUTTON.get() ? View.VISIBLE : View.GONE);
         }
     }
 
-    @SuppressLint("DiscouragedApi")
     public static void setupGallScopeButton(View view, String gallScopeButtonIdName) {
         if (view == null) return;
 
@@ -70,7 +70,6 @@ public class GallScopePatch {
         new GallScopeSession(context, prefillUserId).start();
     }
 
-    @SuppressLint("DiscouragedApi")
     private static int resolveDialogTheme(Context context) {
         TypedValue typedValue = new TypedValue();
         context.getTheme().resolveAttribute(
@@ -252,7 +251,7 @@ public class GallScopePatch {
                     }
 
                     TextView message = new TextView(context);
-                    message.setText(targetUserId + " 스코프 결과: " + snapshot.size() + "건 (" + firstSearchedPage + "~" + endPage + "페이지)");
+                    message.setText(targetUserId + " 스코프 결과\n" + snapshot.size() + "건 (" + firstSearchedPage + "~" + endPage + "페이지)");
 
                     ListView listView = getListView(snapshot);
 
@@ -290,7 +289,6 @@ public class GallScopePatch {
             };
 
             listView.setAdapter(new ArrayAdapter<JSONObject>(context, 0, snapshot) {
-                @SuppressLint("SetTextI18n")
                 @NonNull
                 @Override
                 public View getView(int position, View convertView, @NonNull ViewGroup parent) {

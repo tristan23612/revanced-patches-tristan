@@ -285,31 +285,6 @@ val floatingButtonPatch = bytecodePatch(
                     addInstructions(insertIndex, insertSmali)
                 }
             }
-
-            postListOnViewCreatedMethodMatch.let {
-                it.method.apply {
-                    val onViewCreatedIndex = it[0]
-                    val register = findFreeRegister(onViewCreatedIndex)
-
-                    var insertSmali = ""
-                    floatingButtonDefinitions.forEach { (patchName, settingId) ->
-                        val pascalName = patchName.toPascalCase()
-                        val descriptor = extensionClassDescriptorFor(patchName)
-
-                        insertSmali += $$"""
-                            const-string v$$register, "revanced_$${settingId}_button"
-                            invoke-static { p1, v$$register }, $$descriptor->setup$${pascalName}Button(Landroid/view/View;Ljava/lang/String;)V
-                        """
-                    }
-
-                    insertSmali += $$"""
-                        const-string v$$register, "$$FLOATING_BUTTON_CONTAINER_ID_PREFIX"
-                        invoke-static { p1, v$$register }, $$FLOATING_BUTTON_TOGGLE_PATCH_EXTENSION_CLASS_DESCRIPTOR->setupFloatingButtonToggle(Landroid/view/View;Ljava/lang/String;)V
-                    """
-
-                    addInstructions(onViewCreatedIndex + 1, insertSmali)
-                }
-            }
         }
     }
 }

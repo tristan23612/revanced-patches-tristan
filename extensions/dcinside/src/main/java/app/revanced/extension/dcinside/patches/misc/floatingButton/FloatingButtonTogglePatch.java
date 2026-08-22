@@ -10,36 +10,27 @@ public final class FloatingButtonTogglePatch {
         if (targetView == null) return;
 
         View rootView = targetView.getRootView();
-        int toggleId = rootView.getResources().getIdentifier(
-                idPrefix + "_toggle", "id", rootView.getContext().getPackageName());
+        int toggleId = rootView.getResources().getIdentifier(idPrefix + "_toggle", "id", rootView.getContext().getPackageName());
+        int subContainerId = rootView.getResources().getIdentifier(idPrefix + "_sub_container", "id", rootView.getContext().getPackageName());
 
         View toggleButton = rootView.findViewById(toggleId);
-        if (toggleButton != null) {
-            boolean shouldShow = visible && (Settings.SHOW_DC_BAN_LIST_BUTTON.get() || Settings.SHOW_GALL_SCOPE_BUTTON.get());
-            toggleButton.setVisibility(shouldShow ? View.VISIBLE : View.GONE);
+        View subContainer = rootView.findViewById(subContainerId);
+        if (toggleButton == null) return;
+
+        // 매번 최신 뷰 기준으로 리스너 재부착 (setup 훅과 별개로 안전망 역할)
+        if (subContainer != null) {
+            View toggleIcon = findImageViewChild(toggleButton);
+            if (toggleIcon == null) toggleIcon = toggleButton; // 못 찾으면 폴백
+
+            View iconToRotate = toggleIcon;
+            toggleButton.setOnClickListener(v -> {
+                boolean currentlyExpanded = subContainer.getVisibility() == View.VISIBLE;
+                animateToggle(iconToRotate, subContainer, !currentlyExpanded);
+            });
         }
-    }
 
-    public static void setupFloatingButtonToggle(View view, String idPrefix) {
-        if (view == null) return;
-
-        View rootView = view.getRootView();
-        int toggleButtonResId = rootView.getResources().getIdentifier(idPrefix + "_toggle", "id", rootView.getContext().getPackageName());
-        int subContainerResId = rootView.getResources().getIdentifier(idPrefix + "_sub_container", "id", rootView.getContext().getPackageName());
-
-        View toggleButton = rootView.findViewById(toggleButtonResId);
-        View subContainer = rootView.findViewById(subContainerResId);
-        if (toggleButton == null || subContainer == null) return;
-
-        // 컨테이너가 아니라 그 안의 아이콘 ImageView만 찾는다
-        View toggleIcon = findImageViewChild(toggleButton);
-        if (toggleIcon == null) toggleIcon = toggleButton; // 못 찾으면 폴백
-
-        View iconToRotate = toggleIcon;
-        toggleButton.setOnClickListener(v -> {
-            boolean currentlyExpanded = subContainer.getVisibility() == View.VISIBLE;
-            animateToggle(iconToRotate, subContainer, !currentlyExpanded);
-        });
+        boolean shouldShow = visible && (Settings.SHOW_DC_BAN_LIST_BUTTON.get() || Settings.SHOW_GALL_SCOPE_BUTTON.get());
+        toggleButton.setVisibility(shouldShow ? View.VISIBLE : View.GONE);
     }
 
     private static View findImageViewChild(View parent) {

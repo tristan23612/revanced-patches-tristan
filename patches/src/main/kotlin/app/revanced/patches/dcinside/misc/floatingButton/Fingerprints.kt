@@ -4,7 +4,6 @@ import app.revanced.patcher.*
 import app.revanced.patcher.invoke
 import app.revanced.patcher.patch.BytecodePatchContext
 import com.android.tools.smali.dexlib2.AccessFlags
-import com.android.tools.smali.dexlib2.Opcode
 
 internal val BytecodePatchContext.floatingButtonVisibilityMethodMatch by composingFirstMethod {
     accessFlags(AccessFlags.PUBLIC, AccessFlags.FINAL)
@@ -12,16 +11,6 @@ internal val BytecodePatchContext.floatingButtonVisibilityMethodMatch by composi
     returnType("V")
     instructions(
         "postListQuickWrite"(),
-    )
-}
-
-internal val BytecodePatchContext.postListOnViewCreatedMethodMatch by composingFirstMethod("postListQuickWrite") {
-    name("onViewCreated")
-    accessFlags(AccessFlags.PUBLIC)
-    parameterTypes("Landroid/view/View;", "Landroid/os/Bundle;")
-    returnType("V")
-    instructions(
-        method { name == "onViewCreated" }
     )
 }
 

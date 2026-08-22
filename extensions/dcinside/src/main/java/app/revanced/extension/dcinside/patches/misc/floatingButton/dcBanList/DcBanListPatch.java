@@ -33,10 +33,10 @@ import org.json.JSONObject;
 
 import app.revanced.extension.dcinside.patches.hook.json.JsonHookPatch;
 
+@SuppressLint("DiscouragedApi")
 public class DcBanListPatch {
     private static final String TAG = "ReVanced_DCInside";
 
-    @SuppressLint("DiscouragedApi")
     public static void setDcBanListButtonVisibility(View targetView, boolean visible, String dcBanListButtonIdName) {
         if (targetView == null) return;
 
@@ -49,23 +49,8 @@ public class DcBanListPatch {
 
         View dcBanListButton = rootView.findViewById(resId);
         if (dcBanListButton != null) {
-            dcBanListButton.setVisibility(visible && Settings.SHOW_DC_BAN_LIST_BUTTON.get() && JsonHookPatch.managerSkill ? View.VISIBLE : View.GONE);
-        }
-    }
-
-    @SuppressLint("DiscouragedApi")
-    public static void setupDcBanListButton(View view, String dcBanListButtonIdName) {
-        if (view == null) return;
-
-        int resId = view.getContext().getResources().getIdentifier(
-                dcBanListButtonIdName,
-                "id",
-                view.getContext().getPackageName()
-        );
-
-        View dcBanListButton = view.findViewById(resId);
-        if (dcBanListButton != null) {
             dcBanListButton.setOnClickListener(buttonView -> showExportDialog(buttonView.getContext()));
+            dcBanListButton.setVisibility(visible && Settings.SHOW_DC_BAN_LIST_BUTTON.get() && JsonHookPatch.managerSkill ? View.VISIBLE : View.GONE);
         }
     }
 
@@ -73,7 +58,6 @@ public class DcBanListPatch {
         new ExportSession(context).start();
     }
 
-    @SuppressLint("DiscouragedApi")
     private static int resolveDialogTheme(Context context) {
         TypedValue typedValue = new TypedValue();
         context.getTheme().resolveAttribute(
