@@ -445,6 +445,8 @@ public class GallScopePatch {
             completedPages = new AtomicInteger(0);
             nextPageToLaunch = new AtomicInteger(startPage);
             activeRequests = new AtomicInteger(0);
+            finished.set(false);
+            rangeExceeded = false;
 
             int initial = Math.min(BATCH_SIZE, totalPagesInBatch);
             for (int i = 0; i < initial; i++) {
