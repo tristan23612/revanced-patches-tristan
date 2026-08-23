@@ -23,6 +23,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import androidx.annotation.NonNull;
@@ -101,6 +102,9 @@ public class GallScopePatch {
         private int rangeSize;
 
         private final List<JSONObject> resultsList = Collections.synchronizedList(new ArrayList<>());
+        private volatile boolean rangeExceeded = false;
+        private final AtomicBoolean finished = new AtomicBoolean(false);
+        private final AtomicInteger lastValidPage = new AtomicInteger(0);
         private AtomicInteger completedPages;
         private AtomicInteger nextPageToLaunch;
         private AtomicInteger activeRequests;
@@ -250,21 +254,30 @@ public class GallScopePatch {
                         snapshot = new ArrayList<>(resultsList);
                     }
 
+                    int displayEndPage = Math.min(endPage, lastValidPage.get());
+
                     TextView message = new TextView(context);
-                    message.setText(targetUserId + " 스코프 결과\n" + snapshot.size() + "건 (" + firstSearchedPage + "~" + endPage + "페이지)");
+                    String rangeText = firstSearchedPage + "~" + displayEndPage + "페이지";
+                    if (rangeExceeded) {
+                        rangeText += " (마지막 페이지 도달)";
+                    }
+                    message.setText(targetUserId + " 스코프 결과\n" + snapshot.size() + "건 (" + rangeText + ")");
 
                     ListView listView = getListView(snapshot);
-
                     LinearLayout container = wrapWithPadding(message, listView);
 
                     builder.setView(container)
-                            .setNeutralButton("복사", (d, w) -> copyResultsToClipboard(snapshot))
-                            .setPositiveButton("계속 검색", (d, w) -> {
-                                startPage = endPage + 1;
-                                endPage = startPage + rangeSize - 1;
-                                transitionTo(Step.PARSING);
-                            })
-                            .setNegativeButton("닫기", null);
+                            .setNeutralButton("복사", (d, w) -> copyResultsToClipboard(snapshot));
+
+                    if (!rangeExceeded) {
+                        builder.setPositiveButton("계속 검색", (d, w) -> {
+                            startPage = lastValidPage.get() + 1;
+                            endPage = startPage + rangeSize - 1;
+                            transitionTo(Step.PARSING);
+                        });
+                    }
+
+                    builder.setNegativeButton("닫기", null);
                 }
 
                 case ERROR -> builder
@@ -440,6 +453,7 @@ public class GallScopePatch {
         }
 
         private void launchNextPage() {
+            if (rangeExceeded) return;
             int page = nextPageToLaunch.getAndIncrement();
             if (page > endPage) return;
 
@@ -461,9 +475,15 @@ public class GallScopePatch {
                                 if (response.isSuccessful()) {
                                     String html = response.body().string();
                                     Document doc = Jsoup.parse(html);
-                                    JSONArray pageResults = GallScopeHtmlParser.parseAndFilterByUserId(doc, targetUserId);
-                                    for (int i = 0; i < pageResults.length(); i++) {
-                                        resultsList.add(pageResults.getJSONObject(i));
+
+                                    if (GallScopeHtmlParser.isPageOutOfRange(doc, page)) {
+                                        rangeExceeded = true;
+                                    } else {
+                                        lastValidPage.updateAndGet(v -> Math.max(v, page));
+                                        JSONArray pageResults = GallScopeHtmlParser.parseAndFilterByUserId(doc, targetUserId);
+                                        for (int i = 0; i < pageResults.length(); i++) {
+                                            resultsList.add(pageResults.getJSONObject(i));
+                                        }
                                     }
                                 }
                             } catch (java.io.IOException | JSONException ignored) {
@@ -480,11 +500,13 @@ public class GallScopePatch {
             int done = completedPages.incrementAndGet();
             updateProgressMessageInPlace(done, totalPagesInBatch);
 
-            if (nextPageToLaunch.get() <= endPage) {
+            if (!rangeExceeded && nextPageToLaunch.get() <= endPage) {
                 mainHandler.postDelayed(this::launchNextPage, 500);
-            } else if (done >= totalPagesInBatch) {
-                sortResultsByPostNoDesc();
-                transitionTo(Step.RESULT);
+            } else if (activeRequests.get() == 0) {
+                if (finished.compareAndSet(false, true)) {
+                    sortResultsByPostNoDesc();
+                    transitionTo(Step.RESULT);
+                }
             }
         }
 

@@ -83,6 +83,18 @@ final class GallScopeHtmlParser {
         return record;
     }
 
+    static boolean isPageOutOfRange(Document doc, int requestedPage) {
+        Element currentPageEl = doc.selectFirst("div.bottom_paging_box em");
+        if (currentPageEl == null) return false; // 못 찾으면 판단 보류(안전하게 통과)
+
+        try {
+            int actualPage = Integer.parseInt(currentPageEl.text().trim());
+            return actualPage != requestedPage;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
     private static String toAbsoluteUrl(String href) {
         if (href == null || href.isEmpty()) return "";
         if (href.startsWith("http://") || href.startsWith("https://")) return href;
