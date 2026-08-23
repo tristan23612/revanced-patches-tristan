@@ -26,10 +26,20 @@ final class GallScopeApiClient {
     }
 
     private static Request buildRequest(String galleryType, String galleryId, int page) {
-        String segment = "mini".equals(galleryType) ? "mini" : "mgallery";
+        String segment;
+        if ("gallery".equalsIgnoreCase(galleryType)) {
+            segment = "";
+        } else {
+            segment = galleryType + "/";
+        }
 
-        String url = "https://gall.dcinside.com/" + segment + "/board/lists/"
-                + "?id=" + galleryId
+        String sanitizedGalleryId = galleryId;
+        if (sanitizedGalleryId != null && sanitizedGalleryId.startsWith("mi$")) {
+            sanitizedGalleryId = sanitizedGalleryId.substring(3);
+        }
+
+        String url = "https://gall.dcinside.com/" + segment + "board/lists/"
+                + "?id=" + sanitizedGalleryId
                 + "&page=" + page;
 
         return new Request.Builder()
