@@ -15,6 +15,9 @@ final class GallScopeHtmlParser {
 
     private static final String BASE_URL = "https://gall.dcinside.com";
     private static final Pattern REPLY_COUNT_PATTERN = Pattern.compile("\\[(\\d+)]");
+    private static final Pattern PC_VIEW_URL_PATTERN = Pattern.compile(
+            "https://gall\\.dcinside\\.com/(mini/|mgallery/)?board/view/\\?id=([^&]+)&no=(\\d+)"
+    );
 
     private GallScopeHtmlParser() {
     }
@@ -54,7 +57,7 @@ final class GallScopeHtmlParser {
 
         Element titleAnchor = row.selectFirst("td.gall_tit.ub-word > a");
         String title = titleAnchor != null ? titleAnchor.ownText().trim() : "";
-        String url = titleAnchor != null ? toAbsoluteUrl(titleAnchor.attr("href")) : "";
+        String url = titleAnchor != null ? toMobileUrl(toAbsoluteUrl(titleAnchor.attr("href")) ): "";
 
         String replyRaw = text(row, "a.reply_numbox");
         String replyCount = extractReplyCount(replyRaw);
@@ -99,6 +102,21 @@ final class GallScopeHtmlParser {
         if (href == null || href.isEmpty()) return "";
         if (href.startsWith("http://") || href.startsWith("https://")) return href;
         return href.startsWith("/") ? BASE_URL + href : BASE_URL + "/" + href;
+    }
+
+    static String toMobileUrl(String pcUrl) {
+        if (pcUrl == null || pcUrl.isEmpty()) return pcUrl;
+
+        Matcher matcher = PC_VIEW_URL_PATTERN.matcher(pcUrl);
+        if (!matcher.find()) return pcUrl;
+
+        String prefix = matcher.group(1); // "mini/", "mgallery/", 또는 null(일반 갤러리)
+        String galleryId = matcher.group(2);
+        String postNo = matcher.group(3);
+
+        String segment = "mini/".equals(prefix) ? "mini" : "board";
+
+        return "https://m.dcinside.com/" + segment + "/" + galleryId + "/" + postNo;
     }
 
     private static String extractReplyCount(String raw) {
