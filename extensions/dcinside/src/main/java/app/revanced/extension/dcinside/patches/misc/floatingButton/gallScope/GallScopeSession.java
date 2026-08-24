@@ -6,10 +6,14 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 import android.util.TypedValue;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
@@ -141,29 +145,56 @@ final class GallScopeSession {
             }
 
             case SEARCH_MODE_SELECTION -> {
+                int textColor = resolveDialogTextColor(context);
+                int borderColor = applyAlpha(textColor, 0x80);
+
                 TextView message = new TextView(context);
                 message.setText("검색 방식을 선택하세요.\n(" + targetUserId + ")");
 
-                LinearLayout container = wrapWithPadding(message);
+                Button postButton = new Button(context);
+                postButton.setText("게시글 검색");
+                postButton.setOnClickListener(v -> {
+                    searchMode = SearchMode.POST;
+                    currentDialog.dismiss();
+                    transitionTo(Step.PAGE_RANGE_INPUT);
+                });
+                postButton.setBackground(createOutlineButtonBackground(borderColor));
+                postButton.setTextColor(textColor);
+
+                Button commentButton = new Button(context);
+                commentButton.setText("댓글 검색");
+                commentButton.setOnClickListener(v -> {
+                    searchMode = SearchMode.COMMENT;
+                    commentSearchStrategy.reset();
+                    currentDialog.dismiss();
+                    transitionTo(Step.PAGE_RANGE_INPUT);
+                });
+                commentButton.setBackground(createOutlineButtonBackground(borderColor));
+                commentButton.setTextColor(textColor);
+
+                LinearLayout buttonRow = new LinearLayout(context);
+                buttonRow.setOrientation(LinearLayout.HORIZONTAL);
+
+                LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+                int buttonMargin = (int) (4 * context.getResources().getDisplayMetrics().density);
+
+                LinearLayout.LayoutParams postButtonParams = new LinearLayout.LayoutParams(buttonParams);
+                postButtonParams.rightMargin = buttonMargin;
+                LinearLayout.LayoutParams commentButtonParams = new LinearLayout.LayoutParams(buttonParams);
+                commentButtonParams.leftMargin = buttonMargin;
+
+                buttonRow.addView(postButton, postButtonParams);
+                buttonRow.addView(commentButton, commentButtonParams);
+
+                LinearLayout container = wrapWithPadding(message, buttonRow);
 
                 builder.setView(container)
-                        .setPositiveButton("게시글 검색", (d, w) -> {
-                            searchMode = SearchMode.POST;
-                            transitionTo(Step.PAGE_RANGE_INPUT);
-                        })
-                        .setNeutralButton("댓글 검색", (d, w) -> {
-                            searchMode = SearchMode.COMMENT;
-                            commentSearchStrategy.reset();
-                            transitionTo(Step.PAGE_RANGE_INPUT);
-                        })
                         .setNegativeButton("취소", null);
             }
 
             case PAGE_RANGE_INPUT -> {
                 TextView message = new TextView(context);
-                String rangeLabel = (searchMode == SearchMode.COMMENT)
-                        ? "검색할 페이지 개수를 입력하세요.\n(" + targetUserId + ", 댓글 검색)"
-                        : "검색할 페이지 범위를 입력하세요.\n(" + targetUserId + ")";
+                String rangeLabel = "검색할 페이지 범위를 입력하세요.\n(" + targetUserId + "의 " + searchMode + ")";
                 message.setText(rangeLabel);
 
                 EditText startInput = new EditText(context);
@@ -445,6 +476,14 @@ final class GallScopeSession {
         return (int) (16 * context.getResources().getDisplayMetrics().density);
     }
 
+    private static Drawable createOutlineButtonBackground(int borderColor) {
+        GradientDrawable drawable = new GradientDrawable();
+        drawable.setColor(Color.TRANSPARENT);
+        drawable.setStroke(2, borderColor);
+        drawable.setCornerRadius(8);
+        return drawable;
+    }
+
     private static int resolveDialogTheme(Context context) {
         TypedValue typedValue = new TypedValue();
         context.getTheme().resolveAttribute(
@@ -455,14 +494,31 @@ final class GallScopeSession {
         return typedValue.resourceId;
     }
 
+    private static int resolveDialogTextColor(Context context) {
+        int dialogThemeResId = resolveDialogTheme(context);
+        Context themedContext = new ContextThemeWrapper(context, dialogThemeResId);
+
+        TypedValue typedValue = new TypedValue();
+        themedContext.getTheme().resolveAttribute(android.R.attr.textColorPrimary, typedValue, true);
+
+        if (typedValue.resourceId != 0) {
+            return themedContext.getResources().getColor(typedValue.resourceId, themedContext.getTheme());
+        }
+        return typedValue.data;
+    }
+
+    private static int applyAlpha(int color, int alpha) {
+        // alpha: 0~255
+        return (color & 0x00FFFFFF) | (alpha << 24);
+    }
+
     private void transitionTo(Step nextStep) {
         this.currentStep = nextStep;
         mainHandler.post(this::renderStep);
     }
 
     private String progressText(int completed, int total) {
-        String unit = (searchMode == SearchMode.COMMENT) ? "회" : "페이지";
-        return "검색하고 있습니다...\n(" + completed + " / " + total + unit + ")";
+        return "검색하고 있습니다...\n(" + completed + " / " + total + "페이지" + ")";
     }
 
     private void copyResultsToClipboard(List<JSONObject> snapshot) {

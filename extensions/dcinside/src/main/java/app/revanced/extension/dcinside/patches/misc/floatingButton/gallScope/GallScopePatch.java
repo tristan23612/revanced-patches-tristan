@@ -23,18 +23,6 @@ public class GallScopePatch {
         }
     }
 
-    public static void setupGallScopeButton(View view, String gallScopeButtonIdName) {
-        if (view == null) return;
-
-        int resId = view.getContext().getResources().getIdentifier(
-                gallScopeButtonIdName, "id", view.getContext().getPackageName());
-
-        View button = view.findViewById(resId);
-        if (button != null) {
-            button.setOnClickListener(buttonView -> new GallScopeSession(buttonView.getContext(), null).start());
-        }
-    }
-
     /**
      * 게시글 화면 등 외부에서 식별코드를 이미 알고 있을 때 바로 모드 선택부터 시작
      */
