@@ -115,7 +115,7 @@ public class DcBanListPatch {
 
             AlertDialog.Builder builder = new AlertDialog.Builder(context, dialogThemeResId)
                     .setTitle("차단 내역 내보내기")
-                    .setCancelable(false);
+                    .setCancelable(true);
 
             switch (currentStep) {
                 case OAUTH_CONFIRMATION -> builder

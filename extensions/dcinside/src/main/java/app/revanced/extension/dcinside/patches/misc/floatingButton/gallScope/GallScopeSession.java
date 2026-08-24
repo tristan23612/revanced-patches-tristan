@@ -110,7 +110,7 @@ final class GallScopeSession {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context, dialogThemeResId)
                 .setTitle("갤스코프")
-                .setCancelable(false);
+                .setCancelable(true);
 
         switch (currentStep) {
             case IDENTIFIER_INPUT -> {
