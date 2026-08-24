@@ -39,7 +39,21 @@ final class GallScopeSession {
         ERROR
     }
 
-    private enum SearchMode { POST, COMMENT }
+    private enum SearchMode {
+        POST("게시글"), COMMENT("댓글");
+
+        private final String label;
+
+        SearchMode(String label) {
+            this.label = label;
+        }
+
+        @NonNull
+        @Override
+        public String toString() {
+            return label;
+        }
+    }
 
     private final Context context;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -231,7 +245,7 @@ final class GallScopeSession {
                 if (rangeExceeded) {
                     rangeText += " (마지막 페이지 도달)";
                 }
-                message.setText(targetUserId + " 스코프 결과\n" + snapshot.size() + "건 (" + rangeText + ")");
+                message.setText(targetUserId + " " + searchMode + " 스코프 결과\n" + snapshot.size() + "건 (" + rangeText + ")");
 
                 ListView listView = getListView(snapshot);
                 LinearLayout container = wrapWithPadding(message, listView);
@@ -241,9 +255,7 @@ final class GallScopeSession {
 
                 if (!rangeExceeded) {
                     builder.setPositiveButton("계속 검색", (d, w) -> {
-                        if (searchMode == SearchMode.COMMENT) {
-                            // commentSearchStrategy 내부 상태(누적 카운트 등)로 이어서 진행
-                        } else {
+                        if (searchMode != SearchMode.COMMENT) {
                             startPage = lastValidPage + 1;
                             endPage = startPage + rangeSize - 1;
                         }
@@ -348,8 +360,8 @@ final class GallScopeSession {
                 String type = item != null ? item.optString("type", "post") : "post";
 
                 if ("comment".equals(type)) {
-                    String nickname = item != null ? item.optString("nickname", "") : "";
-                    String date = item != null ? item.optString("date", "") : "";
+                    String nickname = item.optString("nickname", "");
+                    String date = item.optString("date", "");
                     titleView.setText(title);
                     subView.setText("작성자: " + nickname + " | " + date);
                 } else {
@@ -455,12 +467,12 @@ final class GallScopeSession {
 
     private void copyResultsToClipboard(List<JSONObject> snapshot) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(targetUserId).append(" 스코프 결과\n");
-        stringBuilder.append(snapshot.size()).append("개의 결과를 찾았습니다.\n");
+        stringBuilder.append(targetUserId).append(" ").append(searchMode).append(" 스코프 결과\n");
+        stringBuilder.append(snapshot.size()).append("개의 결과를 찾았습니다.\n\n");
         for (JSONObject item : snapshot) {
             stringBuilder.append(item.optString("date", "")).append("\t")
-                    .append(item.optString("title", "")).append("\t")
-                    .append(item.optString("url", "")).append("\n");
+                    .append(item.optString("title", "")).append("\n")
+                    .append(item.optString("url", "")).append("\n\n");
         }
 
         ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
