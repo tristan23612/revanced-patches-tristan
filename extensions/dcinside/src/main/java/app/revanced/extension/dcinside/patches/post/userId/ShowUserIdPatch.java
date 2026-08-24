@@ -26,7 +26,7 @@ public class ShowUserIdPatch {
             Context context = view.getContext();
 
             int targetTextViewId = context.getResources().getIdentifier(
-                    "custom_user_id", "id", context.getPackageName()
+                    "revanced_user_id", "id", context.getPackageName()
             );
 
             if (targetTextViewId == 0) return;

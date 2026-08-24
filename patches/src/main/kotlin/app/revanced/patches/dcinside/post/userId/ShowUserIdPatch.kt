@@ -55,13 +55,13 @@ private fun injectUserIdTextView(
         val targetLeft = leftElement ?: return@use
         val targetRight = rightElement ?: return@use
 
-        targetLeft.setAttribute("app:layout_constraintEnd_toStartOf", "@+id/custom_user_id")
-        targetRight.setAttribute("app:layout_constraintStart_toEndOf", "@+id/custom_user_id")
+        targetLeft.setAttribute("app:layout_constraintEnd_toStartOf", "@+id/revanced_user_id")
+        targetRight.setAttribute("app:layout_constraintStart_toEndOf", "@+id/revanced_user_id")
 
         val userIdElement = document.createElement(viewClass).apply {
             setAttribute("android:textAppearance", "?attr/textTypeSub")
             setAttribute("android:textColor", textColorAttr)
-            setAttribute("android:id", "@+id/custom_user_id")
+            setAttribute("android:id", "@+id/revanced_user_id")
             setAttribute("android:layout_width", "wrap_content")
             setAttribute("android:layout_height", height)
             setAttribute("android:singleLine", "true")
