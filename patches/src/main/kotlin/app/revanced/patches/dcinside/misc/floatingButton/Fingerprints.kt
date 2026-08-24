@@ -13,14 +13,3 @@ internal val BytecodePatchContext.floatingButtonVisibilityMethodMatch by composi
         "postListQuickWrite"(),
     )
 }
-
-internal val BytecodePatchContext.postHeaderSetupMethodMatch by composingFirstMethod {
-    parameterTypes("Lcom/dcinside/app/model/PostInfo;", "Z", "Ljava/lang/String;")
-    returnType("V")
-    instructions(
-        "info"(),
-        "readHeaderSubject"(),
-        "readHeaderMemberIc"(),
-        "readHeaderUserMemo"(),
-    )
-}

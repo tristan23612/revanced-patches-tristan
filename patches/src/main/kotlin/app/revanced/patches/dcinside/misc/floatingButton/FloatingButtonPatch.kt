@@ -232,7 +232,6 @@ val floatingButtonPatch = bytecodePatch(
         jsonHookPatch,
         floatingButtonContainerResourcePatch,
         floatingButtonResourcePatch,
-        gallScopePostHeaderPatch,
     )
 
     apply {
