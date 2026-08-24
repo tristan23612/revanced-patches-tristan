@@ -81,8 +81,14 @@ final class GallScopeSession {
     private final PostSearchStrategy postSearchStrategy = new PostSearchStrategy();
     private final CommentSearchStrategy commentSearchStrategy = new CommentSearchStrategy();
 
+    private final int textColor;
+    private final int secondaryColor;
+
     GallScopeSession(Context context, String prefillUserId) {
         this.context = context;
+        this.textColor = resolveDialogTextColor(context);
+        this.secondaryColor = applyAlpha(textColor, 0x80);
+
         if (prefillUserId != null && !prefillUserId.trim().isEmpty()) {
             this.targetUserId = prefillUserId.trim();
             this.currentStep = Step.SEARCH_MODE_SELECTION;
@@ -101,6 +107,7 @@ final class GallScopeSession {
         }
 
         int dialogThemeResId = resolveDialogTheme(context);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(context, dialogThemeResId)
                 .setTitle("갤스코프")
                 .setCancelable(false);
@@ -112,7 +119,7 @@ final class GallScopeSession {
 
                 EditText input = new EditText(context);
                 input.setHint("식별코드 또는 IP 입력");
-                input.setHintTextColor(0xFF9E9E9E);
+                input.setHintTextColor(secondaryColor);
                 input.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
                 input.setGravity(android.view.Gravity.CENTER);
 
@@ -145,9 +152,6 @@ final class GallScopeSession {
             }
 
             case SEARCH_MODE_SELECTION -> {
-                int textColor = resolveDialogTextColor(context);
-                int borderColor = applyAlpha(textColor, 0x80);
-
                 TextView message = new TextView(context);
                 message.setText("검색 방식을 선택하세요.\n(" + targetUserId + ")");
 
@@ -158,7 +162,7 @@ final class GallScopeSession {
                     currentDialog.dismiss();
                     transitionTo(Step.PAGE_RANGE_INPUT);
                 });
-                postButton.setBackground(createOutlineButtonBackground(borderColor));
+                postButton.setBackground(createOutlineButtonBackground(secondaryColor));
                 postButton.setTextColor(textColor);
 
                 Button commentButton = new Button(context);
@@ -169,7 +173,7 @@ final class GallScopeSession {
                     currentDialog.dismiss();
                     transitionTo(Step.PAGE_RANGE_INPUT);
                 });
-                commentButton.setBackground(createOutlineButtonBackground(borderColor));
+                commentButton.setBackground(createOutlineButtonBackground(secondaryColor));
                 commentButton.setTextColor(textColor);
 
                 LinearLayout buttonRow = new LinearLayout(context);
@@ -199,14 +203,14 @@ final class GallScopeSession {
 
                 EditText startInput = new EditText(context);
                 startInput.setHint("시작 페이지");
-                startInput.setHintTextColor(0xFF9E9E9E);
+                startInput.setHintTextColor(secondaryColor);
                 startInput.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
                 startInput.setGravity(android.view.Gravity.CENTER);
                 startInput.setText(String.valueOf(endPage > 0 ? endPage + 1 : 1));
 
                 EditText endInput = new EditText(context);
                 endInput.setHint("끝 페이지");
-                endInput.setHintTextColor(0xFF9E9E9E);
+                endInput.setHintTextColor(secondaryColor);
                 endInput.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
                 endInput.setGravity(android.view.Gravity.CENTER);
                 endInput.setText(String.valueOf(
@@ -374,7 +378,7 @@ final class GallScopeSession {
 
                     subView = new TextView(context);
                     subView.setTextSize(13);
-                    subView.setTextColor(0xFF9E9E9E);
+                    subView.setTextColor(secondaryColor);
 
                     row.addView(titleView);
                     row.addView(subView);

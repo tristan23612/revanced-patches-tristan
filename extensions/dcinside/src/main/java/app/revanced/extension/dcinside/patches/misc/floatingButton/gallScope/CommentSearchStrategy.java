@@ -129,7 +129,7 @@ final class CommentSearchStrategy implements SearchStrategy {
                             int done = commentAccumulatedPageCount - commentAccumulatedStartCount;
                             mainHandler.post(() -> callback.onProgress(done, context.rangeSize));
 
-                            mainHandler.postDelayed(CommentSearchStrategy.this::fetchNextCommentPage, 500);
+                            mainHandler.postDelayed(CommentSearchStrategy.this::fetchNextCommentPage, 100);
                         } catch (JSONException e) {
                             finishCommentFetch();
                         } catch (IOException e) {
