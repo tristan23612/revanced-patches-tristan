@@ -1,5 +1,6 @@
 package app.revanced.extension.dcinside.patches.misc.floatingButton.gallScope;
 
+import android.net.Uri;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -15,13 +16,7 @@ final class GallScopeHtmlParser {
 
     private static final String BASE_URL = "https://gall.dcinside.com";
     private static final Pattern REPLY_COUNT_PATTERN = Pattern.compile("\\[(\\d+)]");
-    private static final Pattern PC_VIEW_URL_PATTERN = Pattern.compile(
-            "https://gall\\.dcinside\\.com/(mini/|mgallery/)?board/view/\\?id=([^&]+)&no=(\\d+)"
-    );
     private static final Pattern SEARCH_POS_PATTERN = Pattern.compile("search_pos=(\\d+)");
-    private static final Pattern COMMENT_VIEW_URL_PATTERN = Pattern.compile(
-            "/(?:mini/|mgallery/)?board/view/\\?id=([^&]+)&no=(\\d+).*?(?:&fcno=(\\d+))?"
-    );
 
     private GallScopeHtmlParser() {
     }
@@ -134,10 +129,13 @@ final class GallScopeHtmlParser {
 
         String postNo = "";
         String fcno = "";
-        Matcher m = COMMENT_VIEW_URL_PATTERN.matcher(href);
-        if (m.find()) {
-            postNo = m.group(2) != null ? m.group(2) : "";
-            fcno = m.group(3) != null ? m.group(3) : "";
+
+        if (!href.isEmpty()) {
+            Uri uri = Uri.parse(href);
+            String noParam = uri.getQueryParameter("no");
+            String fcnoParam = uri.getQueryParameter("fcno");
+            postNo = noParam != null ? noParam : "";
+            fcno = fcnoParam != null ? fcnoParam : "";
         }
 
         String nickname = writerEl.attr("data-nick").trim();
@@ -147,7 +145,7 @@ final class GallScopeHtmlParser {
         record.put("type", "comment");
         record.put("postNo", postNo);
         record.put("subject", "");
-        record.put("title", content); // 결과 리스트뷰 재활용을 위해 title 자리에 댓글 내용
+        record.put("title", content);
         record.put("url", toMobileUrl(absoluteUrl));
         record.put("replyCount", "");
         record.put("nickname", nickname);
@@ -156,7 +154,7 @@ final class GallScopeHtmlParser {
         record.put("date", date);
         record.put("views", "");
         record.put("recommend", "");
-        record.put("fcno", fcno); // 댓글 위치 식별용, 게시글 스키마엔 없는 부가 필드
+        record.put("fcno", fcno);
 
         return record;
     }
@@ -185,14 +183,15 @@ final class GallScopeHtmlParser {
     static String toMobileUrl(String pcUrl) {
         if (pcUrl == null || pcUrl.isEmpty()) return pcUrl;
 
-        Matcher matcher = PC_VIEW_URL_PATTERN.matcher(pcUrl);
-        if (!matcher.find()) return pcUrl;
+        Uri uri = Uri.parse(pcUrl);
+        String path = uri.getPath();
+        if (path == null || !path.contains("/board/view/")) return pcUrl;
 
-        String prefix = matcher.group(1);
-        String galleryId = matcher.group(2);
-        String postNo = matcher.group(3);
+        String galleryId = uri.getQueryParameter("id");
+        String postNo = uri.getQueryParameter("no");
+        if (galleryId == null || postNo == null) return pcUrl;
 
-        String segment = "mini/".equals(prefix) ? "mini" : "board";
+        String segment = path.contains("/mini/") ? "mini" : "board";
 
         return "https://m.dcinside.com/" + segment + "/" + galleryId + "/" + postNo;
     }

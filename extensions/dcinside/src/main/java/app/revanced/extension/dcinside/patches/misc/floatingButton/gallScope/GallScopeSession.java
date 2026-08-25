@@ -12,6 +12,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
 import android.view.View;
@@ -33,6 +34,8 @@ import app.revanced.extension.dcinside.patches.hook.json.JsonHookPatch;
  */
 @SuppressLint({"DiscouragedApi", "SetTextI18n"})
 final class GallScopeSession {
+
+    private static final String TAG = "ReVanced_DCInside";
 
     private enum Step {
         IDENTIFIER_INPUT,
@@ -423,6 +426,18 @@ final class GallScopeSession {
                 intent.setClassName(context.getPackageName(), "com.dcinside.app.PostReadActivity");
                 intent.putExtra("com.dcinside.app.extra.GALLERY_ID", JsonHookPatch.galleryId);
                 intent.putExtra("com.dcinside.app.extra.POST_NUMBER", postNoInt);
+
+                if ("comment".equals(item.optString("type", "post"))) {
+                    String fcno = item.optString("fcno", "");
+                    if (!fcno.isEmpty()) {
+                        try {
+                            Log.d(TAG, "fcno: " + fcno);
+                            intent.putExtra("com.dcinside.app.extra.COMMENT_NUMBER", Integer.parseInt(fcno));
+                        } catch (NumberFormatException ignored) {
+                        }
+                    }
+                }
+
                 context.startActivity(intent);
             } catch (NumberFormatException e) {
                 Toast.makeText(context, "게시글 번호가 올바르지 않습니다.", Toast.LENGTH_SHORT).show();
