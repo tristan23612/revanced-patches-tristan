@@ -259,9 +259,18 @@ Second \"item\" text"</string>
             <string name="revanced_disable_post_pum_option_summary_off">게시글 작성 시 펌 금지 옵션이 기본적으로 비활성화됩니다.</string>
         </patch>
         <patch id="post.userId.showUserIdPatch">
-            <string name="revanced_show_user_id_title">식별 코드 표시</string>
-            <string name="revanced_show_user_id_summary_on">반고닉과 고닉 유저의 식별 코드가 표시됩니다.</string>
-            <string name="revanced_show_user_id_summary_off">반고닉과 고닉 유저의 식별 코드가 표시되지 않습니다.</string>
+            <string name="revanced_show_user_id_title">식별코드 표시</string>
+            <string name="revanced_show_user_id_summary_on">반고닉과 고닉 유저의 식별코드가 표시됩니다.</string>
+            <string name="revanced_show_user_id_summary_off">반고닉과 고닉 유저의 식별코드가 표시되지 않습니다.</string>
+            <string name="revanced_show_user_id_guide_title">식별코드 표시 가이드</string>
+            <string name="revanced_show_user_id_guide_summary">"식별코드 표시 옵션이 켜진 경우 다음 위치에 식별코드가 표시됩니다.
+- 게시글 목록에서 게시글 작성자 우측
+- 게시글 내부에서 게시글 작성자 우측
+- 게시글 내부에서 댓글 작성자 우측
+- 최근 본 글 목록에서 작성자 우측(드물게 누락됨)
+                
+갤스코프 옵션이 켜진 경우 식별코드를 터치해 스코프를 바로 열 수 있습니다.
+"</string>
         </patch>
         <patch id="post.list.quickPostManagementPatch">
             <string name="revanced_enable_quick_post_management_title">빠른 게시글 관리</string>
@@ -296,8 +305,8 @@ Second \"item\" text"</string>
             <string name="revanced_show_gall_scope_button_title">Gall Scope 아이콘 표시하기</string>
             <string name="revanced_show_gall_scope_button_summary_on">Gall Scope 아이콘이 퀵쓰기 버튼 위에 추가됩니다.</string>
             <string name="revanced_show_gall_scope_button_summary_off">Gall Scope 아이콘이 퀵쓰기 버튼 위에 추가되지 않습니다.</string>
-            <string name="revanced_gall_scope_post_header_interaction_guide_title">작성자 스코프 바로 열기</string>
-            <string name="revanced_gall_scope_post_header_interaction_guide_summary">식별 코드 표시 옵션이 켜진 경우 작성자의 식별 코드를 터치해 스코프를 바로 열 수 있습니다.</string>
+            <string name="revanced_gall_scope_post_header_interaction_guide_title">식별코드 스코프 바로 열기</string>
+            <string name="revanced_gall_scope_post_header_interaction_guide_summary">식별코드 표시 옵션이 켜진 경우 식별코드를 터치해 스코프를 바로 열 수 있습니다.</string>
         </patch>
         <patch id="misc.hook.hookPatch">
             <string name="revanced_hide_administrator_notice_title">운영자 공지 숨기기</string>

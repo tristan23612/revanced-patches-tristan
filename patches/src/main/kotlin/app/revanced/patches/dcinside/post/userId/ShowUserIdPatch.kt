@@ -13,6 +13,7 @@ import app.revanced.patches.all.misc.resources.addResourcesPatch
 import app.revanced.patches.dcinside.misc.extension.sharedExtensionPatch
 import app.revanced.patches.dcinside.misc.settings.PreferenceScreen
 import app.revanced.patches.dcinside.misc.settings.settingsPatch
+import app.revanced.patches.shared.misc.settings.preference.NonInteractivePreference
 import app.revanced.patches.shared.misc.settings.preference.SwitchPreference
 import app.revanced.util.doRecursively
 import app.revanced.util.getFreeRegisterProvider
@@ -193,6 +194,7 @@ val showUserIdPatch = bytecodePatch(
 
         PreferenceScreen.GENERAL.addPreferences(
             SwitchPreference("revanced_show_user_id"),
+            NonInteractivePreference("revanced_show_user_id_guide")
         )
 
         postItemBindMethodMatch.let {
