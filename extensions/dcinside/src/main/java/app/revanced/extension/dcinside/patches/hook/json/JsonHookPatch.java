@@ -44,23 +44,7 @@ public final class JsonHookPatch {
                 JSONObject jsonObject = jsonArray.optJSONObject(i);
                 if (jsonObject == null) continue;
 
-                if (jsonObject.has("gall_info")) {
-                    JSONArray gallInfoArray = jsonObject.optJSONArray("gall_info");
-                    if (gallInfoArray != null && gallInfoArray.length() > 0) {
-                        JSONObject gallInfo = gallInfoArray.optJSONObject(0);
-                        if (gallInfo != null) {
-                            managerSkill = gallInfo.optBoolean("managerskill", false);
-
-                            if (gallInfo.optBoolean("is_minor", false)) {
-                                galleryType = "mgallery";
-                            } else if (gallInfo.optBoolean("is_mini", false)) {
-                                galleryType = "mini";
-                            } else {
-                                galleryType = "gallery";
-                            }
-                        }
-                    }
-                }
+                updateGalleryMetadata(jsonObject);
 
                 for (JsonHook hook : hooks) {
                     jsonObject = hook.hook(jsonObject);
@@ -72,6 +56,43 @@ public final class JsonHookPatch {
         } catch (Exception e) {
             Log.e(TAG, "jsonHook: failed to parse JSON", e);
             return StreamUtils.INSTANCE.fromString(jsonArray.toString());
+        }
+    }
+
+    /**
+     * Updates the metadata of a gallery represented by the provided JSON object. This method
+     * evaluates specific fields within the JSON object to determine and set the
+     * gallery's type and manager skill status.
+     *
+     * @param jsonObject The JSON object containing gallery metadata. Must not be null.
+     */
+    private static void updateGalleryMetadata(@NotNull JSONObject jsonObject) {
+        JSONObject infoObj;
+
+        JSONArray gallInfoArray = jsonObject.optJSONArray("gall_info");
+        if (gallInfoArray != null && gallInfoArray.length() > 0) {
+            infoObj = gallInfoArray.optJSONObject(0);
+        } else {
+            infoObj = jsonObject.optJSONObject("view_info");
+        }
+
+        if (infoObj == null) return;
+
+        // galleryType 결정 (is_minor -> is_mini -> gallery 순)
+        if (infoObj.optBoolean("is_minor", false)) {
+            galleryType = "mgallery";
+        } else if (infoObj.optBoolean("is_mini", false)) {
+            galleryType = "mini";
+        } else {
+            galleryType = "gallery";
+        }
+
+        // managerSkill 결정 (view_main 내 위치 우선 탐색 후 fallback)
+        JSONObject viewMain = jsonObject.optJSONObject("view_main");
+        if (viewMain != null && viewMain.has("managerskill")) {
+            managerSkill = viewMain.optBoolean("managerskill", false);
+        } else {
+            managerSkill = infoObj.optBoolean("managerskill", false);
         }
     }
 }
