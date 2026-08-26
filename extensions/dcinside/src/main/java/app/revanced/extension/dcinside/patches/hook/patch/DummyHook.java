@@ -14,7 +14,7 @@ public final class DummyHook extends BaseJsonHook {
     }
 
     @Override
-    public String apply(@NotNull String json) {
-        return json;
+    public JSONObject apply(@NotNull JSONObject jsonObject) {
+        return jsonObject;
     }
 }

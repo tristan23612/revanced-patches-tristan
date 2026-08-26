@@ -19,14 +19,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 
+import app.revanced.extension.dcinside.patches.hook.json.JsonHookPatch;
+import app.revanced.extension.dcinside.patches.hook.okhttp.CustomNetworkInterceptorPatch;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
-
-import app.revanced.extension.dcinside.patches.hook.json.JsonHookPatch;
 
 /**
  * 갤스코프 다이얼로그 상태 머신. 실제 fetch/파싱 로직은 SearchStrategy 구현체(PostSearchStrategy,
@@ -68,6 +68,8 @@ final class GallScopeSession {
     private AlertDialog currentDialog;
 
     private String targetUserId;
+    private String galleryType;
+    private String galleryId;
     private SearchMode searchMode;
 
     private int firstSearchedPage = -1;
@@ -87,13 +89,15 @@ final class GallScopeSession {
     private final int textColor;
     private final int secondaryColor;
 
-    GallScopeSession(Context context, String prefillUserId) {
+    GallScopeSession(Context context, String prefillUserId, String prefillGalleryType, String prefillGalleryId) {
         this.context = context;
         this.textColor = resolveDialogTextColor(context);
         this.secondaryColor = applyAlpha(textColor, 0x80);
 
-        if (prefillUserId != null && !prefillUserId.trim().isEmpty()) {
+        if (prefillUserId != null && !prefillUserId.trim().isEmpty() && prefillGalleryType != null && !prefillGalleryType.trim().isEmpty() && prefillGalleryId != null && !prefillGalleryId.trim().isEmpty()) {
             this.targetUserId = prefillUserId.trim();
+            this.galleryType = prefillGalleryType.trim();
+            this.galleryId = prefillGalleryId.trim();
             this.currentStep = Step.SEARCH_MODE_SELECTION;
         } else {
             this.currentStep = Step.IDENTIFIER_INPUT;
@@ -142,13 +146,15 @@ final class GallScopeSession {
 
                 builder.setView(container)
                         .setPositiveButton("다음", (d, w) -> {
-                            String id = input.getText().toString().trim();
-                            if (id.isEmpty()) {
+                            String targetUserId = input.getText().toString().trim();
+                            if (targetUserId.isEmpty()) {
                                 Toast.makeText(context, "식별코드를 입력해주세요.", Toast.LENGTH_SHORT).show();
                                 transitionTo(Step.IDENTIFIER_INPUT);
                                 return;
                             }
-                            targetUserId = id;
+                            this.targetUserId = targetUserId;
+                            galleryId = CustomNetworkInterceptorPatch.galleryId;
+                            galleryType = JsonHookPatch.galleryType;
                             transitionTo(Step.SEARCH_MODE_SELECTION);
                         })
                         .setNegativeButton("취소", null);
@@ -315,8 +321,8 @@ final class GallScopeSession {
 
     private void runSearch() {
         SearchStrategy.SearchContext searchContext = new SearchStrategy.SearchContext(
-                JsonHookPatch.galleryType,
-                JsonHookPatch.galleryId,
+                galleryType,
+                galleryId,
                 targetUserId,
                 startPage,
                 endPage,
@@ -424,14 +430,13 @@ final class GallScopeSession {
                 int postNoInt = Integer.parseInt(postNo);
                 Intent intent = new Intent();
                 intent.setClassName(context.getPackageName(), "com.dcinside.app.PostReadActivity");
-                intent.putExtra("com.dcinside.app.extra.GALLERY_ID", JsonHookPatch.galleryId);
+                intent.putExtra("com.dcinside.app.extra.GALLERY_ID", galleryId);
                 intent.putExtra("com.dcinside.app.extra.POST_NUMBER", postNoInt);
 
                 if ("comment".equals(item.optString("type", "post"))) {
                     String fcno = item.optString("fcno", "");
                     if (!fcno.isEmpty()) {
                         try {
-                            Log.d(TAG, "fcno: " + fcno);
                             intent.putExtra("com.dcinside.app.extra.COMMENT_NUMBER", Integer.parseInt(fcno));
                         } catch (NumberFormatException ignored) {
                         }

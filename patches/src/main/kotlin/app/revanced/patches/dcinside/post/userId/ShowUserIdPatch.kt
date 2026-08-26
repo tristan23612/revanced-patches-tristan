@@ -79,6 +79,23 @@ private fun injectUserIdTextView(
     }
 }
 
+context(context: ResourcePatchContext)
+private fun injectGalleryDataStore(layoutPath: String) {
+    context.document(layoutPath).use { document ->
+        val root = document.documentElement ?: return@use
+
+        // 수정 및 추가된 부분: 갤러리 ID 및 Type을 함께 포괄하도록 식별자(ID) 및 위젯 명칭 변경
+        val galleryDataElement = document.createElement("Space").apply {
+            setAttribute("android:id", "@+id/revanced_gallery_data_space")
+            setAttribute("android:layout_width", "0dp")
+            setAttribute("android:layout_height", "0dp")
+            setAttribute("android:visibility", "gone")
+        }
+
+        root.appendChild(galleryDataElement)
+    }
+}
+
 private val postListShowUserIdResourcePatch = resourcePatch {
     compatibleWith("com.dcinside.app.android")
 
@@ -100,6 +117,7 @@ private val postListShowUserIdResourcePatch = resourcePatch {
                     "app:layout_constraintTop_toTopOf" to "@+id/post_list_item_nic",
                 ),
             )
+            injectGalleryDataStore(layoutPath)
         }
     }
 }
@@ -121,6 +139,7 @@ private val postHeaderShowUserIdResourcePatch = resourcePatch {
                 "app:layout_constraintBaseline_toBaselineOf" to "@+id/read_header_name",
             ),
         )
+        injectGalleryDataStore("res/layout/view_read_header.xml")
     }
 }
 
@@ -148,6 +167,7 @@ private val replyShowUserIdResourcePatch = resourcePatch {
                     "app:layout_constraintTop_toTopOf" to "@+id/reply_name",
                 ),
             )
+            injectGalleryDataStore(layoutPath)
         }
     }
 }

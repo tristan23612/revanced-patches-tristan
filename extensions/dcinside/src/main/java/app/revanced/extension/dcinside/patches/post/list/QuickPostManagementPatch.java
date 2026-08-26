@@ -24,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 
 import androidx.annotation.NonNull;
 import app.revanced.extension.dcinside.patches.hook.json.JsonHookPatch;
+import app.revanced.extension.dcinside.patches.hook.okhttp.CustomNetworkInterceptorPatch;
 import app.revanced.extension.dcinside.settings.Settings;
 
 public class QuickPostManagementPatch {
@@ -93,7 +94,7 @@ public class QuickPostManagementPatch {
                     try {
                         Intent intent = new Intent(context, Class.forName("com.dcinside.app.manager.MinorExtActivity"));
                         intent.setAction("action_block");
-                        intent.putExtra("com.dcinside.app.extra.GALLERY_ID", JsonHookPatch.galleryId);
+                        intent.putExtra("com.dcinside.app.extra.GALLERY_ID", CustomNetworkInterceptorPatch.galleryId);
                         intent.putExtra("com.dcinside.app.extra.POST_NUMBER", postNo);
 
                         if (context instanceof Activity) {
@@ -152,12 +153,12 @@ public class QuickPostManagementPatch {
                 );
 
                 StringBuilder body = new StringBuilder();
-                appendParam(body, "user_id", JsonHookPatch.userId);
+                appendParam(body, "user_id", CustomNetworkInterceptorPatch.userId);
                 appendParam(body, "client_token", clientToken);
-                appendParam(body, "id", JsonHookPatch.galleryId);
+                appendParam(body, "id", CustomNetworkInterceptorPatch.galleryId);
                 appendParam(body, "no", String.valueOf(postNo));
                 appendParam(body, "mode", "board_del");
-                appendParam(body, "app_id", JsonHookPatch.appId);
+                appendParam(body, "app_id", CustomNetworkInterceptorPatch.appId);
 
                 try (OutputStream os = connection.getOutputStream()) {
                     os.write(body.toString().getBytes(StandardCharsets.UTF_8));

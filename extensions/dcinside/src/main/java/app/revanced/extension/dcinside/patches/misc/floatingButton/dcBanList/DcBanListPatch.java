@@ -16,7 +16,10 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import app.revanced.extension.dcinside.patches.hook.json.JsonHookPatch;
+import app.revanced.extension.dcinside.patches.hook.okhttp.CustomNetworkInterceptorPatch;
 import app.revanced.extension.dcinside.settings.Settings;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -30,8 +33,6 @@ import okhttp3.Response;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import app.revanced.extension.dcinside.patches.hook.json.JsonHookPatch;
 
 @SuppressLint("DiscouragedApi")
 public class DcBanListPatch {
@@ -301,7 +302,7 @@ public class DcBanListPatch {
                     JSONObject payload = new JSONObject();
                     payload.put("action", "getLastKnownRecord");
                     payload.put("sheetId", targetSheetId);
-                    payload.put("galleryId", JsonHookPatch.galleryId);
+                    payload.put("galleryId", CustomNetworkInterceptorPatch.galleryId);
 
                     GasApiClient.sendPost("", payload.toString(), new Callback() {
                         @Override
@@ -356,7 +357,7 @@ public class DcBanListPatch {
          */
         private void parseBanList() {
             String galleryType = JsonHookPatch.galleryType;
-            String galleryId = JsonHookPatch.galleryId;
+            String galleryId = CustomNetworkInterceptorPatch.galleryId;
 
             JSONArray collected = new JSONArray();
 
@@ -454,7 +455,7 @@ public class DcBanListPatch {
                     JSONObject payload = new JSONObject();
                     payload.put("action", "uploadToGoogleSheet");
                     payload.put("sheetId", targetSheetId);
-                    payload.put("galleryId", JsonHookPatch.galleryId);
+                    payload.put("galleryId", CustomNetworkInterceptorPatch.galleryId);
                     payload.put("banList", banListJsonArray);
 
                     GasApiClient.sendPost("", payload.toString(), new Callback() {
@@ -502,7 +503,7 @@ public class DcBanListPatch {
                 String json = Settings.DC_BAN_LIST_SHEET_ID_MAP.get();
                 if (json.isEmpty()) return "";
                 JSONObject map = new JSONObject(json);
-                return map.optString(JsonHookPatch.galleryId, "");
+                return map.optString(CustomNetworkInterceptorPatch.galleryId, "");
             } catch (JSONException e) {
                 Log.w(TAG, "sheetId 맵 파싱 실패", e);
                 return "";
@@ -513,7 +514,7 @@ public class DcBanListPatch {
             try {
                 String json = Settings.DC_BAN_LIST_SHEET_ID_MAP.get();
                 JSONObject map = json.isEmpty() ? new JSONObject() : new JSONObject(json);
-                map.put(JsonHookPatch.galleryId, sheetId);
+                map.put(CustomNetworkInterceptorPatch.galleryId, sheetId);
                 Settings.DC_BAN_LIST_SHEET_ID_MAP.save(map.toString());
             } catch (JSONException e) {
                 Log.e(TAG, "sheetId 맵 저장 실패", e);

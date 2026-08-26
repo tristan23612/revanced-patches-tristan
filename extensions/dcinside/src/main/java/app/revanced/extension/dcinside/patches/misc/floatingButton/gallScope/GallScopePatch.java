@@ -18,7 +18,7 @@ public class GallScopePatch {
 
         View gallScopeButton = rootView.findViewById(resId);
         if (gallScopeButton != null) {
-            gallScopeButton.setOnClickListener(buttonView -> new GallScopeSession(buttonView.getContext(), null).start());
+            gallScopeButton.setOnClickListener(buttonView -> new GallScopeSession(buttonView.getContext(), null, null, null).start());
             gallScopeButton.setVisibility(visible && Settings.SHOW_GALL_SCOPE_BUTTON.get() ? View.VISIBLE : View.GONE);
         }
     }
@@ -26,7 +26,7 @@ public class GallScopePatch {
     /**
      * 게시글 화면 등 외부에서 식별코드를 이미 알고 있을 때 바로 모드 선택부터 시작
      */
-    public static void showGallScopeDialogWithUserId(Context context, String prefillUserId) {
-        new GallScopeSession(context, prefillUserId).start();
+    public static void showGallScopeDialogWithUserId(Context context, String prefillUserId, String prefillGalleryType, String prefillGalleryId) {
+        new GallScopeSession(context, prefillUserId, prefillGalleryType, prefillGalleryId).start();
     }
 }

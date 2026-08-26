@@ -7,6 +7,7 @@ import app.revanced.patcher.patch.BytecodePatchContext
 import app.revanced.patcher.patch.PatchException
 import app.revanced.patcher.patch.bytecodePatch
 import app.revanced.patches.dcinside.misc.extension.sharedExtensionPatch
+import app.revanced.patches.dcinside.misc.hook.okhttp.customNetworkInterceptorPatch
 import java.io.InvalidClassException
 
 /**
@@ -42,37 +43,14 @@ private const val JSON_HOOK_CLASS_DESCRIPTOR = "L$JSON_HOOK_CLASS_NAMESPACE/$BAS
 val jsonHookPatch = bytecodePatch(
     description = "Hooks the stream which reads JSON responses.",
 ) {
-    dependsOn(sharedExtensionPatch)
+    dependsOn(
+        sharedExtensionPatch,
+        customNetworkInterceptorPatch
+        )
 
     apply {
         jsonHookPatchMethodMatch.methodOrNull
             ?: throw PatchException("Unexpected extension.")
-
-        jsonHookMethod.addInstructions(
-            0,
-            """
-                invoke-static/range { p12 .. p12 }, $JSON_HOOK_PATCH_CLASS_DESCRIPTOR->jsonHook(Ljava/lang/String;)Ljava/lang/String;
-                move-result-object p12
-            """
-        )
-
-        jsonApiPostListHookMethod.apply {
-            addInstructions(
-                0,
-                $$"""
-                    invoke-static/range {p0 .. p0}, $$JSON_HOOK_PATCH_CLASS_DESCRIPTOR->hookGalleryID(Ljava/lang/String;)V
-                """
-            )
-        }
-
-        addQueryParameterHookMethod.addInstructions(
-            0,
-            $$"""
-                move-object/from16 v0, p1
-                move-object/from16 v1, p2
-                invoke-static {v0, v1}, $$JSON_HOOK_PATCH_CLASS_DESCRIPTOR->hookParam(Ljava/lang/String;Ljava/lang/String;)V
-            """
-        )
     }
 
     afterDependents {

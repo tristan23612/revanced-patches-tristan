@@ -2,8 +2,15 @@ package app.revanced.extension.dcinside.patches.hook.json;
 
 import android.util.Log;
 import app.revanced.extension.dcinside.patches.hook.patch.DummyHook;
+import app.revanced.extension.dcinside.utils.json.JsonUtils;
+import app.revanced.extension.dcinside.utils.stream.StreamUtils;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,30 +21,7 @@ public final class JsonHookPatch {
     private static final List<JsonHook> hooks;
 
     public static boolean managerSkill = false;
-
     public static String galleryType = "";
-
-    public static String galleryId = "";
-
-    public static String appId = "";
-
-    public static String userId = "";
-
-    public static void hookGalleryID(String id) {
-        galleryId = id;
-    }
-
-    public static void hookParam(String key, String value) {
-        if (key == null || value == null) {
-            return;
-        }
-
-        if ("app_id".equals(key)) {
-            appId = value;
-        } else if ("user_id".equals(key) || "confirm_id".equals(key)) {
-            userId = value;
-        }
-    }
 
     static {
         hooks = new ArrayList<>();
@@ -47,31 +31,47 @@ public final class JsonHookPatch {
     private JsonHookPatch() {
     }
 
-    public static String jsonHook(String json) {
+    public static InputStream parseJsonHook(@NotNull InputStream jsonInputStream) {
+        JSONArray jsonArray;
         try {
-            JSONArray root = new JSONArray(json);
-            JSONObject response = root.getJSONObject(0);
+            jsonArray = JsonUtils.parseJsonArray(jsonInputStream);
+        } catch (IOException | JSONException e) {
+            return jsonInputStream;
+        }
 
-            if (response.has("gall_info")) {
-                JSONObject gallInfo = response.getJSONArray("gall_info").getJSONObject(0);
+        try {
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.optJSONObject(i);
+                if (jsonObject == null) continue;
 
-                managerSkill = gallInfo.optBoolean("managerskill", false);
+                if (jsonObject.has("gall_info")) {
+                    JSONArray gallInfoArray = jsonObject.optJSONArray("gall_info");
+                    if (gallInfoArray != null && gallInfoArray.length() > 0) {
+                        JSONObject gallInfo = gallInfoArray.optJSONObject(0);
+                        if (gallInfo != null) {
+                            managerSkill = gallInfo.optBoolean("managerskill", false);
 
-                if (gallInfo.optBoolean("is_minor", false)) {
-                    galleryType = "mgallery";
-                } else if (gallInfo.optBoolean("is_mini", false)) {
-                    galleryType = "mini";
-                } else {
-                    galleryType = "gallery";
+                            if (gallInfo.optBoolean("is_minor", false)) {
+                                galleryType = "mgallery";
+                            } else if (gallInfo.optBoolean("is_mini", false)) {
+                                galleryType = "mini";
+                            } else {
+                                galleryType = "gallery";
+                            }
+                        }
+                    }
                 }
+
+                for (JsonHook hook : hooks) {
+                    jsonObject = hook.hook(jsonObject);
+                }
+                jsonArray.put(i, jsonObject);
             }
+
+            return StreamUtils.INSTANCE.fromString(jsonArray.toString());
         } catch (Exception e) {
             Log.e(TAG, "jsonHook: failed to parse JSON", e);
+            return StreamUtils.INSTANCE.fromString(jsonArray.toString());
         }
-
-        for (JsonHook hook : hooks) {
-            json = hook.hook(json);
-        }
-        return json;
     }
 }

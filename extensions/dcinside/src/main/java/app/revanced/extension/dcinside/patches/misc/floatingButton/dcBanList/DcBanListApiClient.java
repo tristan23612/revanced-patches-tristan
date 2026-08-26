@@ -1,13 +1,13 @@
 package app.revanced.extension.dcinside.patches.misc.floatingButton.dcBanList;
 
 import java.util.concurrent.TimeUnit;
-
 import java.io.IOException;
 
-import app.revanced.extension.dcinside.patches.hook.json.JsonHookPatch;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+
+import app.revanced.extension.dcinside.patches.hook.okhttp.CustomNetworkInterceptorPatch;
 
 public class DcBanListApiClient {
     private static final OkHttpClient HTTP_CLIENT = new OkHttpClient.Builder()
@@ -30,8 +30,8 @@ public class DcBanListApiClient {
         String url = "https://m.dcinside.com/management/" + segment + "/avoid/"
                 + galleryId
                 + "?page=" + page
-                + "&app_id=" + JsonHookPatch.appId
-                + "&confirm_id=" + JsonHookPatch.userId;
+                + "&app_id=" + CustomNetworkInterceptorPatch.appId
+                + "&confirm_id=" + CustomNetworkInterceptorPatch.userId;
 
         return new Request.Builder()
                 .url(url)

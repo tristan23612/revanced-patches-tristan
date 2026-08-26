@@ -9,8 +9,13 @@ import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import app.revanced.extension.dcinside.patches.hook.json.JsonHookPatch;
+import app.revanced.extension.dcinside.patches.hook.okhttp.CustomNetworkInterceptorPatch;
 import app.revanced.extension.dcinside.patches.misc.floatingButton.gallScope.GallScopePatch;
 import app.revanced.extension.dcinside.settings.Settings;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ShowUserIdPatch {
     private ShowUserIdPatch() {}
@@ -26,6 +31,19 @@ public class ShowUserIdPatch {
         try {
             Context context = view.getContext();
 
+            int targetSpaceId = context.getResources().getIdentifier(
+                    "revanced_gallery_data_space", "id", context.getPackageName()
+            );
+
+            View galleryDataSpaceView = view.findViewById(targetSpaceId);
+            if (galleryDataSpaceView != null) {
+                Map<String, String> galleryData = new HashMap<>();
+                galleryData.put("gallery_id", CustomNetworkInterceptorPatch.galleryId);
+                galleryData.put("gallery_type", JsonHookPatch.galleryType);
+
+                galleryDataSpaceView.setTag(galleryData);
+            }
+
             int targetTextViewId = context.getResources().getIdentifier(
                     "revanced_user_id", "id", context.getPackageName()
             );
@@ -36,7 +54,7 @@ public class ShowUserIdPatch {
             if (userIdTextView == null) return;
 
             if (!TextUtils.isEmpty(userId)) {
-                userIdTextView.setText("(" + userId + ") ");
+                userIdTextView.setText(userId + " ");
                 int color = extractMemoColor(charSequence);
                 userIdTextView.setTextColor(color != 0 ? color : DEFAULT_USER_ID_COLOR);
                 userIdTextView.setVisibility(View.VISIBLE);
@@ -54,28 +72,40 @@ public class ShowUserIdPatch {
     private static void setGallScopeUserIdClickListener(View view) {
         if (view == null || !Settings.SHOW_USER_ID.get() || !Settings.SHOW_GALL_SCOPE_BUTTON.get()) return;
 
-        View rootView = view.getRootView();
-        // 1. 동적 리소스 ID 탐색 및 예외 처리
-        int resId = rootView.getResources().getIdentifier(
+        Context context = view.getContext();
+
+        int resId = view.getResources().getIdentifier(
                 "revanced_user_id",
                 "id",
-                rootView.getContext().getPackageName()
+                context.getPackageName()
         );
         if (resId == 0) return;
 
-        TextView userIdView = rootView.findViewById(resId);
+        TextView userIdView = view.findViewById(resId);
         if (userIdView == null) return;
 
-        // 2. 일반 클릭 리스너 바인딩
+        String userId = userIdView.getText().toString().trim();
+
+        int targetSpaceId = context.getResources().getIdentifier(
+                "revanced_gallery_data_space", "id", context.getPackageName()
+        );
+
+        View spaceView = view.findViewById(targetSpaceId);
+        String galleryId;
+        String galleryType;
+        if (spaceView != null && spaceView.getTag() instanceof Map) {
+            @SuppressWarnings("unchecked")
+            Map<String, String> galleryData = (Map<String, String>) spaceView.getTag();
+
+            galleryId = galleryData.get("gallery_id");
+            galleryType = galleryData.get("gallery_type");
+        } else {
+            galleryId = "";
+            galleryType = "";
+        }
+
         userIdView.setOnClickListener(v -> {
-            CharSequence rawText = userIdView.getText();
-            if (rawText == null || rawText.length() == 0) return;
-
-            // 3. 정규식을 통한 공백 및 괄호('(', ')') 일체 제거
-            String cleanedUserId = rawText.toString().replaceAll("[()\\s]", "");
-            if (cleanedUserId.isEmpty()) return;
-
-            GallScopePatch.showGallScopeDialogWithUserId(v.getContext(), cleanedUserId);
+            GallScopePatch.showGallScopeDialogWithUserId(v.getContext(), userId, galleryType, galleryId);
         });
     }
 

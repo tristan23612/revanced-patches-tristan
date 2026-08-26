@@ -1,6 +1,7 @@
 package app.revanced.extension.dcinside.patches.hook.patch;
 
 import android.util.Log;
+import androidx.annotation.NonNull;
 import app.revanced.extension.dcinside.patches.hook.json.BaseJsonHook;
 import app.revanced.extension.dcinside.settings.Settings;
 import org.json.JSONArray;
@@ -15,16 +16,13 @@ public final class HideAdministratorNoticeHook extends BaseJsonHook {
     }
 
     @Override
-    public String apply(String json) {
-        if (json == null || !Settings.HIDE_ADMINISTRATOR_NOTICE.get()) return json;
+    public JSONObject apply(@NonNull JSONObject jsonObject) {
+        if (!Settings.HIDE_ADMINISTRATOR_NOTICE.get()) return jsonObject;
 
         try {
-            JSONArray root = new JSONArray(json);
-            JSONObject response = root.getJSONObject(0);
+            if (!jsonObject.has("gall_list")) return jsonObject;
 
-            if (!response.has("gall_list")) return json;
-
-            JSONArray gallList = response.getJSONArray("gall_list");
+            JSONArray gallList = jsonObject.getJSONArray("gall_list");
             JSONArray filtered = new JSONArray();
 
             for (int i = 0; i < gallList.length(); i++) {
@@ -37,13 +35,11 @@ public final class HideAdministratorNoticeHook extends BaseJsonHook {
                 }
             }
 
-            response.put("gall_list", filtered);
-            root.put(0, response);
-
-            return root.toString();
+            jsonObject.put("gall_list", filtered);
+            return jsonObject;
         } catch (Exception e) {
             Log.e(TAG, "HideAdministratorNoticeHook: failed to parse JSON", e);
-            return json;
+            return jsonObject;
         }
     }
 }
