@@ -12,21 +12,18 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
-
+import androidx.annotation.NonNull;
 import app.revanced.extension.dcinside.patches.hook.json.JsonHookPatch;
 import app.revanced.extension.dcinside.patches.hook.okhttp.CustomNetworkInterceptorPatch;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import androidx.annotation.NonNull;
 
 /**
  * 갤스코프 다이얼로그 상태 머신. 실제 fetch/파싱 로직은 SearchStrategy 구현체(PostSearchStrategy,

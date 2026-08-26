@@ -15,17 +15,16 @@ import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
+import app.revanced.extension.dcinside.patches.hook.json.JsonHookPatch;
+import app.revanced.extension.dcinside.patches.hook.okhttp.CustomNetworkInterceptorPatch;
+import app.revanced.extension.dcinside.settings.Settings;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-
-import androidx.annotation.NonNull;
-import app.revanced.extension.dcinside.patches.hook.json.JsonHookPatch;
-import app.revanced.extension.dcinside.patches.hook.okhttp.CustomNetworkInterceptorPatch;
-import app.revanced.extension.dcinside.settings.Settings;
 
 public class QuickPostManagementPatch {
     private static final String TAG = "ReVanced_DCInside";

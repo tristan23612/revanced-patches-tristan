@@ -1,16 +1,15 @@
 package app.revanced.extension.dcinside.patches.misc.floatingButton.gallScope;
 
 import android.net.Uri;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 final class GallScopeHtmlParser {
 

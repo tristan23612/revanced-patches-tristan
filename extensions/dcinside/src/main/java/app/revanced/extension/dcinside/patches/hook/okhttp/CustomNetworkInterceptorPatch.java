@@ -3,20 +3,15 @@ package app.revanced.extension.dcinside.patches.hook.okhttp;
 import android.os.Build;
 import android.util.Log;
 import androidx.annotation.NonNull;
+import app.revanced.extension.dcinside.patches.hook.json.JsonHookPatch;
+import okhttp3.*;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 import java.util.zip.GZIPInputStream;
-
-import app.revanced.extension.dcinside.patches.hook.json.JsonHookPatch;
-import okhttp3.Interceptor;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
 
 public final class CustomNetworkInterceptorPatch implements Interceptor {
     private static final String TAG = "ReVanced_DCInside";

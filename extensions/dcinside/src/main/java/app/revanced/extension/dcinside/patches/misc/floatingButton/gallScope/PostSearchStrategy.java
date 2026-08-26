@@ -2,23 +2,21 @@ package app.revanced.extension.dcinside.patches.misc.floatingButton.gallScope;
 
 import android.os.Handler;
 import android.os.Looper;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+import androidx.annotation.NonNull;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import androidx.annotation.NonNull;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Response;
 
 /**
  * 게시글 검색 전략 - startPage~endPage 범위를 슬라이딩 윈도우(BATCH_SIZE 동시 요청) 방식으로 병렬 파싱.

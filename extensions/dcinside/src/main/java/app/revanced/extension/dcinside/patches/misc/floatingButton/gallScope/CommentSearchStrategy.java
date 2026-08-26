@@ -3,23 +3,21 @@ package app.revanced.extension.dcinside.patches.misc.floatingButton.gallScope;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+import androidx.annotation.NonNull;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import androidx.annotation.NonNull;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Response;
 
 /**
  * 댓글 검색 전략 - search_pos 커서 기반이라 병렬화 불가, 순차 재귀 방식으로 처리.

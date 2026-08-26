@@ -1,13 +1,12 @@
 package app.revanced.extension.dcinside.patches.misc.floatingButton.dcBanList;
 
-import java.util.concurrent.TimeUnit;
-import java.io.IOException;
-
+import app.revanced.extension.dcinside.patches.hook.okhttp.CustomNetworkInterceptorPatch;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import app.revanced.extension.dcinside.patches.hook.okhttp.CustomNetworkInterceptorPatch;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class DcBanListApiClient {
     private static final OkHttpClient HTTP_CLIENT = new OkHttpClient.Builder()

@@ -15,24 +15,21 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.Toast;
-
+import androidx.annotation.NonNull;
 import app.revanced.extension.dcinside.patches.hook.json.JsonHookPatch;
 import app.revanced.extension.dcinside.patches.hook.okhttp.CustomNetworkInterceptorPatch;
 import app.revanced.extension.dcinside.settings.Settings;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-
-import java.io.IOException;
-import java.util.Objects;
-
-import androidx.annotation.NonNull;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
+import java.io.IOException;
+import java.util.Objects;
 
 @SuppressLint("DiscouragedApi")
 public class DcBanListPatch {

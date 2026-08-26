@@ -1,11 +1,10 @@
 package app.revanced.extension.dcinside.patches.misc.floatingButton.gallScope;
 
-import java.util.concurrent.TimeUnit;
-
-import app.revanced.extension.dcinside.patches.hook.json.JsonHookPatch;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+
+import java.util.concurrent.TimeUnit;
 
 final class GallScopeApiClient {
     private static final String PC_USER_AGENT =
