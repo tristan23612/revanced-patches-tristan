@@ -25,7 +25,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
+@SuppressLint("DiscouragedApi")
 public class QuickPostManagementPatch {
     private static final String TAG = "ReVanced_DCInside";
 
@@ -135,6 +137,22 @@ public class QuickPostManagementPatch {
         String clientToken = getClientToken(context);
         android.os.Handler mainHandler = new android.os.Handler(android.os.Looper.getMainLooper());
 
+        int targetSpaceId = context.getResources().getIdentifier(
+                "revanced_gallery_data_space", "id", context.getPackageName()
+        );
+
+        View spaceView = itemView.findViewById(targetSpaceId);
+        String galleryId;
+        if (spaceView != null && spaceView.getTag() instanceof Map) {
+            @SuppressWarnings("unchecked")
+            Map<String, String> galleryData = (Map<String, String>) spaceView.getTag();
+
+            galleryId = galleryData.get("gallery_id");
+        } else {
+            Toast.makeText(context, "Cannot find gallery data", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         new Thread(() -> {
             boolean success;
             String errorMessage = null;
@@ -154,7 +172,7 @@ public class QuickPostManagementPatch {
                 StringBuilder body = new StringBuilder();
                 appendParam(body, "user_id", CustomNetworkInterceptorPatch.userId);
                 appendParam(body, "client_token", clientToken);
-                appendParam(body, "id", CustomNetworkInterceptorPatch.galleryId);
+                appendParam(body, "id", galleryId);
                 appendParam(body, "no", String.valueOf(postNo));
                 appendParam(body, "mode", "board_del");
                 appendParam(body, "app_id", CustomNetworkInterceptorPatch.appId);

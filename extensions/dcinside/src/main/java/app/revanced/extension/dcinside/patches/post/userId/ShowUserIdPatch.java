@@ -1,6 +1,8 @@
 package app.revanced.extension.dcinside.patches.post.userId;
 
 import android.annotation.SuppressLint;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Color;
 import android.text.Spanned;
@@ -9,6 +11,7 @@ import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 import app.revanced.extension.dcinside.patches.hook.json.JsonHookPatch;
 import app.revanced.extension.dcinside.patches.hook.okhttp.CustomNetworkInterceptorPatch;
 import app.revanced.extension.dcinside.patches.misc.floatingButton.gallScope.GallScopePatch;
@@ -17,6 +20,7 @@ import app.revanced.extension.dcinside.settings.Settings;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressLint({"DiscouragedApi", "SetTextI18n"})
 public class ShowUserIdPatch {
     private ShowUserIdPatch() {}
 
@@ -24,7 +28,6 @@ public class ShowUserIdPatch {
 
     private static final String TAG = "ReVanced_DCInside";
 
-    @SuppressLint({"DiscouragedApi", "SetTextI18n"})
     public static void setUserId(View view, String userId, CharSequence charSequence) {
         if (view == null || !Settings.SHOW_USER_ID.get()) return;
 
@@ -63,12 +66,12 @@ public class ShowUserIdPatch {
             }
 
             setGallScopeUserIdClickListener(view);
+            setGallScopeUserIdLongClickListener(view);
         } catch (Exception e) {
             Log.e(TAG, "Error in setUserId", e);
         }
     }
 
-    @SuppressLint("DiscouragedApi")
     private static void setGallScopeUserIdClickListener(View view) {
         if (view == null || !Settings.SHOW_USER_ID.get() || !Settings.SHOW_GALL_SCOPE_BUTTON.get()) return;
 
@@ -106,6 +109,41 @@ public class ShowUserIdPatch {
 
         userIdView.setOnClickListener(v -> {
             GallScopePatch.showGallScopeDialogWithUserId(v.getContext(), userId, galleryType, galleryId);
+        });
+    }
+
+    private static void setGallScopeUserIdLongClickListener(View view) {
+        if (view == null || !Settings.SHOW_USER_ID.get()) return;
+
+        Context context = view.getContext();
+
+        int resId = context.getResources().getIdentifier(
+                "revanced_user_id",
+                "id",
+                context.getPackageName()
+        );
+        if (resId == 0) return;
+
+        TextView userIdView = view.findViewById(resId);
+        if (userIdView == null) return;
+
+        userIdView.setOnLongClickListener(v -> {
+            String userId = userIdView.getText().toString().trim();
+            if (TextUtils.isEmpty(userId)) return false;
+
+            try {
+                ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                if (clipboard != null) {
+                    ClipData clip = ClipData.newPlainText("User ID", userId);
+                    clipboard.setPrimaryClip(clip);
+
+                    Toast.makeText(context, "User ID가 복사되었습니다: " + userId, Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to copy userId to clipboard", e);
+            }
+            return false;
         });
     }
 
