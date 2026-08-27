@@ -7,15 +7,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 final class DcBanListHtmlParser {
-    private static final Pattern HEADER_PATTERN = Pattern.compile("^([\\s\\S]+?)\\s*(?:\\(([^)]+)\\))?$");
-
     private DcBanListHtmlParser() {}
 
     static JSONArray parsePage(Document doc) throws JSONException {
@@ -31,49 +23,60 @@ final class DcBanListHtmlParser {
 
     static JSONObject parseMobileRow(Element row) throws JSONException {
         Elements captions = row.select(".mg-block-caption");
+        Element firstCaption = captions.isEmpty() ? null : captions.get(0);
 
-        String headerText = captions.isEmpty() ? "" : text(captions.get(0), ".tit");
-        String ipText = captions.isEmpty() ? "" : text(captions.get(0), ".ip");
+        String[] header = parseHeader(firstCaption);
+        String nickname = header[0];
+        String identifierFromHeader = header[1];
 
-        Matcher matcher = HEADER_PATTERN.matcher(headerText);
-        String nickname = "";
-        String identifierFromHeader = "";
-        if (matcher.matches()) {
-            nickname = matcher.group(1) != null ? Objects.requireNonNull(matcher.group(1)).trim() : "";
-            identifierFromHeader = matcher.group(2) != null ? Objects.requireNonNull(matcher.group(2)).trim() : "";
-        }
-        String identifier = (identifierFromHeader + " " + ipText).trim();
+        boolean hasIp = firstCaption != null && firstCaption.selectFirst(".ip") != null;
+        String identifier = hasIp
+                ? (identifierFromHeader + " + IP").trim()
+                : identifierFromHeader;
 
-        // 동적 캡션(2번째 항목부터)을 label -> value Element 맵으로 구성
-        Map<String, Element> captionMap = new LinkedHashMap<>();
+        String contentType = "", contentTitle = "";
+        String reason = "", duration = "", dateTime = "", manager = "";
+
         for (int i = 1; i < captions.size(); i++) {
-            Element cap = captions.get(i);
-            Element titEl = cap.selectFirst(".tit");
-            Element txtEl = cap.selectFirst(".txt");
-            if (titEl != null && txtEl != null) {
-                captionMap.put(titEl.text().trim(), txtEl);
+            Element titEl = captions.get(i).selectFirst(".tit");
+            Element txtEl = captions.get(i).selectFirst(".txt");
+            if (titEl == null || txtEl == null) continue;
+
+            String label = titEl.text().trim();
+            switch (label) {
+                case "게시글":
+                case "댓글":
+                    contentType = label;
+                    Element lnkgo = txtEl.selectFirst(".lnkgo");
+                    contentTitle = (lnkgo != null ? lnkgo.text() : txtEl.text()).trim();
+                    break;
+                case "사유":
+                    reason = txtEl.text().trim();
+                    break;
+                case "기간":
+                    duration = txtEl.text().trim();
+                    break;
+                case "처리 일시":
+                    dateTime = txtEl.text().trim();
+                    break;
+                case "처리자":
+                    manager = txtEl.text().trim();
+                    break;
+                default:
+                    break; // "차단 상태" 등 불필요한 항목은 무시
             }
         }
 
-        String contentType = captionMap.containsKey("게시글") ? "게시글"
-                : (captionMap.containsKey("댓글") ? "댓글" : "");
-        Element contentEl = captionMap.containsKey("게시글") ? captionMap.get("게시글") : captionMap.get("댓글");
-
-        String contentTitle = "";
-        if (contentEl != null) {
-            Element lnkgo = contentEl.selectFirst(".lnkgo");
-            contentTitle = (lnkgo != null ? lnkgo.text() : contentEl.text()).trim();
-        }
         String content = contentType.isEmpty() ? contentTitle : "[" + contentType + "] " + contentTitle;
 
         JSONObject record = new JSONObject();
         record.put("nickname", nickname);
         record.put("identifier", identifier);
         record.put("content", content);
-        record.put("reason", captionText(captionMap, "사유"));
-        record.put("duration", captionText(captionMap, "기간"));
-        record.put("dateTime", captionText(captionMap, "처리 일시"));
-        record.put("manager", captionText(captionMap, "처리자"));
+        record.put("reason", reason);
+        record.put("duration", duration);
+        record.put("dateTime", dateTime);
+        record.put("manager", manager);
 
         return record;
     }
@@ -86,14 +89,36 @@ final class DcBanListHtmlParser {
         return Math.max(totalPages, 1);
     }
 
-    private static String captionText(Map<String, Element> captionMap, String label) {
-        Element el = captionMap.get(label);
-        return el != null ? el.text().trim() : "";
-    }
+    /**
+     * Parses the header element to extract a nickname and an optional identifier.
+     * The header typically contains text in the format "nickname (identifier)".
+     * If the identifier is absent, only the nickname is returned.
+     *
+     * @param firstCaption the first caption element containing the header to parse;
+     *                     can be null if no caption is provided
+     * @return a String array containing two elements:
+     *         - [0]: the parsed nickname (non-null, potentially empty if parsing fails)
+     *         - [1]: the parsed identifier, or an empty string if no identifier is present
+     */
+    private static String[] parseHeader(Element firstCaption) {
+        if (firstCaption == null) return new String[]{"", ""};
+        Element titEl = firstCaption.selectFirst(".tit");
+        if (titEl == null) return new String[]{"", ""};
 
-    private static String text(Element parent, String selector) {
-        Element el = parent.selectFirst(selector);
-        return el != null ? el.text().trim() : "";
+        Element tit = titEl.clone();
+        tit.select(".tip_box, .ip").remove(); // 부가 요소만 제거하면 나머지는 형태가 동일해짐
+
+        String fullText = tit.text().trim();
+        int openIdx = fullText.lastIndexOf('(');
+        int closeIdx = fullText.lastIndexOf(')');
+        if (openIdx >= 0 && closeIdx == fullText.length() - 1 && closeIdx > openIdx) {
+            String nickname = fullText.substring(0, openIdx).trim();
+            String identifier = fullText.substring(openIdx + 1, closeIdx).trim();
+            return new String[]{nickname, identifier};
+        }
+
+        // 괄호 형태가 아니면 전체를 nickname으로, identifier는 빈 값
+        return new String[]{fullText, ""};
     }
 
     private static String inputValue(Document doc, String selector) {
@@ -108,5 +133,4 @@ final class DcBanListHtmlParser {
             return fallback;
         }
     }
-
 }
