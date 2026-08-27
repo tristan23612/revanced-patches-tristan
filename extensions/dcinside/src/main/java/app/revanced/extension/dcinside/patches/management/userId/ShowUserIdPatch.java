@@ -1,4 +1,4 @@
-package app.revanced.extension.dcinside.patches.post.userId;
+package app.revanced.extension.dcinside.patches.management.userId;
 
 import android.annotation.SuppressLint;
 import android.content.ClipData;
@@ -14,7 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import app.revanced.extension.dcinside.patches.hook.json.JsonHookPatch;
 import app.revanced.extension.dcinside.patches.hook.okhttp.CustomNetworkInterceptorPatch;
-import app.revanced.extension.dcinside.patches.misc.floatingButton.gallScope.GallScopePatch;
+import app.revanced.extension.dcinside.patches.management.floatingButton.gallScope.GallScopePatch;
 import app.revanced.extension.dcinside.settings.Settings;
 
 import java.util.HashMap;

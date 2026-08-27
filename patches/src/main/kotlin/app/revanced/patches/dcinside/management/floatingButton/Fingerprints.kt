@@ -1,4 +1,4 @@
-package app.revanced.patches.dcinside.misc.floatingButton
+package app.revanced.patches.dcinside.management.floatingButton
 
 import app.revanced.patcher.*
 import app.revanced.patcher.invoke

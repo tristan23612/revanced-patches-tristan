@@ -1,4 +1,4 @@
-package app.revanced.patches.dcinside.post.userId
+package app.revanced.patches.dcinside.management.userId
 
 import app.revanced.patcher.*
 import app.revanced.patcher.extensions.methodReference

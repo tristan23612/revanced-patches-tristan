@@ -271,6 +271,13 @@ object PreferenceScreen : BasePreferenceScreen() {
         iconBold = "@drawable/revanced_settings_screen_04_general_bold",
         layout = "@layout/preference_with_icon",
     )
+    val MANAGEMENT = Screen(
+        key = "revanced_settings_screen_05_player",
+        summaryKey = null,
+        icon = "@drawable/revanced_settings_screen_05_player",
+        iconBold = "@drawable/revanced_settings_screen_05_player_bold",
+        layout = "@layout/preference_with_icon",
+    )
     val MISC = Screen(
         key = "revanced_settings_screen_11_misc",
         summaryKey = null,

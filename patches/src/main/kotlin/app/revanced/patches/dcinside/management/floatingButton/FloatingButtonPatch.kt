@@ -1,4 +1,4 @@
-package app.revanced.patches.dcinside.misc.floatingButton
+package app.revanced.patches.dcinside.management.floatingButton
 
 import app.revanced.patcher.extensions.addInstructions
 import app.revanced.patcher.patch.ResourcePatchContext
@@ -25,10 +25,10 @@ import org.w3c.dom.Element
 private fun String.toPascalCase() = replaceFirstChar { it.uppercase() }
 
 private fun extensionClassDescriptorFor(patchName: String) =
-    "Lapp/revanced/extension/dcinside/patches/misc/floatingButton/$patchName/${patchName.toPascalCase()}Patch;"
+    "Lapp/revanced/extension/dcinside/patches/management/floatingButton/$patchName/${patchName.toPascalCase()}Patch;"
 
 private const val FLOATING_BUTTON_TOGGLE_PATCH_EXTENSION_CLASS_DESCRIPTOR =
-    "Lapp/revanced/extension/dcinside/patches/misc/floatingButton/FloatingButtonTogglePatch;"
+    "Lapp/revanced/extension/dcinside/patches/management/floatingButton/FloatingButtonTogglePatch;"
 
 private const val FLOATING_BUTTON_CONTAINER_ID_PREFIX= "revanced_floating_button"
 
@@ -235,7 +235,7 @@ val floatingButtonPatch = bytecodePatch(
     )
 
     apply {
-        addResources("dcinside", "misc.floatingButton.floatingButtonPatch")
+        addResources("dcinside", "management.floatingButton.floatingButtonPatch")
 
         val floatingButtonGuidePreference = NonInteractivePreference(
             key = "revanced_floating_button_guide"
@@ -251,7 +251,7 @@ val floatingButtonPatch = bytecodePatch(
             )
         }.toSet()
 
-        PreferenceScreen.MISC.addPreferences(
+        PreferenceScreen.MANAGEMENT.addPreferences(
             PreferenceScreenPreference(
                 key = "revanced_floating_button_screen",
                 sorting = PreferenceScreenPreference.Sorting.UNSORTED,

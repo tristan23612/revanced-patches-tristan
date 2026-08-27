@@ -16,7 +16,6 @@ private const val EXTENSION_CLASS_DESCRIPTOR = "Lapp/revanced/extension/dcinside
 val disableUpdateCheckPatch = bytecodePatch(
     name = "Disable update check",
     description = "Add option to disable update check",
-    use = false,
 ) {
     compatibleWith("com.dcinside.app.android")
 

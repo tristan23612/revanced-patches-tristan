@@ -1,4 +1,4 @@
-package app.revanced.extension.dcinside.patches.post.list;
+package app.revanced.extension.dcinside.patches.management.post.list;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;

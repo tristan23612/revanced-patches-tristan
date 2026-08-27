@@ -1,4 +1,4 @@
-package app.revanced.patches.dcinside.post.list
+package app.revanced.patches.dcinside.management.post.list
 
 import app.revanced.patcher.*
 import app.revanced.patcher.invoke

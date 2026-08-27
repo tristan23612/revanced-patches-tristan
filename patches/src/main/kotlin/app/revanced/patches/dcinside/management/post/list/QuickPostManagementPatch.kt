@@ -1,4 +1,4 @@
-package app.revanced.patches.dcinside.post.list
+package app.revanced.patches.dcinside.management.post.list
 
 import app.revanced.patcher.extensions.addInstructions
 import app.revanced.patcher.extensions.getInstruction
@@ -13,7 +13,7 @@ import app.revanced.patches.dcinside.misc.settings.settingsPatch
 import app.revanced.patches.shared.misc.settings.preference.SwitchPreference
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 
-private const val QUICK_POST_MANAGEMENT_PATCH_EXTENSION_CLASS_DESCRIPTOR = "Lapp/revanced/extension/dcinside/patches/post/list/QuickPostManagementPatch;"
+private const val QUICK_POST_MANAGEMENT_PATCH_EXTENSION_CLASS_DESCRIPTOR = "Lapp/revanced/extension/dcinside/patches/management/post/list/QuickPostManagementPatch;"
 
 @Suppress("unused")
 val quickPostManagementPatch = bytecodePatch(
@@ -30,9 +30,9 @@ val quickPostManagementPatch = bytecodePatch(
     )
 
     apply {
-        addResources("dcinside", "post.list.quickPostManagementPatch")
+        addResources("dcinside", "management.post.list.quickPostManagementPatch")
 
-        PreferenceScreen.MISC.addPreferences(
+        PreferenceScreen.MANAGEMENT.addPreferences(
             SwitchPreference("revanced_enable_quick_post_management")
         )
 

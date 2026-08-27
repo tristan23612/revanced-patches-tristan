@@ -1,4 +1,4 @@
-package app.revanced.patches.dcinside.post.userId
+package app.revanced.patches.dcinside.management.userId
 
 import app.revanced.patcher.extensions.addInstructions
 import app.revanced.patcher.extensions.getInstruction
@@ -14,6 +14,7 @@ import app.revanced.patches.dcinside.misc.extension.sharedExtensionPatch
 import app.revanced.patches.dcinside.misc.settings.PreferenceScreen
 import app.revanced.patches.dcinside.misc.settings.settingsPatch
 import app.revanced.patches.shared.misc.settings.preference.NonInteractivePreference
+import app.revanced.patches.shared.misc.settings.preference.PreferenceScreenPreference
 import app.revanced.patches.shared.misc.settings.preference.SwitchPreference
 import app.revanced.util.doRecursively
 import app.revanced.util.getFreeRegisterProvider
@@ -24,7 +25,7 @@ import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.value.StringEncodedValue
 import org.w3c.dom.Element
 
-private const val SHOW_USER_ID_PATCH_EXTENSION_CLASS_DESCRIPTOR = "Lapp/revanced/extension/dcinside/patches/post/userId/ShowUserIdPatch;"
+private const val SHOW_USER_ID_PATCH_EXTENSION_CLASS_DESCRIPTOR = "Lapp/revanced/extension/dcinside/patches/management/userId/ShowUserIdPatch;"
 private const val POST_ITEM_CLASS_DESCRIPTOR = "Lcom/dcinside/app/model/PostInfo;"
 
 context(context: ResourcePatchContext)
@@ -190,11 +191,18 @@ val showUserIdPatch = bytecodePatch(
     )
 
     apply {
-        addResources("dcinside", "post.userId.showUserIdPatch")
+        addResources("dcinside", "management.userId.showUserIdPatch")
 
-        PreferenceScreen.GENERAL.addPreferences(
-            SwitchPreference("revanced_show_user_id"),
-            NonInteractivePreference("revanced_show_user_id_guide")
+        PreferenceScreen.MANAGEMENT.addPreferences(
+            PreferenceScreenPreference(
+                key = "revanced_user_id_screen",
+                sorting = PreferenceScreenPreference.Sorting.UNSORTED,
+                preferences = setOf(
+                    NonInteractivePreference("revanced_show_user_id_guide"),
+                    SwitchPreference("revanced_show_user_id"),
+                    SwitchPreference("revanced_enable_user_id_gall_scope")
+                )
+            ),
         )
 
         postItemBindMethodMatch.let {

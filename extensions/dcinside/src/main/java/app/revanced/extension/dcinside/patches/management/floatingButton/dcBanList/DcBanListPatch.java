@@ -1,4 +1,4 @@
-package app.revanced.extension.dcinside.patches.misc.floatingButton.dcBanList;
+package app.revanced.extension.dcinside.patches.management.floatingButton.dcBanList;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;

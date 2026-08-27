@@ -1,4 +1,4 @@
-package app.revanced.extension.dcinside.patches.misc.floatingButton;
+package app.revanced.extension.dcinside.patches.management.floatingButton;
 
 import android.annotation.SuppressLint;
 import android.view.View;

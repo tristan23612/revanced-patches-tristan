@@ -1,4 +1,4 @@
-package app.revanced.extension.dcinside.patches.misc.floatingButton.dcBanList;
+package app.revanced.extension.dcinside.patches.management.floatingButton.dcBanList;
 
 import android.webkit.CookieManager;
 import app.revanced.extension.dcinside.settings.Settings;

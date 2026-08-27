@@ -1,4 +1,4 @@
-package app.revanced.extension.dcinside.patches.misc.floatingButton.dcBanList;
+package app.revanced.extension.dcinside.patches.management.floatingButton.dcBanList;
 
 import org.json.JSONArray;
 import org.json.JSONException;

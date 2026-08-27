@@ -1,4 +1,4 @@
-package app.revanced.extension.dcinside.patches.misc.floatingButton.gallScope;
+package app.revanced.extension.dcinside.patches.management.floatingButton.gallScope;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
