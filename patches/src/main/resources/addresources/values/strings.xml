@@ -277,7 +277,7 @@ Second \"item\" text"</string>
 
 식별코드를 길게 터치해 복사할 수 있습니다.
 
-갤스코프 옵션이 켜진 경우 식별코드를 터치해 스코프를 바로 열 수 있습니다.
+식별코드를 터치해 갤스코프를 바로 열 수 있습니다.
 플로팅 버튼 패치를 참조하세요."</string>
             <string name="revanced_show_user_id_title">식별코드 표시</string>
             <string name="revanced_show_user_id_summary_on">반고닉과 고닉 유저의 식별코드가 표시됩니다.</string>
@@ -303,6 +303,12 @@ Second \"item\" text"</string>
             <string name="revanced_show_dc_ban_list_button_title">DC BanList 아이콘 표시하기</string>
             <string name="revanced_show_dc_ban_list_button_summary_on">DC BanList 아이콘이 퀵쓰기 버튼 위에 추가됩니다.</string>
             <string name="revanced_show_dc_ban_list_button_summary_off">DC BanList 아이콘이 퀵쓰기 버튼 위에 추가되지 않습니다.</string>
+            <string name="revanced_enable_dc_ban_list_identifier_search_button_title">DC BanList 식별 코드 검색</string>
+            <string name="revanced_enable_dc_ban_list_identifier_search_button_summary_on">DC BanList 식별 코드 검색 기능이 활성화됩니다.</string>
+            <string name="revanced_enable_dc_ban_list_identifier_search_button_summary_off">DC BanList 식별 코드 검색 기능이 활성화되지 않습니다.</string>
+            <string name="revanced_enable_dc_ban_list_ban_list_export_button_title">DC BanList 업로드</string>
+            <string name="revanced_enable_dc_ban_list_ban_list_export_button_summary_on">DC BanList 업로드 기능이 활성화됩니다.</string>
+            <string name="revanced_enable_dc_ban_list_ban_list_export_button_summary_off">DC BanList 업로드 기능이 활성화되지 앟습니다.</string>
             <string name="revanced_dc_ban_list_sheet_id_map_title">DC BanList 시트 id</string>
             <string name="revanced_dc_ban_list_sheet_id_map_summary">DC BanList가 저장한 시트 id를 확인합니다.</string>
             <string name="revanced_dc_ban_list_gas_authorization_webview_title">GAS 인증하기</string>

@@ -62,16 +62,50 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
     private List<JSONObject> identifierResults = new ArrayList<>();
     private String identifierErrorMessage = "시트 데이터를 불러오지 못했습니다.";
 
+    /**
+     * SHEET_ID_INPUT에서 확인/취소 시 복귀할 Step. SHEET_ID_INPUT으로 전환하는 지점마다
+     * 갱신하고, 최초 진입 시에는 생성자에서 resolveActionStep()으로 미리 계산해둔다.
+     */
+    private Step sheetIdReturnStep;
+
     DcBanListSession(Context context) {
         super(context, resolveInitialStep());
 
-        if (currentStep == Step.ACTION_SELECTION) {
+        if (currentStep != Step.SHEET_ID_INPUT) {
             targetSheetId = loadSavedSheetId();
         }
+
+        sheetIdReturnStep = currentStep == Step.SHEET_ID_INPUT
+                ? resolveActionStep()
+                : currentStep;
+    }
+
+    static boolean hasAnyEnabledAction() {
+        return Settings.ENABLE_DC_BAN_LIST_IDENTIFIER_SEARCH.get() || Settings.ENABLE_DC_BAN_LIST_BAN_LIST_EXPORT.get();
+    }
+
+    /**
+     * 시트 ID가 이미 있다는 전제 하에, 활성화된 분기 개수에 따라 진입해야 할 Step을 반환.
+     * 단일 분기면 그 Step으로 바로, 둘 다 켜졌으면 ACTION_SELECTION으로.
+     */
+    private static Step resolveActionStep() {
+        boolean identifierEnabled = Settings.ENABLE_DC_BAN_LIST_IDENTIFIER_SEARCH.get();
+        boolean exportEnabled = Settings.ENABLE_DC_BAN_LIST_BAN_LIST_EXPORT.get();
+
+        if (identifierEnabled && !exportEnabled) {
+            return Step.IDENTIFIER_INPUT;
+        }
+        if (exportEnabled && !identifierEnabled) {
+            return Step.OAUTH_CONFIRMATION;
+        }
+        return Step.ACTION_SELECTION;
     }
 
     private static Step resolveInitialStep() {
-        return loadSavedSheetId().isEmpty() ? Step.SHEET_ID_INPUT : Step.ACTION_SELECTION;
+        if (loadSavedSheetId().isEmpty()) {
+            return Step.SHEET_ID_INPUT;
+        }
+        return resolveActionStep();
     }
 
     @Override
@@ -86,33 +120,6 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
         }
 
         super.renderStep();
-
-        if (currentDialog.getWindow() == null) return;
-
-        currentDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            currentDialog.getWindow().setDecorFitsSystemWindows(false);
-        }
-
-        View rootView = currentDialog.findViewById(android.R.id.content);
-        rootView.setOnApplyWindowInsetsListener((view, insets) -> {
-            // Framework API 직접 사용
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                Insets imeInsets = insets.getInsets(WindowInsets.Type.ime());
-                Insets systemBarsInsets = insets.getInsets(WindowInsets.Type.systemBars());
-
-                int bottomPadding = Math.max(Objects.requireNonNull(imeInsets).bottom, Objects.requireNonNull(systemBarsInsets).bottom);
-                view.setPadding(
-                        systemBarsInsets.left,
-                        systemBarsInsets.top,
-                        systemBarsInsets.right,
-                        bottomPadding
-                );
-
-                return WindowInsets.CONSUMED;
-            }
-            return insets;
-        });
     }
 
     /**
@@ -170,7 +177,7 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
                                 if (isEditingExisting) {
                                     // 변경 없이 그대로 진행 - 기존 시트 ID 유지
                                     targetSheetId = existingSheetId;
-                                    transitionTo(Step.ACTION_SELECTION);
+                                    transitionTo(sheetIdReturnStep);
                                     return;
                                 }
                                 Toast.makeText(context, "시트 ID를 입력해주세요.", Toast.LENGTH_SHORT).show();
@@ -179,32 +186,14 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
                             }
                             targetSheetId = id;
                             saveSheetIdToMap(id);
-                            transitionTo(Step.ACTION_SELECTION);
+                            transitionTo(sheetIdReturnStep);
                         })
-                        .setNegativeButton("취소", isEditingExisting ? (d, w) -> transitionTo(Step.ACTION_SELECTION) : null);
+                        .setNegativeButton("취소", isEditingExisting ? (d, w) -> transitionTo(sheetIdReturnStep) : null);
             }
 
             case ACTION_SELECTION -> {
                 TextView message = new TextView(context);
                 message.setText("원하는 작업을 선택하세요.");
-
-                Button identifierSearchButton = new Button(context);
-                identifierSearchButton.setText("식별코드 조회");
-                identifierSearchButton.setOnClickListener(v -> {
-                    currentDialog.dismiss();
-                    transitionTo(Step.IDENTIFIER_INPUT);
-                });
-                identifierSearchButton.setBackground(DialogUiUtils.createOutlineButtonBackground(secondaryColor));
-                identifierSearchButton.setTextColor(textColor);
-
-                Button banListExportButton = new Button(context);
-                banListExportButton.setText("차단 내역 내보내기");
-                banListExportButton.setOnClickListener(v -> {
-                    currentDialog.dismiss();
-                    transitionTo(Step.OAUTH_CONFIRMATION);
-                });
-                banListExportButton.setBackground(DialogUiUtils.createOutlineButtonBackground(secondaryColor));
-                banListExportButton.setTextColor(textColor);
 
                 LinearLayout buttonRow = new LinearLayout(context);
                 buttonRow.setOrientation(LinearLayout.HORIZONTAL);
@@ -212,19 +201,46 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
                 LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
                 int buttonMargin = (int) (4 * context.getResources().getDisplayMetrics().density);
 
-                LinearLayout.LayoutParams identifierSearchParams = new LinearLayout.LayoutParams(buttonParams);
-                identifierSearchParams.rightMargin = buttonMargin;
+                List<View> buttons = new ArrayList<>();
 
-                LinearLayout.LayoutParams banListExportParams = new LinearLayout.LayoutParams(buttonParams);
-                banListExportParams.leftMargin = buttonMargin;
+                if (Settings.ENABLE_DC_BAN_LIST_IDENTIFIER_SEARCH.get()) {
+                    Button identifierSearchButton = new Button(context);
+                    identifierSearchButton.setText("식별코드 조회");
+                    identifierSearchButton.setOnClickListener(v -> {
+                        currentDialog.dismiss();
+                        transitionTo(Step.IDENTIFIER_INPUT);
+                    });
+                    identifierSearchButton.setBackground(DialogUiUtils.createOutlineButtonBackground(secondaryColor));
+                    identifierSearchButton.setTextColor(textColor);
+                    buttons.add(identifierSearchButton);
+                }
 
-                buttonRow.addView(identifierSearchButton, identifierSearchParams);
-                buttonRow.addView(banListExportButton, banListExportParams);
+                if (Settings.ENABLE_DC_BAN_LIST_BAN_LIST_EXPORT.get()) {
+                    Button banListExportButton = new Button(context);
+                    banListExportButton.setText("차단 내역 내보내기");
+                    banListExportButton.setOnClickListener(v -> {
+                        currentDialog.dismiss();
+                        transitionTo(Step.OAUTH_CONFIRMATION);
+                    });
+                    banListExportButton.setBackground(DialogUiUtils.createOutlineButtonBackground(secondaryColor));
+                    banListExportButton.setTextColor(textColor);
+                    buttons.add(banListExportButton);
+                }
+
+                for (int i = 0; i < buttons.size(); i++) {
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(buttonParams);
+                    if (i > 0) params.leftMargin = buttonMargin;
+                    if (i < buttons.size() - 1) params.rightMargin = buttonMargin;
+                    buttonRow.addView(buttons.get(i), params);
+                }
 
                 LinearLayout container = DialogUiUtils.wrapWithPadding(context, message, buttonRow);
 
                 builder.setView(container)
-                        .setNeutralButton("시트 ID 변경", (d, w) -> transitionTo(Step.SHEET_ID_INPUT))
+                        .setNeutralButton("시트 ID 변경", (d, w) -> {
+                            sheetIdReturnStep = Step.ACTION_SELECTION;
+                            transitionTo(Step.SHEET_ID_INPUT);
+                        })
                         .setNegativeButton("취소", null);
             }
 
@@ -263,7 +279,11 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
                             }
                             transitionTo(Step.IDENTIFIER_FETCHING);
                         })
-                        .setNegativeButton("취소", (d, w) -> transitionTo(Step.ACTION_SELECTION));
+                        .setNeutralButton("시트 ID 변경", (d, w) -> {
+                            sheetIdReturnStep = Step.IDENTIFIER_INPUT;
+                            transitionTo(Step.SHEET_ID_INPUT);
+                        })
+                        .setNegativeButton("취소", null);
             }
 
             case IDENTIFIER_FETCHING -> {
@@ -285,12 +305,15 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
 
             case OAUTH_CONFIRMATION -> builder
                     .setMessage("구글 권한 확인 및 계정 연동 상태를 검증합니다.")
-                    .setNeutralButton("자동 진행", (d, w) -> {
-                        autoProcess = true;
-                        transitionTo(Step.OAUTH_CONFIRMATION); // renderStep 재진입 → tryAutoAdvance가 가로챔
+                    .setNeutralButton("시트 ID 변경", (d, w) -> {
+                        sheetIdReturnStep = Step.OAUTH_CONFIRMATION;
+                        transitionTo(Step.SHEET_ID_INPUT);
                     })
                     .setPositiveButton("권한 확인", (d, w) -> checkAuthStatus())
-                    .setNegativeButton("취소", null);
+                    .setNegativeButton("자동 진행", (d, w) -> {
+                        autoProcess = true;
+                        transitionTo(Step.OAUTH_CONFIRMATION); // renderStep 재진입 → tryAutoAdvance가 가로챔
+                    });
 
             case CHECKING_AUTH -> builder
                     .setMessage("구글 계정 권한을 확인하고 있습니다...");

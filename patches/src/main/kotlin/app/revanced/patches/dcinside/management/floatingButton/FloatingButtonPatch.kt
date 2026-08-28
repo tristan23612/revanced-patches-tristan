@@ -183,6 +183,8 @@ private data class FloatingButtonDefinition(
 private val floatingButtonDefinitions = listOf(
     FloatingButtonDefinition("dcBanList", "dc_ban_list") { settingId ->
         setOf(
+            SwitchPreference("revanced_enable_${settingId}_identifier_search_button"),
+            SwitchPreference("revanced_enable_${settingId}_ban_list_export_button"),
             TextPreference(
                 key = "revanced_${settingId}_sheet_id_map",
                 inputType = InputType.TEXT_MULTI_LINE,
