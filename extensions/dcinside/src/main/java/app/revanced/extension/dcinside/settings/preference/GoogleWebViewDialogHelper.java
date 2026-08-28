@@ -7,11 +7,7 @@ import android.os.Message;
 import android.util.TypedValue;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.webkit.CookieManager;
-import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
+import android.webkit.*;
 
 /**
  * Shared WebView dialog builder used by Google account related preferences

@@ -1,6 +1,5 @@
 package app.revanced.extension.dcinside.patches.management.floatingButton.dcBanList;
 
-import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;

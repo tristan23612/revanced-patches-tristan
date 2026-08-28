@@ -1,12 +1,13 @@
 package app.revanced.extension.dcinside.utils.json;
 
 import app.revanced.extension.dcinside.utils.stream.StreamUtils;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.InputStream;
-import org.jetbrains.annotations.NotNull;
 
 public final class JsonUtils {
     public static final JsonUtils INSTANCE = new JsonUtils();

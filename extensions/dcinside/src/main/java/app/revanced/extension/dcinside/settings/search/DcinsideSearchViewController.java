@@ -1,22 +1,21 @@
 package app.revanced.extension.dcinside.settings.search;
 
 import android.app.Activity;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.preference.Preference;
 import android.preference.PreferenceScreen;
 import android.view.MenuItem;
 import android.view.View;
-import android.graphics.drawable.Drawable;
 import android.widget.*;
-
 import app.revanced.extension.dcinside.settings.DcinsideActivityHook;
+import app.revanced.extension.dcinside.settings.preference.DcinsidePreferenceFragment;
 import app.revanced.extension.shared.ResourceType;
 import app.revanced.extension.shared.Utils;
 import app.revanced.extension.shared.settings.search.BaseSearchResultItem;
 import app.revanced.extension.shared.settings.search.BaseSearchResultsAdapter;
 import app.revanced.extension.shared.settings.search.BaseSearchViewController;
-import app.revanced.extension.dcinside.settings.preference.DcinsidePreferenceFragment;
 import app.revanced.extension.shared.ui.CustomDialog;
 import app.revanced.extension.shared.ui.Dim;
 

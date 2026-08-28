@@ -7,7 +7,6 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.os.Build;
 import android.preference.PreferenceFragment;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,19 +15,17 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toolbar;
-
 import androidx.annotation.Nullable;
+import app.revanced.extension.dcinside.settings.preference.DcinsidePreferenceFragment;
+import app.revanced.extension.dcinside.settings.search.DcinsideSearchViewController;
+import app.revanced.extension.shared.Utils;
+import app.revanced.extension.shared.settings.BaseActivityHook;
+import app.revanced.extension.shared.ui.CustomDialog;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import app.revanced.extension.shared.Utils;
-import app.revanced.extension.shared.settings.BaseActivityHook;
-import app.revanced.extension.shared.ui.CustomDialog;
-import app.revanced.extension.dcinside.settings.preference.DcinsidePreferenceFragment;
-import app.revanced.extension.dcinside.settings.search.DcinsideSearchViewController;
 
 @SuppressWarnings("deprecation")
 public class DcinsideActivityHook extends BaseActivityHook {

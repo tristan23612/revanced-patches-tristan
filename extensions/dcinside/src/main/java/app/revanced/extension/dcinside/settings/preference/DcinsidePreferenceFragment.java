@@ -8,12 +8,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Toolbar;
-
+import app.revanced.extension.dcinside.settings.DcinsideActivityHook;
 import app.revanced.extension.shared.Logger;
 import app.revanced.extension.shared.ResourceType;
 import app.revanced.extension.shared.Utils;
 import app.revanced.extension.shared.settings.preference.ToolbarPreferenceFragment;
-import app.revanced.extension.dcinside.settings.DcinsideActivityHook;
 
 /**
  * Preference fragment for ReVanced settings.

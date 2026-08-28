@@ -10,7 +10,6 @@ import android.graphics.drawable.GradientDrawable;
 import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
 import android.view.View;
-import android.view.View.MeasureSpec;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ListView;

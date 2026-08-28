@@ -3,10 +3,9 @@ package app.revanced.extension.dcinside.patches.management.floatingButton.dcBanL
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.graphics.Insets;
-import android.os.Build;
 import android.util.Log;
-import android.view.*;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.*;
 import androidx.annotation.NonNull;
 import app.revanced.extension.dcinside.patches.hook.json.JsonHookPatch;
@@ -26,9 +25,8 @@ import org.jsoup.nodes.Document;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
-@SuppressLint("DiscouragedApi")
+@SuppressLint({"DiscouragedApi", "SetTextI18n"})
 final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
     private static final String TAG = "ReVanced_DCInside";
 
