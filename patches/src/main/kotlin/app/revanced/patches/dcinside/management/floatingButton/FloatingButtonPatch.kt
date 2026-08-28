@@ -10,12 +10,7 @@ import app.revanced.patches.dcinside.misc.extension.sharedExtensionPatch
 import app.revanced.patches.dcinside.misc.hook.json.jsonHookPatch
 import app.revanced.patches.dcinside.misc.settings.PreferenceScreen
 import app.revanced.patches.dcinside.misc.settings.settingsPatch
-import app.revanced.patches.shared.misc.settings.preference.BasePreference
-import app.revanced.patches.shared.misc.settings.preference.InputType
-import app.revanced.patches.shared.misc.settings.preference.NonInteractivePreference
-import app.revanced.patches.shared.misc.settings.preference.PreferenceScreenPreference
-import app.revanced.patches.shared.misc.settings.preference.SwitchPreference
-import app.revanced.patches.shared.misc.settings.preference.TextPreference
+import app.revanced.patches.shared.misc.settings.preference.*
 import app.revanced.util.ResourceGroup
 import app.revanced.util.asSequence
 import app.revanced.util.copyResources

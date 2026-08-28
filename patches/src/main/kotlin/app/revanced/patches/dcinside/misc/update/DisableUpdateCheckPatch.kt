@@ -8,7 +8,6 @@ import app.revanced.patches.dcinside.misc.extension.sharedExtensionPatch
 import app.revanced.patches.dcinside.misc.settings.PreferenceScreen
 import app.revanced.patches.dcinside.misc.settings.settingsPatch
 import app.revanced.patches.shared.misc.settings.preference.SwitchPreference
-import app.revanced.util.returnEarly
 
 private const val EXTENSION_CLASS_DESCRIPTOR = "Lapp/revanced/extension/dcinside/patches/misc/DisableUpdateCheckPatch;"
 

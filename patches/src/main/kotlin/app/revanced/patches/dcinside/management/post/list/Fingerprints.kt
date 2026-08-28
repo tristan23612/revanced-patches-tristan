@@ -1,7 +1,6 @@
 package app.revanced.patches.dcinside.management.post.list
 
 import app.revanced.patcher.*
-import app.revanced.patcher.invoke
 import app.revanced.patcher.patch.BytecodePatchContext
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
