@@ -4,6 +4,10 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.View;
+import android.view.ViewGroup;
+
+import java.util.Objects;
 
 public abstract class DialogSession<S extends Enum<S>> {
 
@@ -35,15 +39,19 @@ public abstract class DialogSession<S extends Enum<S>> {
             currentDialog.dismiss();
         }
 
-        int dialogThemeResId = DialogUiUtils.resolveDialogTheme(context);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(context, dialogThemeResId)
+        AlertDialog.Builder builder = new AlertDialog.Builder(context)
                 .setTitle(getDialogTitle())
                 .setCancelable(true);
 
         buildStep(builder, currentStep);
 
         currentDialog = builder.create();
+
+        if (currentDialog.getWindow() != null) {
+            android.widget.EditText temp = new android.widget.EditText(context);
+            currentDialog.getWindow().setBackgroundDrawable(temp.getBackground());
+        }
+
         currentDialog.show();
     }
 
