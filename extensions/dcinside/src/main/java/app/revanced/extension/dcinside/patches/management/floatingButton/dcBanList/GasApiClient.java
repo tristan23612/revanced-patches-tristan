@@ -21,7 +21,7 @@ public class GasApiClient {
     /**
      * GET 요청
      */
-    public static void sendGet(String queryString, Callback callback) {
+      static void sendGet(String queryString, Callback callback) {
         executeRequest("GET", queryString, null, callback);
     }
 

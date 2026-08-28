@@ -2,24 +2,17 @@ package app.revanced.extension.dcinside.patches.management.floatingButton.gallSc
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.TextUtils;
-import android.util.TypedValue;
-import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import androidx.annotation.NonNull;
 import app.revanced.extension.dcinside.patches.hook.json.JsonHookPatch;
 import app.revanced.extension.dcinside.patches.hook.okhttp.CustomNetworkInterceptorPatch;
+import app.revanced.extension.dcinside.patches.management.floatingButton.DialogSession;
+import app.revanced.extension.dcinside.patches.management.floatingButton.DialogUiUtils;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -30,11 +23,11 @@ import java.util.List;
  * CommentSearchStrategy)에 위임하고, 이 클래스는 UI 스텝 전환과 결과 표시만 담당한다.
  */
 @SuppressLint({"DiscouragedApi", "SetTextI18n"})
-final class GallScopeSession {
+final class GallScopeSession extends DialogSession<GallScopeSession.Step> {
 
     private static final String TAG = "ReVanced_DCInside";
 
-    private enum Step {
+    enum Step {
         IDENTIFIER_INPUT,
         SEARCH_MODE_SELECTION,
         PAGE_RANGE_INPUT,
@@ -59,11 +52,6 @@ final class GallScopeSession {
         }
     }
 
-    private final Context context;
-    private final Handler mainHandler = new Handler(Looper.getMainLooper());
-    private Step currentStep;
-    private AlertDialog currentDialog;
-
     private String targetUserId;
     private String galleryType;
     private String galleryId;
@@ -83,40 +71,31 @@ final class GallScopeSession {
     private final PostSearchStrategy postSearchStrategy = new PostSearchStrategy();
     private final CommentSearchStrategy commentSearchStrategy = new CommentSearchStrategy();
 
-    private final int textColor;
-    private final int secondaryColor;
-
     GallScopeSession(Context context, String prefillUserId, String prefillGalleryType, String prefillGalleryId) {
-        this.context = context;
-        this.textColor = resolveDialogTextColor(context);
-        this.secondaryColor = applyAlpha(textColor, 0x80);
+        super(context, resolveInitialStep(prefillUserId, prefillGalleryType, prefillGalleryId));
 
-        if (prefillUserId != null && !prefillUserId.trim().isEmpty() && prefillGalleryType != null && !prefillGalleryType.trim().isEmpty() && prefillGalleryId != null && !prefillGalleryId.trim().isEmpty()) {
+        if (currentStep == Step.SEARCH_MODE_SELECTION) {
             this.targetUserId = prefillUserId.trim();
             this.galleryType = prefillGalleryType.trim();
             this.galleryId = prefillGalleryId.trim();
-            this.currentStep = Step.SEARCH_MODE_SELECTION;
-        } else {
-            this.currentStep = Step.IDENTIFIER_INPUT;
         }
     }
 
-    void start() {
-        renderStep();
+    private static Step resolveInitialStep(String prefillUserId, String prefillGalleryType, String prefillGalleryId) {
+        boolean hasPrefill = prefillUserId != null && !prefillUserId.trim().isEmpty()
+                && prefillGalleryType != null && !prefillGalleryType.trim().isEmpty()
+                && prefillGalleryId != null && !prefillGalleryId.trim().isEmpty();
+        return hasPrefill ? Step.SEARCH_MODE_SELECTION : Step.IDENTIFIER_INPUT;
     }
 
-    private void renderStep() {
-        if (currentDialog != null && currentDialog.isShowing()) {
-            currentDialog.dismiss();
-        }
+    @Override
+    protected String getDialogTitle() {
+        return "갤스코프";
+    }
 
-        int dialogThemeResId = resolveDialogTheme(context);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(context, dialogThemeResId)
-                .setTitle("갤스코프")
-                .setCancelable(true);
-
-        switch (currentStep) {
+    @Override
+    protected void buildStep(AlertDialog.Builder builder, Step step) {
+        switch (step) {
             case IDENTIFIER_INPUT -> {
                 TextView message = new TextView(context);
                 message.setText("검색할 유저의 식별코드를 입력하세요.");
@@ -139,7 +118,7 @@ final class GallScopeSession {
                 row.addView(input, inputParams);
                 row.addView(new View(context), spacerParams);
 
-                LinearLayout container = wrapWithPadding(message, row);
+                LinearLayout container = DialogUiUtils.wrapWithPadding(context, message, row);
 
                 builder.setView(container)
                         .setPositiveButton("다음", (d, w) -> {
@@ -168,7 +147,7 @@ final class GallScopeSession {
                     currentDialog.dismiss();
                     transitionTo(Step.PAGE_RANGE_INPUT);
                 });
-                postButton.setBackground(createOutlineButtonBackground(secondaryColor));
+                postButton.setBackground(DialogUiUtils.createOutlineButtonBackground(secondaryColor));
                 postButton.setTextColor(textColor);
 
                 Button commentButton = new Button(context);
@@ -179,7 +158,7 @@ final class GallScopeSession {
                     currentDialog.dismiss();
                     transitionTo(Step.PAGE_RANGE_INPUT);
                 });
-                commentButton.setBackground(createOutlineButtonBackground(secondaryColor));
+                commentButton.setBackground(DialogUiUtils.createOutlineButtonBackground(secondaryColor));
                 commentButton.setTextColor(textColor);
 
                 LinearLayout buttonRow = new LinearLayout(context);
@@ -196,7 +175,7 @@ final class GallScopeSession {
                 buttonRow.addView(postButton, postButtonParams);
                 buttonRow.addView(commentButton, commentButtonParams);
 
-                LinearLayout container = wrapWithPadding(message, buttonRow);
+                LinearLayout container = DialogUiUtils.wrapWithPadding(context, message, buttonRow);
 
                 builder.setView(container)
                         .setNegativeButton("취소", null);
@@ -242,7 +221,7 @@ final class GallScopeSession {
                 row.addView(endInput, inputParams);
                 row.addView(new View(context), spacerParams);
 
-                LinearLayout container = wrapWithPadding(message, row);
+                LinearLayout container = DialogUiUtils.wrapWithPadding(context, message, row);
 
                 builder.setView(container)
                         .setPositiveButton("검색 시작", (d, w) -> {
@@ -289,7 +268,7 @@ final class GallScopeSession {
                 message.setText(targetUserId + " " + searchMode + " 스코프 결과\n" + snapshot.size() + "건 (" + rangeText + ")");
 
                 ListView listView = getListView(snapshot);
-                LinearLayout container = wrapWithPadding(message, listView);
+                LinearLayout container = DialogUiUtils.wrapWithPadding(context, message, listView);
 
                 builder.setView(container)
                         .setNeutralButton("복사", (d, w) -> copyResultsToClipboard(snapshot));
@@ -311,9 +290,6 @@ final class GallScopeSession {
                     .setMessage("요청 처리 중 오류가 발생했습니다.")
                     .setPositiveButton("확인", null);
         }
-
-        currentDialog = builder.create();
-        currentDialog.show();
     }
 
     private void runSearch() {
@@ -353,15 +329,7 @@ final class GallScopeSession {
 
     @NonNull
     private ListView getListView(List<JSONObject> snapshot) {
-        int maxHeightPx = (int) (context.getResources().getDisplayMetrics().heightPixels * 0.5f);
-
-        ListView listView = new ListView(context) {
-            @Override
-            protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-                int heightSpec = MeasureSpec.makeMeasureSpec(maxHeightPx, MeasureSpec.AT_MOST);
-                super.onMeasure(widthMeasureSpec, heightSpec);
-            }
-        };
+        ListView listView = DialogUiUtils.createHeightLimitedListView(context, 0.5f);
 
         listView.setAdapter(new ArrayAdapter<JSONObject>(context, 0, snapshot) {
             @NonNull
@@ -451,93 +419,6 @@ final class GallScopeSession {
         return listView;
     }
 
-    private LinearLayout wrapWithPadding(View... children) {
-        LinearLayout container = new LinearLayout(context);
-        container.setOrientation(LinearLayout.VERTICAL);
-
-        int padding = resolveDialogPreferredPadding(context);
-        container.setPadding(padding, 0, padding, 0);
-
-        for (View child : children) {
-            ViewGroup.LayoutParams existingParams = child.getLayoutParams();
-            boolean hasOwnParams = existingParams instanceof LinearLayout.LayoutParams;
-
-            LinearLayout.LayoutParams params = hasOwnParams
-                    ? (LinearLayout.LayoutParams) existingParams
-                    : new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-
-            if (!hasOwnParams) {
-                params.topMargin = padding / 2;
-            }
-
-            container.addView(child, params);
-        }
-
-        return container;
-    }
-
-    private static int resolveDialogPreferredPadding(Context context) {
-        TypedValue typedValue = new TypedValue();
-
-        int appcompatAttrId = context.getResources().getIdentifier(
-                "dialogPreferredPadding", "attr", context.getPackageName());
-        if (appcompatAttrId != 0 &&
-                context.getTheme().resolveAttribute(appcompatAttrId, typedValue, true)) {
-            return TypedValue.complexToDimensionPixelSize(
-                    typedValue.data, context.getResources().getDisplayMetrics());
-        }
-
-        if (context.getTheme().resolveAttribute(
-                android.R.attr.dialogPreferredPadding, typedValue, true)) {
-            return TypedValue.complexToDimensionPixelSize(
-                    typedValue.data, context.getResources().getDisplayMetrics());
-        }
-
-        return (int) (16 * context.getResources().getDisplayMetrics().density);
-    }
-
-    private static Drawable createOutlineButtonBackground(int borderColor) {
-        GradientDrawable drawable = new GradientDrawable();
-        drawable.setColor(Color.TRANSPARENT);
-        drawable.setStroke(2, borderColor);
-        drawable.setCornerRadius(8);
-        return drawable;
-    }
-
-    private static int resolveDialogTheme(Context context) {
-        TypedValue typedValue = new TypedValue();
-        context.getTheme().resolveAttribute(
-                context.getResources().getIdentifier("alertDialogTheme", "attr", context.getPackageName()),
-                typedValue,
-                true
-        );
-        return typedValue.resourceId;
-    }
-
-    private static int resolveDialogTextColor(Context context) {
-        int dialogThemeResId = resolveDialogTheme(context);
-        Context themedContext = new ContextThemeWrapper(context, dialogThemeResId);
-
-        TypedValue typedValue = new TypedValue();
-        themedContext.getTheme().resolveAttribute(android.R.attr.textColorPrimary, typedValue, true);
-
-        if (typedValue.resourceId != 0) {
-            return themedContext.getResources().getColor(typedValue.resourceId, themedContext.getTheme());
-        }
-        return typedValue.data;
-    }
-
-    private static int applyAlpha(int color, int alpha) {
-        // alpha: 0~255
-        return (color & 0x00FFFFFF) | (alpha << 24);
-    }
-
-    private void transitionTo(Step nextStep) {
-        this.currentStep = nextStep;
-        mainHandler.post(this::renderStep);
-    }
-
     private String progressText(int completed, int total) {
         return "검색하고 있습니다...\n(" + completed + " / " + total + "페이지" + ")";
     }
@@ -552,8 +433,6 @@ final class GallScopeSession {
                     .append(item.optString("url", "")).append("\n\n");
         }
 
-        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-        clipboard.setPrimaryClip(ClipData.newPlainText("GallScope Results", stringBuilder.toString()));
-        Toast.makeText(context, "결과가 클립보드에 복사되었습니다.", Toast.LENGTH_SHORT).show();
+        DialogUiUtils.copyToClipboard(context, "GallScope Results", stringBuilder.toString());
     }
 }
