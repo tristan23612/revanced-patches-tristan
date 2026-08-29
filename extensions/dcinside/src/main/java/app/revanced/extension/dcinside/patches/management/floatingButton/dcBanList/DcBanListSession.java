@@ -692,7 +692,7 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
                     detailView = (TextView) views[1];
                 }
                 JSONObject item = getItem(position);
-                titleView.setText("식별코드: " + (item == null ? "" : item.optString(DcBanListCsvParser.IDENTIFIER_COLUMN, "")));
+                titleView.setText(item == null ? "" : item.optString(DcBanListCsvParser.CONTENT_COLUMN, ""));
                 detailView.setText(formatAllIdentifierColumns(item));
                 return row;
             }

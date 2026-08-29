@@ -10,6 +10,7 @@ import java.util.List;
 /** Parses a CSV export while retaining every column by its header name. */
 final class DcBanListCsvParser {
     static final String IDENTIFIER_COLUMN = "식별코드";
+    static final String CONTENT_COLUMN = "게시글 / 댓글";
 
     private DcBanListCsvParser() {
     }
