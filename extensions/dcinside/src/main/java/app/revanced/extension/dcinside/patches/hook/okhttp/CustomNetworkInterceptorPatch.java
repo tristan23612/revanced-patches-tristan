@@ -89,7 +89,7 @@ public final class CustomNetworkInterceptorPatch implements Interceptor {
                     .body(ResponseBody.create(modifiedData, contentType))
                     .build();
         } catch (Exception e) {
-            Log.e(TAG, "Failed to intercept HomeTimeline response", e);
+            Log.e(TAG, "<-- [FAILED] " + path + " : " + e.getMessage());
             return response;
         }
     }
