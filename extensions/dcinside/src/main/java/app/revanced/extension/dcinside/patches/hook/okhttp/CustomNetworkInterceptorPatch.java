@@ -31,10 +31,12 @@ public final class CustomNetworkInterceptorPatch implements Interceptor {
         Request request = chain.request();
 
         boolean isTargetUrl = false;
+        boolean isListRequest = false;
         String path = request.url().encodedPath();
         for (String keyword : URL_FILTER_KEYWORD_LIST) {
             if (path.contains(keyword)) {
                 isTargetUrl = true;
+                isListRequest = keyword.equals("gall_list_new");
                 break;
             }
         }
@@ -67,7 +69,7 @@ public final class CustomNetworkInterceptorPatch implements Interceptor {
                 rawBytes = responseStream.readAllBytes();
             }
 
-            InputStream modifiedStream = JsonHookPatch.parseJsonHook(new ByteArrayInputStream(rawBytes));
+            InputStream modifiedStream = JsonHookPatch.parseJsonHook(new ByteArrayInputStream(rawBytes), isListRequest);
             byte[] modifiedData = null;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 modifiedData = modifiedStream.readAllBytes();

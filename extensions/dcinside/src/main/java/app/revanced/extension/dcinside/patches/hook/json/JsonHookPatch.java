@@ -31,7 +31,7 @@ public final class JsonHookPatch {
     private JsonHookPatch() {
     }
 
-    public static InputStream parseJsonHook(@NotNull InputStream jsonInputStream) {
+    public static InputStream parseJsonHook(@NotNull InputStream jsonInputStream, boolean isListRequest) {
         JSONArray jsonArray;
         try {
             jsonArray = JsonUtils.parseJsonArray(jsonInputStream);
@@ -44,7 +44,7 @@ public final class JsonHookPatch {
                 JSONObject jsonObject = jsonArray.optJSONObject(i);
                 if (jsonObject == null) continue;
 
-                updateGalleryMetadata(jsonObject);
+                updateGalleryMetadata(jsonObject, isListRequest);
 
                 for (JsonHook hook : hooks) {
                     jsonObject = hook.hook(jsonObject);
@@ -59,14 +59,7 @@ public final class JsonHookPatch {
         }
     }
 
-    /**
-     * Updates the metadata of a gallery represented by the provided JSON object. This method
-     * evaluates specific fields within the JSON object to determine and set the
-     * gallery's type and manager skill status.
-     *
-     * @param jsonObject The JSON object containing gallery metadata. Must not be null.
-     */
-    private static void updateGalleryMetadata(@NotNull JSONObject jsonObject) {
+    private static void updateGalleryMetadata(@NotNull JSONObject jsonObject, boolean isListRequest) {
         JSONObject infoObj;
 
         JSONArray gallInfoArray = jsonObject.optJSONArray("gall_info");
@@ -78,7 +71,6 @@ public final class JsonHookPatch {
 
         if (infoObj == null) return;
 
-        // galleryType 결정 (is_minor -> is_mini -> gallery 순)
         if (infoObj.optBoolean("is_minor", false)) {
             galleryType = "mgallery";
         } else if (infoObj.optBoolean("is_mini", false)) {
@@ -87,7 +79,9 @@ public final class JsonHookPatch {
             galleryType = "gallery";
         }
 
-        // managerSkill 결정 (view_main 내 위치 우선 탐색 후 fallback)
+        // managerSkill은 리스트 요청 응답에서만 갱신 (게시글 화면 진입 시 다른 갤러리 값으로 오염되는 것 방지)
+        if (!isListRequest) return;
+
         JSONObject viewMain = jsonObject.optJSONObject("view_main");
         if (viewMain != null && viewMain.has("managerskill")) {
             managerSkill = viewMain.optBoolean("managerskill", false);
