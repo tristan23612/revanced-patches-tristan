@@ -305,10 +305,10 @@ Second \"item\" text"</string>
             <string name="revanced_show_dc_ban_list_button_summary_off">DC BanList 아이콘이 퀵쓰기 버튼 위에 추가되지 않습니다.</string>
             <string name="revanced_enable_dc_ban_list_identifier_search_button_title">DC BanList 식별 코드 검색</string>
             <string name="revanced_enable_dc_ban_list_identifier_search_button_summary_on">DC BanList 식별 코드 검색 기능이 활성화됩니다.</string>
-            <string name="revanced_enable_dc_ban_list_identifier_search_button_summary_off">DC BanList 식별 코드 검색 기능이 활성화되지 않습니다.</string>
+            <string name="revanced_enable_dc_ban_list_identifier_search_button_summary_off">DC BanList 식별 코드 검색 기능이 비활성화됩니다.</string>
             <string name="revanced_enable_dc_ban_list_ban_list_export_button_title">DC BanList 업로드</string>
             <string name="revanced_enable_dc_ban_list_ban_list_export_button_summary_on">DC BanList 업로드 기능이 활성화됩니다.</string>
-            <string name="revanced_enable_dc_ban_list_ban_list_export_button_summary_off">DC BanList 업로드 기능이 활성화되지 앟습니다.</string>
+            <string name="revanced_enable_dc_ban_list_ban_list_export_button_summary_off">DC BanList 업로드 기능이 비활성화됩니다.</string>
             <string name="revanced_dc_ban_list_sheet_id_map_title">DC BanList 시트 id</string>
             <string name="revanced_dc_ban_list_sheet_id_map_summary">DC BanList가 저장한 시트 id를 확인합니다.</string>
             <string name="revanced_dc_ban_list_gas_authorization_webview_title">GAS 인증하기</string>
