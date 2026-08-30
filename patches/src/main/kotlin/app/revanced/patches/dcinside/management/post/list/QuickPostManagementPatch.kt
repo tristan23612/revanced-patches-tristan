@@ -1,11 +1,9 @@
-package app.revanced.patches.dcinside.post.list
+package app.revanced.patches.dcinside.management.post.list
 
 import app.revanced.patcher.extensions.addInstructions
 import app.revanced.patcher.extensions.getInstruction
 import app.revanced.patcher.extensions.methodReference
-import app.revanced.patcher.patch.booleanOption
 import app.revanced.patcher.patch.bytecodePatch
-import app.revanced.patcher.patch.resourcePatch
 import app.revanced.patches.all.misc.resources.addResources
 import app.revanced.patches.all.misc.resources.addResourcesPatch
 import app.revanced.patches.dcinside.misc.extension.sharedExtensionPatch
@@ -13,11 +11,9 @@ import app.revanced.patches.dcinside.misc.hook.json.jsonHookPatch
 import app.revanced.patches.dcinside.misc.settings.PreferenceScreen
 import app.revanced.patches.dcinside.misc.settings.settingsPatch
 import app.revanced.patches.shared.misc.settings.preference.SwitchPreference
-import app.revanced.util.doRecursively
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
-import org.w3c.dom.Element
 
-private const val QUICK_POST_MANAGEMENT_PATCH_EXTENSION_CLASS_DESCRIPTOR = "Lapp/revanced/extension/dcinside/patches/post/list/QuickPostManagementPatch;"
+private const val QUICK_POST_MANAGEMENT_PATCH_EXTENSION_CLASS_DESCRIPTOR = "Lapp/revanced/extension/dcinside/patches/management/post/list/QuickPostManagementPatch;"
 
 @Suppress("unused")
 val quickPostManagementPatch = bytecodePatch(
@@ -34,28 +30,10 @@ val quickPostManagementPatch = bytecodePatch(
     )
 
     apply {
-        addResources("dcinside", "post.list.quickPostManagementPatch")
+        addResources("dcinside", "management.post.list.quickPostManagementPatch")
 
-        PreferenceScreen.MISC.addPreferences(
+        PreferenceScreen.MANAGEMENT.addPreferences(
             SwitchPreference("revanced_enable_quick_post_management")
-        )
-
-        jsonApiPostListHookMethod.apply {
-            addInstructions(
-                0,
-                $$"""
-                    invoke-static/range {p0 .. p0}, $$QUICK_POST_MANAGEMENT_PATCH_EXTENSION_CLASS_DESCRIPTOR->hookGalleryID(Ljava/lang/String;)V
-                """
-            )
-        }
-
-        addQueryParameterHookMethod.addInstructions(
-            0,
-            $$"""
-                move-object/from16 v0, p1
-                move-object/from16 v1, p2
-                invoke-static {v0, v1}, $$QUICK_POST_MANAGEMENT_PATCH_EXTENSION_CLASS_DESCRIPTOR->hookParam(Ljava/lang/String;Ljava/lang/String;)V
-            """
         )
 
         postItemBindMethodMatch.let {

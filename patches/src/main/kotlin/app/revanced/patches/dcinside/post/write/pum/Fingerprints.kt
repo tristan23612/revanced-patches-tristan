@@ -1,7 +1,6 @@
 package app.revanced.patches.dcinside.post.write.pum
 
 import app.revanced.patcher.*
-import app.revanced.patcher.invoke
 import app.revanced.patcher.patch.BytecodePatchContext
 import com.android.tools.smali.dexlib2.Opcode
 

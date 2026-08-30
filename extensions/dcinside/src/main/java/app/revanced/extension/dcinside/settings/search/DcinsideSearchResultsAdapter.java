@@ -2,13 +2,12 @@ package app.revanced.extension.dcinside.settings.search;
 
 import android.content.Context;
 import android.preference.PreferenceScreen;
-
 import android.view.View;
 import android.widget.TextView;
 import app.revanced.extension.dcinside.settings.DcinsideActivityHook;
+import app.revanced.extension.shared.settings.search.BaseSearchResultItem;
 import app.revanced.extension.shared.settings.search.BaseSearchResultsAdapter;
 import app.revanced.extension.shared.settings.search.BaseSearchViewController;
-import app.revanced.extension.shared.settings.search.BaseSearchResultItem;
 
 import java.util.List;
 

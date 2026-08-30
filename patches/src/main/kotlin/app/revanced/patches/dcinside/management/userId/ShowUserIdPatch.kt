@@ -1,4 +1,4 @@
-package app.revanced.patches.dcinside.post.userId
+package app.revanced.patches.dcinside.management.userId
 
 import app.revanced.patcher.extensions.addInstructions
 import app.revanced.patcher.extensions.getInstruction
@@ -13,6 +13,8 @@ import app.revanced.patches.all.misc.resources.addResourcesPatch
 import app.revanced.patches.dcinside.misc.extension.sharedExtensionPatch
 import app.revanced.patches.dcinside.misc.settings.PreferenceScreen
 import app.revanced.patches.dcinside.misc.settings.settingsPatch
+import app.revanced.patches.shared.misc.settings.preference.NonInteractivePreference
+import app.revanced.patches.shared.misc.settings.preference.PreferenceScreenPreference
 import app.revanced.patches.shared.misc.settings.preference.SwitchPreference
 import app.revanced.util.doRecursively
 import app.revanced.util.getFreeRegisterProvider
@@ -23,7 +25,7 @@ import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.value.StringEncodedValue
 import org.w3c.dom.Element
 
-private const val SHOW_USER_ID_PATCH_EXTENSION_CLASS_DESCRIPTOR = "Lapp/revanced/extension/dcinside/patches/post/userId/ShowUserIdPatch;"
+private const val SHOW_USER_ID_PATCH_EXTENSION_CLASS_DESCRIPTOR = "Lapp/revanced/extension/dcinside/patches/management/userId/ShowUserIdPatch;"
 private const val POST_ITEM_CLASS_DESCRIPTOR = "Lcom/dcinside/app/model/PostInfo;"
 
 context(context: ResourcePatchContext)
@@ -55,13 +57,13 @@ private fun injectUserIdTextView(
         val targetLeft = leftElement ?: return@use
         val targetRight = rightElement ?: return@use
 
-        targetLeft.setAttribute("app:layout_constraintEnd_toStartOf", "@+id/custom_user_id")
-        targetRight.setAttribute("app:layout_constraintStart_toEndOf", "@+id/custom_user_id")
+        targetLeft.setAttribute("app:layout_constraintEnd_toStartOf", "@+id/revanced_user_id")
+        targetRight.setAttribute("app:layout_constraintStart_toEndOf", "@+id/revanced_user_id")
 
         val userIdElement = document.createElement(viewClass).apply {
             setAttribute("android:textAppearance", "?attr/textTypeSub")
             setAttribute("android:textColor", textColorAttr)
-            setAttribute("android:id", "@+id/custom_user_id")
+            setAttribute("android:id", "@+id/revanced_user_id")
             setAttribute("android:layout_width", "wrap_content")
             setAttribute("android:layout_height", height)
             setAttribute("android:singleLine", "true")
@@ -76,6 +78,23 @@ private fun injectUserIdTextView(
         }
 
         targetLeft.parentNode?.insertBefore(userIdElement, targetRight)
+    }
+}
+
+context(context: ResourcePatchContext)
+private fun injectGalleryDataStore(layoutPath: String) {
+    context.document(layoutPath).use { document ->
+        val root = document.documentElement ?: return@use
+
+        // 수정 및 추가된 부분: 갤러리 ID 및 Type을 함께 포괄하도록 식별자(ID) 및 위젯 명칭 변경
+        val galleryDataElement = document.createElement("Space").apply {
+            setAttribute("android:id", "@+id/revanced_gallery_data_space")
+            setAttribute("android:layout_width", "0dp")
+            setAttribute("android:layout_height", "0dp")
+            setAttribute("android:visibility", "gone")
+        }
+
+        root.appendChild(galleryDataElement)
     }
 }
 
@@ -100,6 +119,7 @@ private val postListShowUserIdResourcePatch = resourcePatch {
                     "app:layout_constraintTop_toTopOf" to "@+id/post_list_item_nic",
                 ),
             )
+            injectGalleryDataStore(layoutPath)
         }
     }
 }
@@ -121,6 +141,7 @@ private val postHeaderShowUserIdResourcePatch = resourcePatch {
                 "app:layout_constraintBaseline_toBaselineOf" to "@+id/read_header_name",
             ),
         )
+        injectGalleryDataStore("res/layout/view_read_header.xml")
     }
 }
 
@@ -148,6 +169,7 @@ private val replyShowUserIdResourcePatch = resourcePatch {
                     "app:layout_constraintTop_toTopOf" to "@+id/reply_name",
                 ),
             )
+            injectGalleryDataStore(layoutPath)
         }
     }
 }
@@ -169,10 +191,18 @@ val showUserIdPatch = bytecodePatch(
     )
 
     apply {
-        addResources("dcinside", "post.userId.showUserIdPatch")
+        addResources("dcinside", "management.userId.showUserIdPatch")
 
-        PreferenceScreen.GENERAL.addPreferences(
-            SwitchPreference("revanced_show_user_id"),
+        PreferenceScreen.MANAGEMENT.addPreferences(
+            PreferenceScreenPreference(
+                key = "revanced_user_id_screen",
+                sorting = PreferenceScreenPreference.Sorting.UNSORTED,
+                preferences = setOf(
+                    NonInteractivePreference("revanced_show_user_id_guide"),
+                    SwitchPreference("revanced_show_user_id"),
+                    SwitchPreference("revanced_enable_user_id_gall_scope")
+                )
+            ),
         )
 
         postItemBindMethodMatch.let {

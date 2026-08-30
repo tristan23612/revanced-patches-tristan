@@ -229,6 +229,7 @@ Second \"item\" text"</string>
             <string name="revanced_settings_screen_01_ads_title">광고</string>
             <string name="revanced_settings_screen_03_feed_title">피드</string>
             <string name="revanced_settings_screen_04_general_title">일반</string>
+            <string name="revanced_settings_screen_05_player_title">갤러리 관리</string>
             <string name="revanced_settings_screen_11_misc_title">기타</string>
         </patch>
         <patch id="ads.hideAdsPatch">
@@ -258,20 +259,74 @@ Second \"item\" text"</string>
             <string name="revanced_disable_post_pum_option_summary_on">게시글 작성 시 펌 금지 옵션이 기본적으로 활성화됩니다.</string>
             <string name="revanced_disable_post_pum_option_summary_off">게시글 작성 시 펌 금지 옵션이 기본적으로 비활성화됩니다.</string>
         </patch>
-        <patch id="post.userId.showUserIdPatch">
-            <string name="revanced_show_user_id_title">식별 코드 표시</string>
-            <string name="revanced_show_user_id_summary_on">반고닉과 고닉 유저의 식별 코드가 표시됩니다.</string>
-            <string name="revanced_show_user_id_summary_off">반고닉과 고닉 유저의 식별 코드가 표시되지 않습니다.</string>
-        </patch>
-        <patch id="post.list.quickPostManagementPatch">
-            <string name="revanced_enable_quick_post_management_title">빠른 게시글 관리</string>
-            <string name="revanced_enable_quick_post_management_summary_on">게시글 목록에서 긴 터치를 통해 게시글 차단 및 삭제 팝업을 띄웁니다.</string>
-            <string name="revanced_enable_quick_post_management_summary_off">게시글 목록에서 긴 터치를 통해 게시글 차단 및 삭제 팝업을 띄우지 않습니다.</string>
-        </patch>
         <patch id="post.view.hideBottomLikePostsPatch">
             <string name="revanced_hide_bottom_like_posts_title">게시글 하단 추천 게시글 목록 숨기기</string>
             <string name="revanced_hide_bottom_like_posts_summary_on">게시글 하단의 추천 게시글 목록이 숨겨집니다.</string>
             <string name="revanced_hide_bottom_like_posts_summary_off">게시글 하단의 추천 게시글 목록이 숨겨지지 않습니다.</string>
+        </patch>
+        <patch id="management.userId.showUserIdPatch">
+            <string name="revanced_user_id_screen_title">식별코드</string>
+            <string name="revanced_user_id_screen_summary">식별코드 관련 설정을 할 수 있습니다.</string>
+            <string name="revanced_show_user_id_guide_title">식별코드 표시 가이드</string>
+            <string name="revanced_show_user_id_guide_summary">"식별코드 표시 옵션이 켜진 경우 다음 위치에 식별코드가 표시됩니다.
+
+- 게시글 목록에서 게시글 작성자 우측
+- 게시글 내부에서 게시글 작성자 우측
+- 게시글 내부에서 댓글 작성자 우측
+- 최근 본 글 목록에서 작성자 우측(드물게 누락됨)
+
+식별코드를 길게 터치해 복사할 수 있습니다.
+
+식별코드를 터치해 갤스코프를 바로 열 수 있습니다.
+플로팅 버튼 패치를 참조하세요."</string>
+            <string name="revanced_show_user_id_title">식별코드 표시</string>
+            <string name="revanced_show_user_id_summary_on">반고닉과 고닉 유저의 식별코드가 표시됩니다.</string>
+            <string name="revanced_show_user_id_summary_off">반고닉과 고닉 유저의 식별코드가 표시되지 않습니다.</string>
+            <string name="revanced_enable_user_id_gall_scope_title">식별코드 터치 시 갤스코프 열기</string>
+            <string name="revanced_enable_user_id_gall_scope_summary_on">식별코드 터치 시 갤스코프가 열립니다.</string>
+            <string name="revanced_enable_user_id_gall_scope_summary_off">식별코드 터치 시 갤스코프가 열리지 않습니다.</string>
+        </patch>
+        <patch id="management.post.list.quickPostManagementPatch">
+            <string name="revanced_enable_quick_post_management_title">빠른 게시글 관리</string>
+            <string name="revanced_enable_quick_post_management_summary_on">게시글 목록에서 긴 터치를 통해 게시글 차단 및 삭제 팝업을 띄웁니다.</string>
+            <string name="revanced_enable_quick_post_management_summary_off">게시글 목록에서 긴 터치를 통해 게시글 차단 및 삭제 팝업을 띄우지 않습니다.</string>
+        </patch>
+        <patch id="management.post.duplicatePost.duplicatePostSearchPatch">
+            <string name="revanced_show_duplicate_post_search_button_title">순회 검사 버튼 표시하기</string>
+            <string name="revanced_show_duplicate_post_search_button_summary_on">순회 검사 버튼이 표시됩니다.</string>
+            <string name="revanced_show_duplicate_post_search_button_summary_off">순회 검사 버튼이 표시되지 않습니다.</string>
+        </patch>
+        <patch id ="management.floatingButton.floatingButtonPatch">
+            <string name="revanced_floating_button_screen_title">플로팅 버튼</string>
+            <string name="revanced_floating_button_screen_summary">퀵쓰기 버튼 위에 추가되는 플로팅 버튼 관련 설정을 할 수 있습니다.</string>
+            <string name="revanced_floating_button_guide_title">플로팅 버튼 가이드</string>
+            <string name="revanced_floating_button_guide_summary">"퀵쓰기 버튼 위에 + 토글 버튼이 추가됩니다.
+토글을 누르면 활성화된 버튼들이 펼쳐지거나 닫힙니다.
+활성화된 버튼이 없으면 토글 버튼이 숨겨집니다."</string>
+            <string name="revanced_dc_ban_list_screen_title">DC BanList</string>
+            <string name="revanced_dc_ban_list_screen_summary">DC BanList 관련 설정을 할 수 있습니다.</string>
+            <string name="revanced_show_dc_ban_list_button_title">DC BanList 아이콘 표시하기</string>
+            <string name="revanced_show_dc_ban_list_button_summary_on">DC BanList 아이콘이 퀵쓰기 버튼 위에 추가됩니다.</string>
+            <string name="revanced_show_dc_ban_list_button_summary_off">DC BanList 아이콘이 퀵쓰기 버튼 위에 추가되지 않습니다.</string>
+            <string name="revanced_enable_dc_ban_list_identifier_search_button_title">DC BanList 식별 코드 검색</string>
+            <string name="revanced_enable_dc_ban_list_identifier_search_button_summary_on">DC BanList 식별 코드 검색 기능이 활성화됩니다.</string>
+            <string name="revanced_enable_dc_ban_list_identifier_search_button_summary_off">DC BanList 식별 코드 검색 기능이 비활성화됩니다.</string>
+            <string name="revanced_enable_dc_ban_list_ban_list_export_button_title">DC BanList 업로드</string>
+            <string name="revanced_enable_dc_ban_list_ban_list_export_button_summary_on">DC BanList 업로드 기능이 활성화됩니다.</string>
+            <string name="revanced_enable_dc_ban_list_ban_list_export_button_summary_off">DC BanList 업로드 기능이 비활성화됩니다.</string>
+            <string name="revanced_dc_ban_list_sheet_id_map_title">DC BanList 시트 id</string>
+            <string name="revanced_dc_ban_list_sheet_id_map_summary">DC BanList가 저장한 시트 id를 확인합니다.</string>
+            <string name="revanced_dc_ban_list_gas_authorization_webview_title">GAS 인증하기</string>
+            <string name="revanced_dc_ban_list_gas_authorization_webview_summary">GAS 인증을 위한 웹뷰를 엽니다.</string>
+            <string name="revanced_dc_ban_list_google_account_manage_webview_title">구글 계정 관리하기</string>
+            <string name="revanced_dc_ban_list_google_account_manage_webview_summary">구글 계정 관리를 위한 웹뷰를 엽니다.</string>
+            <string name="revanced_gall_scope_screen_title">Gall Scope</string>
+            <string name="revanced_gall_scope_screen_summary">Gall Scope 관련 설정을 할 수 있습니다.</string>
+            <string name="revanced_show_gall_scope_button_title">Gall Scope 아이콘 표시하기</string>
+            <string name="revanced_show_gall_scope_button_summary_on">Gall Scope 아이콘이 퀵쓰기 버튼 위에 추가됩니다.</string>
+            <string name="revanced_show_gall_scope_button_summary_off">Gall Scope 아이콘이 퀵쓰기 버튼 위에 추가되지 않습니다.</string>
+            <string name="revanced_gall_scope_post_header_interaction_guide_title">식별코드 스코프 바로 열기</string>
+            <string name="revanced_gall_scope_post_header_interaction_guide_summary">식별코드 표시 옵션이 켜진 경우 식별코드를 터치해 스코프를 바로 열 수 있습니다.</string>
         </patch>
         <patch id="misc.hook.hookPatch">
             <string name="revanced_hide_administrator_notice_title">운영자 공지 숨기기</string>

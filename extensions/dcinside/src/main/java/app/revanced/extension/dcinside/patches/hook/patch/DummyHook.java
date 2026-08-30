@@ -1,8 +1,8 @@
 package app.revanced.extension.dcinside.patches.hook.patch;
 
 import app.revanced.extension.dcinside.patches.hook.json.BaseJsonHook;
-import org.json.JSONObject;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONObject;
 
 /**
  * Dummy hook to reserve a register in [JsonHookPatch.hooks] list.
@@ -14,7 +14,7 @@ public final class DummyHook extends BaseJsonHook {
     }
 
     @Override
-    public String apply(@NotNull String json) {
-        return json;
+    public JSONObject apply(@NotNull JSONObject jsonObject) {
+        return jsonObject;
     }
 }

@@ -2,20 +2,21 @@ package app.revanced.extension.dcinside.patches.hook.json;
 
 import app.revanced.extension.dcinside.patches.hook.patch.Hook;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONObject;
 
-public interface JsonHook extends Hook<String> {
+public interface JsonHook extends Hook<JSONObject> {
     /**
-     * Transform a String.
+     * Transforms the given JSON object using a custom implementation.
      *
-     * @param json The String.
-     * @return The transformed String.
+     * @param json The JSON object to transform. Must not be null.
+     * @return The transformed JSON object. Must not be null.
      */
     @NotNull
-    String transform(@NotNull String json);
+    JSONObject transform(@NotNull JSONObject json);
 
     @Override
     @NotNull
-    default String hook(@NotNull String type) {
+    default JSONObject hook(@NotNull JSONObject type) {
         return transform(type);
     }
 }

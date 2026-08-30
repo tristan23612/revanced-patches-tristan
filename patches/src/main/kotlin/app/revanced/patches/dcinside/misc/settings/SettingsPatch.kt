@@ -9,11 +9,15 @@ import app.revanced.patcher.patch.bytecodePatch
 import app.revanced.patcher.patch.resourcePatch
 import app.revanced.patches.all.misc.resources.addResources
 import app.revanced.patches.all.misc.resources.addResourcesPatch
-import app.revanced.patches.shared.misc.mapping.resourceMappingPatch
-import app.revanced.patches.shared.misc.settings.settingsPatch
-import app.revanced.patches.shared.misc.settings.preference.*
 import app.revanced.patches.dcinside.misc.extension.sharedExtensionPatch
-import app.revanced.util.*
+import app.revanced.patches.shared.misc.mapping.resourceMappingPatch
+import app.revanced.patches.shared.misc.settings.preference.BasePreference
+import app.revanced.patches.shared.misc.settings.preference.BasePreferenceScreen
+import app.revanced.patches.shared.misc.settings.preference.PreferenceScreenPreference
+import app.revanced.patches.shared.misc.settings.settingsPatch
+import app.revanced.util.ResourceGroup
+import app.revanced.util.copyResources
+import app.revanced.util.findElementByAttributeValueOrThrow
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.builder.MutableMethodImplementation
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethod
@@ -69,6 +73,14 @@ private val settingsResourcePatch = resourcePatch {
                 "revanced_settings_screen_12_video.xml",
                 "revanced_settings_screen_12_video_bold.xml",
             ),
+        )
+
+        copyResources(
+            "dcinside/settings",
+            ResourceGroup(
+                "layout",
+                "preference_with_icon.xml"
+            )
         )
 
         document("AndroidManifest.xml").use { document ->
@@ -242,33 +254,40 @@ internal fun modifyActivityForSettingsInjection(
 }
 
 object PreferenceScreen : BasePreferenceScreen() {
-
     val ADS = Screen(
         key = "revanced_settings_screen_01_ads",
         summaryKey = null,
         icon = "@drawable/revanced_settings_screen_01_ads",
         iconBold = "@drawable/revanced_settings_screen_01_ads_bold",
+        layout = "@layout/preference_with_icon",
     )
-
     val FEED = Screen(
         key = "revanced_settings_screen_03_feed",
         summaryKey = null,
         icon = "@drawable/revanced_settings_screen_03_feed",
         iconBold = "@drawable/revanced_settings_screen_03_feed_bold",
+        layout = "@layout/preference_with_icon",
     )
-
     val GENERAL = Screen(
         key = "revanced_settings_screen_04_general",
         summaryKey = null,
         icon = "@drawable/revanced_settings_screen_04_general",
         iconBold = "@drawable/revanced_settings_screen_04_general_bold",
+        layout = "@layout/preference_with_icon",
     )
-
+    val MANAGEMENT = Screen(
+        key = "revanced_settings_screen_05_player",
+        summaryKey = null,
+        icon = "@drawable/revanced_settings_screen_05_player",
+        iconBold = "@drawable/revanced_settings_screen_05_player_bold",
+        layout = "@layout/preference_with_icon",
+    )
     val MISC = Screen(
         key = "revanced_settings_screen_11_misc",
         summaryKey = null,
         icon = "@drawable/revanced_settings_screen_11_misc",
         iconBold = "@drawable/revanced_settings_screen_11_misc_bold",
+        layout = "@layout/preference_with_icon",
     )
 
     override fun commit(screen: PreferenceScreenPreference) {

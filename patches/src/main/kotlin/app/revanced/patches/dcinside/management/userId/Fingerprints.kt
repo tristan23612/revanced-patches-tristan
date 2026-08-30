@@ -1,8 +1,7 @@
-package app.revanced.patches.dcinside.post.userId
+package app.revanced.patches.dcinside.management.userId
 
 import app.revanced.patcher.*
 import app.revanced.patcher.extensions.methodReference
-import app.revanced.patcher.invoke
 import app.revanced.patcher.patch.BytecodePatchContext
 import app.revanced.util.indexOfFirstInstruction
 import com.android.tools.smali.dexlib2.AccessFlags
