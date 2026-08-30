@@ -49,6 +49,10 @@ public abstract class DialogSession<S extends Enum<S>> {
         }
 
         currentDialog.show();
+
+        if (currentDialog.getWindow() != null) {
+            DialogUiUtils.attachCopyOnLongClickToListViews(currentDialog.getWindow().getDecorView());
+        }
     }
 
     protected void transitionTo(S nextStep) {

@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 
@@ -153,5 +154,40 @@ public final class DialogUiUtils {
         ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
         clipboard.setPrimaryClip(ClipData.newPlainText(label, text));
         Toast.makeText(context, "결과가 클립보드에 복사되었습니다.", Toast.LENGTH_SHORT).show();
+    }
+
+    public static void attachCopyOnLongClickToListViews(@NonNull View root) {
+        if (root instanceof ListView listView) {
+            listView.setOnItemLongClickListener((parent, view, position, id) -> {
+                String text = collectText(view);
+                if (text.isEmpty()) return false;
+                copyToClipboard(view.getContext(), "copied_text", text);
+                return true;
+            });
+        } else if (root instanceof ViewGroup group) {
+            for (int i = 0; i < group.getChildCount(); i++) {
+                attachCopyOnLongClickToListViews(group.getChildAt(i));
+            }
+        }
+    }
+
+    private static String collectText(View view) {
+        StringBuilder sb = new StringBuilder();
+        collectTextRecursively(view, sb);
+        return sb.toString().trim();
+    }
+
+    private static void collectTextRecursively(View view, StringBuilder sb) {
+        if (view instanceof TextView tv) {
+            CharSequence text = tv.getText();
+            if (text != null && text.length() > 0) {
+                if (sb.length() > 0) sb.append("\n");
+                sb.append(text);
+            }
+        } else if (view instanceof ViewGroup group) {
+            for (int i = 0; i < group.getChildCount(); i++) {
+                collectTextRecursively(group.getChildAt(i), sb);
+            }
+        }
     }
 }
