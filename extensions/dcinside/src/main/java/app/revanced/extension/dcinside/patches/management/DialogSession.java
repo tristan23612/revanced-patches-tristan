@@ -1,13 +1,9 @@
-package app.revanced.extension.dcinside.patches.management.floatingButton;
+package app.revanced.extension.dcinside.patches.management;
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
-import android.view.View;
-import android.view.ViewGroup;
-
-import java.util.Objects;
 
 public abstract class DialogSession<S extends Enum<S>> {
 

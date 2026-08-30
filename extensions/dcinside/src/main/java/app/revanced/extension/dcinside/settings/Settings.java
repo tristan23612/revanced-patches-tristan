@@ -39,6 +39,7 @@ public class Settings extends BaseSettings {
     public static final StringSetting DC_BAN_LIST_GAS_URL = new StringSetting("revanced_dc_ban_list_gas_url", "https://script.google.com/macros/s/AKfycbwemheJRFnqqM7NAN3kZ_P_3Cc0Q9F4YTXplxChghon3VEm0oLhS_RtsJ57ocfEP2s/exec");
     public static final BooleanSetting SHOW_GALL_SCOPE_BUTTON = new BooleanSetting("revanced_show_gall_scope_button", FALSE, FALSE);
     public static final BooleanSetting ENABLE_QUICK_POST_MANAGEMENT = new BooleanSetting("revanced_enable_quick_post_management", FALSE, FALSE);
+    public static final BooleanSetting SHOW_DUPLICATE_POST_SEARCH_BUTTON = new BooleanSetting("revanced_show_duplicate_post_search_button", FALSE, FALSE);
 
     // MISC
     public static final BooleanSetting HIDE_ADMINISTRATOR_NOTICE = new BooleanSetting("revanced_hide_administrator_notice", FALSE, FALSE);

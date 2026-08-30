@@ -11,8 +11,8 @@ import android.widget.*;
 import androidx.annotation.NonNull;
 import app.revanced.extension.dcinside.patches.hook.json.JsonHookPatch;
 import app.revanced.extension.dcinside.patches.hook.okhttp.CustomNetworkInterceptorPatch;
-import app.revanced.extension.dcinside.patches.management.floatingButton.DialogSession;
-import app.revanced.extension.dcinside.patches.management.floatingButton.DialogUiUtils;
+import app.revanced.extension.dcinside.patches.management.DialogSession;
+import app.revanced.extension.dcinside.patches.management.DialogUiUtils;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
