@@ -15,7 +15,7 @@ protobuf = "0.10.0"
 protoc = "4.35.1"
 shadow = "9.4.0"
 hiddenapibypass = "6.1"
-jsoup = "1.17.2"
+jsoup = "1.23.2"
 
 [libraries]
 annotation = { module = "androidx.annotation:annotation", version.ref = "annotation" }
