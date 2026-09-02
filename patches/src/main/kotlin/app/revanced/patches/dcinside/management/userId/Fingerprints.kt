@@ -8,43 +8,41 @@ import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
 
-internal val BytecodePatchContext.postItemBindMethodMatch by composingFirstMethod {
-    accessFlags(AccessFlags.PRIVATE, AccessFlags.FINAL)
-    returnType("V")
+internal fun BytecodePatchContext.postSearchItemOnBindViewHolderMethodMatch(targetMethodMatch: CompositeMatch) = firstMethodComposite {
+    definingClass("Lcom/dcinside/app/post/fragments/")
+    parameterTypes($$"Landroidx/recyclerview/widget/RecyclerView$ViewHolder;", "I")
+    accessFlags(AccessFlags.PUBLIC)
+    name("onBindViewHolder")
     instructions(
-        method { returnType == "Lcom/dcinside/app/response/PostItem;" },
-        after(
-            Opcode.MOVE_RESULT_OBJECT(),
-        ),
-        "null cannot be cast to non-null type com.dcinside.app.post.fragments.PostListItemHolder"(),
+        "viewHolder"(),
         method {
-            parameterTypes.isEmpty() && returnType == "Ljava/lang/String;" && definingClass == "Lcom/dcinside/app/response/PostItem;"
+            targetMethodMatch.method.definingClass == definingClass && targetMethodMatch.method.name == name
         },
-        "dcbest"(),
-        method { name == "getVisibility" },
-        method { returnType == "Landroid/text/Spannable;" },
-        Opcode.MOVE_RESULT_OBJECT(),
+        after(
+            Opcode.RETURN_VOID(),
+        )
+    )
+}
+
+internal val BytecodePatchContext.normalPostItemBindMethodMatch by composingFirstMethod {
+    returnType("V")
+    strings(
+        "null cannot be cast to non-null type com.dcinside.app.post.fragments.PostListItemHolder",
+        "dcbest",
     )
 }
 
 internal val BytecodePatchContext.postSearchItemBindMethodMatch by composingFirstMethod {
+    returnType("V")
     instructions(
-        method { returnType == "Lcom/dcinside/app/response/PostItem;" },
-        Opcode.MOVE_RESULT_OBJECT(),
+        method { returnType == POST_ITEM_CLASS_DESCRIPTOR },
+        after(
+            Opcode.MOVE_RESULT_OBJECT(),
+        ),
         ""(),
         "key"(),
         "dcbest"(),
-        allOf(
-            Opcode.INVOKE_VIRTUAL(),
-            method { definingClass == "Lcom/dcinside/app/response/PostItem;" && returnType == "Ljava/lang/String;" }
-        ),
-        allOf(
-            Opcode.INVOKE_VIRTUAL(),
-            method { definingClass == "Lcom/dcinside/app/response/PostItem;" && returnType == "Ljava/lang/String;" }
-        ),
-        method { name == "getVisibility" },
-        method { returnType == "Landroid/text/Spannable;" },
-        Opcode.MOVE_RESULT_OBJECT(),
+        Opcode.RETURN_VOID(),
     )
 }
 
@@ -53,19 +51,12 @@ internal val BytecodePatchContext.postHeaderSetupMethodMatch by composingFirstMe
     returnType("V")
     instructions(
         "info"(),
-        allOf(
-            Opcode.INVOKE_VIRTUAL(),
-            method { definingClass == "Lcom/dcinside/app/model/PostInfo;" && returnType == "Ljava/lang/String;" }
-        ),
-        allOf(
-            Opcode.INVOKE_VIRTUAL(),
-            method { definingClass == "Lcom/dcinside/app/model/PostInfo;" && returnType == "Ljava/lang/String;" }
-        ),
         "readHeaderSubject"(),
         "readHeaderMemberIc"(),
-        method { returnType == "Ljava/lang/CharSequence;" },
-        Opcode.MOVE_RESULT_OBJECT(),
         "readHeaderUserMemo"(),
+        method { name == "setVisibility" },
+        method { name == "setVisibility" },
+        Opcode.IF_EQZ(),
     )
 }
 
@@ -77,17 +68,16 @@ internal val BytecodePatchContext.postReplySetupMethodMatch by composingFirstMet
         Opcode.MOVE_OBJECT_FROM16(),
         Opcode.MOVE_OBJECT_FROM16(), // PostReplyItem
         Opcode.INVOKE_VIRTUAL(),
-        Opcode.MOVE_RESULT_OBJECT(), // DividerConstraintLayout
         Opcode.MOVE_RESULT_OBJECT(),
-        0x3e4ccccdL(),
-        0x3f800000L(),
         method { name == "setVisibility" },
         method { name == "setVisibility" },
-        method { returnType == "Ljava/lang/String;" }, // user id
         ".*"(),
         "owner"(),
-        method { returnType == "Ljava/lang/CharSequence;" },
+        method { name == "setVisibility" },
+        method { name == "setVisibility" },
+        method { returnType == "Landroid/widget/ImageView;" && parameterTypes.isEmpty() },
         Opcode.MOVE_RESULT_OBJECT(),
+        method { name == "setVisibility" },
     )
 }
 
@@ -102,14 +92,14 @@ internal val BytecodePatchContext.postHistoryRealmSetupMethodMatch by composingF
 }
 
 context(_: BytecodePatchContext)
-internal fun ClassDef.getStringGetterMethod(userIdFieldName: String, compositeMatch: CompositeMatch? = null) = firstMethodDeclaratively {
+internal fun ClassDef.getStringGetterMethod(fieldName: String, compositeMatch: CompositeMatch? = null) = firstMethodDeclaratively {
     accessFlags(AccessFlags.PUBLIC, AccessFlags.FINAL)
     returnType("Ljava/lang/String;")
     parameterTypes()
     instructions(
         allOf(
             Opcode.IGET_OBJECT(),
-            field { name == userIdFieldName }
+            field { name == fieldName }
         ),
         after(
             Opcode.RETURN_OBJECT()

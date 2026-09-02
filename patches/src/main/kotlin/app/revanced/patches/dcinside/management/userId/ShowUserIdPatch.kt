@@ -1,6 +1,7 @@
 package app.revanced.patches.dcinside.management.userId
 
 import app.revanced.patcher.extensions.addInstructions
+import app.revanced.patcher.extensions.fieldReference
 import app.revanced.patcher.extensions.getInstruction
 import app.revanced.patcher.extensions.methodReference
 import app.revanced.patcher.extensions.reference
@@ -26,7 +27,8 @@ import com.android.tools.smali.dexlib2.iface.value.StringEncodedValue
 import org.w3c.dom.Element
 
 private const val SHOW_USER_ID_PATCH_EXTENSION_CLASS_DESCRIPTOR = "Lapp/revanced/extension/dcinside/patches/management/userId/ShowUserIdPatch;"
-private const val POST_ITEM_CLASS_DESCRIPTOR = "Lcom/dcinside/app/model/PostInfo;"
+internal const val POST_INFO_CLASS_DESCRIPTOR = "Lcom/dcinside/app/model/PostInfo;"
+internal const val POST_ITEM_CLASS_DESCRIPTOR = "Lcom/dcinside/app/response/PostItem;"
 
 context(context: ResourcePatchContext)
 private fun injectUserIdTextView(
@@ -150,9 +152,10 @@ private val replyShowUserIdResourcePatch = resourcePatch {
 
     apply {
         mapOf(
-            "res/layout/view_reply_item_text.xml" to "26dp",
             "res/layout/view_reply_item_image.xml" to "31dp",
             "res/layout/view_reply_item_image_big.xml" to "31dp",
+            "res/layout/view_reply_item_tcon.xml" to "31dp",
+            "res/layout/view_reply_item_text.xml" to "26dp",
             "res/layout/view_reply_item_voice.xml" to "26dp",
             "res/layout/view_reply_item_voice2.xml" to "26dp",
         ).forEach { (layoutPath, height) ->
@@ -205,32 +208,39 @@ val showUserIdPatch = bytecodePatch(
             ),
         )
 
-        postItemBindMethodMatch.let {
+        fun ClassDef.getFieldBySerializedName(serializedName: String) = fields.first { field ->
+            field.annotations.any { annotation ->
+                annotation.elements.any { element -> element.name == "value" && (element.value as? StringEncodedValue)?.value == serializedName }
+            }
+        }
+
+        val postItemClassDef = firstClassDef(POST_ITEM_CLASS_DESCRIPTOR)
+        val postItemUserIdField = postItemClassDef.getFieldBySerializedName("user_id")
+        val postItemUserIdGetterMethodReference = postItemClassDef.getStringGetterMethod(postItemUserIdField.name)
+
+        val postInfoClassDef = firstClassDef(POST_INFO_CLASS_DESCRIPTOR)
+        val postInfoUserIdField = postInfoClassDef.getFieldBySerializedName("user_id")
+        val postInfoUserIdGetterMethodReference = postInfoClassDef.getStringGetterMethod(postInfoUserIdField.name)
+
+        postSearchItemOnBindViewHolderMethodMatch(normalPostItemBindMethodMatch).let {
             it.method.apply {
-                val postItemIndex = it[1]
-                val postItemRegister = getInstruction<OneRegisterInstruction>(postItemIndex).registerA
-
-                val userIdMethodReference = getInstruction(it[3]).methodReference
-
-                val spannableIndex = it[-1]
-                val spannableRegister = getInstruction<OneRegisterInstruction>(spannableIndex).registerA
-
-                val registerProvider = getFreeRegisterProvider(spannableIndex, 2, spannableRegister)
-                val viewRegister = registerProvider.getFreeRegister()
-                val userIdRegister = registerProvider.getFreeRegister()
-
-                val insertIndex = spannableIndex + 1
-                var insertSmali = $$"""
-                    move-object/from16 v$$viewRegister, p1
-                    iget-object v$$viewRegister, v$$viewRegister, Landroidx/recyclerview/widget/RecyclerView$ViewHolder;->itemView:Landroid/view/View;
+                val insertIndex = it[2]
+                val insertSmali = $$"""
+                    invoke-virtual { p0, p2 }, $$definingClass->getItem(I)Lcom/dcinside/app/response/PostItem;
+                    move-result-object v0
                     
-                    invoke-virtual {v$$postItemRegister}, $$userIdMethodReference
-                    move-result-object v$$userIdRegister
+                    invoke-virtual { v0 }, $$postItemUserIdGetterMethodReference
+                    move-result-object v1
                     
-                    invoke-static {v$$viewRegister, v$$userIdRegister, v$$spannableRegister}, $$SHOW_USER_ID_PATCH_EXTENSION_CLASS_DESCRIPTOR->setUserId(Landroid/view/View;Ljava/lang/String;Ljava/lang/CharSequence;)V
+                    iget-object v0, p1, Landroidx/recyclerview/widget/RecyclerView$ViewHolder;->itemView:Landroid/view/View;
+                    
+                    invoke-static { v0, v1 }, $$SHOW_USER_ID_PATCH_EXTENSION_CLASS_DESCRIPTOR->setUserId(Landroid/view/View;Ljava/lang/String;)V
                 """
 
-                addInstructions(insertIndex, insertSmali)
+                addInstructions(
+                    insertIndex,
+                    insertSmali,
+                )
             }
         }
 
@@ -239,106 +249,95 @@ val showUserIdPatch = bytecodePatch(
                 val postItemIndex = it[1]
                 val postItemRegister = getInstruction<OneRegisterInstruction>(postItemIndex).registerA
 
-                val userIdMethodReference = getInstruction(it[6]).methodReference
+                val insertIndex = it[-1]
+                val insertSmali = $$"""
+                    move-object/from16 v0, p1
+                    iget-object v0, v0, Landroidx/recyclerview/widget/RecyclerView$ViewHolder;->itemView:Landroid/view/View;
+                    
+                    invoke-virtual { v$$postItemRegister }, $$postItemUserIdGetterMethodReference
+                    move-result-object v1
+                    
+                    invoke-static { v0, v1 }, $$SHOW_USER_ID_PATCH_EXTENSION_CLASS_DESCRIPTOR->setUserId(Landroid/view/View;Ljava/lang/String;)V
+                """
 
-                val spannableIndex = it[-1]
-                val spannableRegister = getInstruction<OneRegisterInstruction>(spannableIndex).registerA
-
-                val registerProvider = getFreeRegisterProvider(postItemIndex, 2, postItemRegister)
-                val viewRegister = registerProvider.getFreeRegister()
-                val userIdRegister = registerProvider.getFreeRegister()
-
-                val insertIndex = spannableIndex + 1
                 addInstructions(
                     insertIndex,
-                    $$"""
-                        move-object/from16 v$$viewRegister, p1
-                        iget-object v$$viewRegister, v$$viewRegister, Landroidx/recyclerview/widget/RecyclerView$ViewHolder;->itemView:Landroid/view/View;
-                        
-                        invoke-virtual { v$$postItemRegister }, $$userIdMethodReference
-                        move-result-object v$$userIdRegister
-                        
-                        invoke-static { v$$viewRegister, v$$userIdRegister, v$$spannableRegister }, $$SHOW_USER_ID_PATCH_EXTENSION_CLASS_DESCRIPTOR->setUserId(Landroid/view/View;Ljava/lang/String;Ljava/lang/CharSequence;)V
-                    """
+                    insertSmali,
                 )
             }
         }
 
-
         postHeaderSetupMethodMatch.let {
             it.method.apply {
-                val userIdIndex = it[2]
-                val userIdReference = getInstruction<OneRegisterInstruction>(userIdIndex).reference!!
+                val insertIndex = it[-1]
+                val insertRegister = getInstruction<OneRegisterInstruction>(insertIndex).registerA
 
-                val charSequenceIndex = it[6]
-                val charSequenceRegister = getInstruction<OneRegisterInstruction>(charSequenceIndex).registerA
+                val freeRegisterProvider = getFreeRegisterProvider(insertIndex + 1, 2, insertRegister)
+                val userIdRegister = freeRegisterProvider.getFreeRegister()
+                val viewRegister = freeRegisterProvider.getFreeRegister()
 
-                val registerProvider = getFreeRegisterProvider(charSequenceIndex, 2, charSequenceRegister)
-                val viewRegister = registerProvider.getFreeRegister()
-                val userIdRegister = registerProvider.getFreeRegister()
+                val insertSmali = $$"""
+                    move-object/from16 v$$viewRegister, p0
+                    
+                    move-object/from16 v$$userIdRegister, p1
+                    invoke-virtual { v$$userIdRegister }, $$postInfoUserIdGetterMethodReference
+                    move-result-object v$$userIdRegister
+                    
+                    invoke-static { v$$viewRegister, v$$userIdRegister }, $$SHOW_USER_ID_PATCH_EXTENSION_CLASS_DESCRIPTOR->setUserId(Landroid/view/View;Ljava/lang/String;)V
+                """
 
                 addInstructions(
-                    charSequenceIndex + 1,
-                    """
-                        move-object/from16 v$viewRegister, p0
-                        
-                        move-object/from16 v$userIdRegister, p1
-                        invoke-virtual { v$userIdRegister }, $userIdReference
-                        move-result-object v$userIdRegister
-                        
-                        invoke-static { v$viewRegister , v$userIdRegister, v$charSequenceRegister }, $SHOW_USER_ID_PATCH_EXTENSION_CLASS_DESCRIPTOR->setUserId(Landroid/view/View;Ljava/lang/String;Ljava/lang/CharSequence;)V
-                    """
+                    insertIndex,
+                    insertSmali
                 )
             }
         }
 
         postReplySetupMethodMatch.let {
             it.method.apply {
-                val userIdIndex = it[10]
-                val userIdReference = getInstruction<OneRegisterInstruction>(userIdIndex).reference!!
+                val insertIndex = it[-1] + 1
 
-                val charSequenceIndex = it[-1]
-                val charSequenceRegister = getInstruction<OneRegisterInstruction>(charSequenceIndex).registerA
-
-                val viewRegister = getInstruction<FiveRegisterInstruction>(charSequenceIndex - 1).registerD
-                val userIdRegister = getInstruction<FiveRegisterInstruction>(charSequenceIndex - 1).registerE
+                val freeRegisterProvider = getFreeRegisterProvider(insertIndex, 2)
+                val userIdRegister = freeRegisterProvider.getFreeRegister()
+                val viewRegister = freeRegisterProvider.getFreeRegister()
 
                 val viewIndex = it[3]
                 val viewReference = getInstruction<OneRegisterInstruction>(viewIndex).reference!!
 
+                val postReplyClassDef = firstClassDef(it.method.parameters[2].type)
+                val postReplyUserIdField = postReplyClassDef.getFieldBySerializedName("user_id")
+                val postReplyUserIdGetterMethodReference = postReplyClassDef.getStringGetterMethod(postReplyUserIdField.name)
+
+                val insertSmali = $$"""
+                    move-object/from16 v$$viewRegister, p1
+                    invoke-virtual { v$$viewRegister }, $$viewReference
+                    move-result-object v$$viewRegister
+                    
+                    move-object/from16 v$$userIdRegister, p3
+                    invoke-virtual { v$$userIdRegister }, $$postReplyUserIdGetterMethodReference
+                    move-result-object v$$userIdRegister
+                    
+                    invoke-static { v$$viewRegister, v$$userIdRegister }, $$SHOW_USER_ID_PATCH_EXTENSION_CLASS_DESCRIPTOR->setUserId(Landroid/view/View;Ljava/lang/String;)V
+                """
+
                 addInstructions(
-                    charSequenceIndex + 1,
-                    """
-                        move-object/from16 v$viewRegister, p1
-                        invoke-virtual { v$viewRegister }, $viewReference
-                        move-result-object v$viewRegister
-                        
-                        move-object/from16 v$userIdRegister, p3
-                        invoke-virtual { v$userIdRegister }, $userIdReference
-                        move-result-object v$userIdRegister
-                        
-                        invoke-static { v$viewRegister , v$userIdRegister, v$charSequenceRegister }, $SHOW_USER_ID_PATCH_EXTENSION_CLASS_DESCRIPTOR->setUserId(Landroid/view/View;Ljava/lang/String;Ljava/lang/CharSequence;)V
-                    """
+                    insertIndex,
+                    insertSmali
                 )
             }
         }
 
         postHistoryRealmSetupMethodMatch.let {
             it.method.apply {
-                fun ClassDef.getFieldBySerializedName(serializedName: String) = fields.first { field ->
-                    field.annotations.any { annotation ->
-                        annotation.elements.any { element -> element.name == "value" && (element.value as? StringEncodedValue)?.value == serializedName }
-                    }
-                }
-                val postItemClassDef = firstClassDef(POST_ITEM_CLASS_DESCRIPTOR)
+                val postInfoClassDef = firstClassDef(POST_INFO_CLASS_DESCRIPTOR)
 
-                val userIdField = postItemClassDef.getFieldBySerializedName("user_id")
-                val userIpField = postItemClassDef.getFieldBySerializedName("ip")
-                val userNameField = postItemClassDef.getFieldBySerializedName("name")
+                val userIdField = postInfoClassDef.getFieldBySerializedName("user_id")
+                val userIpField = postInfoClassDef.getFieldBySerializedName("ip")
+                val userNameField = postInfoClassDef.getFieldBySerializedName("name")
 
-                val userIdGetterMethodReference = postItemClassDef.getStringGetterMethod(userIdField.name)
-                val userIpGetterMethodReference = postItemClassDef.getStringGetterMethod(userIpField.name)
-                val userNameGetterMethodReference = postItemClassDef.getStringGetterMethod(userNameField.name, it)
+                val userIdGetterMethodReference = postInfoClassDef.getStringGetterMethod(userIdField.name)
+                val userIpGetterMethodReference = postInfoClassDef.getStringGetterMethod(userIpField.name)
+                val userNameGetterMethodReference = postInfoClassDef.getStringGetterMethod(userNameField.name, it)
 
                 val userNameIndex = indexOfFirstInstructionOrThrow {methodReference == userNameGetterMethodReference} + 1
                 val userNameRegister = getInstruction<OneRegisterInstruction>(userNameIndex).registerA

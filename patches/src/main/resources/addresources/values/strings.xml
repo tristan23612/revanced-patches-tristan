@@ -271,12 +271,10 @@ Second \"item\" text"</string>
             <string name="revanced_show_user_id_guide_summary">"식별코드 표시 옵션이 켜진 경우 다음 위치에 식별코드가 표시됩니다.
 
 - 게시글 목록에서 게시글 작성자 우측
-- 게시글 내부에서 게시글 작성자 우측
-- 게시글 내부에서 댓글 작성자 우측
+- 게시글 내부에서 게시글 / 댓글 작성자 우측
 - 최근 본 글 목록에서 작성자 우측(드물게 누락됨)
 
 식별코드를 길게 터치해 복사할 수 있습니다.
-
 식별코드를 터치해 갤스코프를 바로 열 수 있습니다.
 플로팅 버튼 패치를 참조하세요."</string>
             <string name="revanced_show_user_id_title">식별코드 표시</string>
