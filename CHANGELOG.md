@@ -1,3 +1,10 @@
+# [1.2.0-dev.2](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.2.0-dev.1...v1.2.0-dev.2) (2026-09-02)
+
+
+### Features
+
+* **dcinside:** Support 5.3.4 and code refactor ([#35](https://github.com/tristan23612/revanced-patches-tristan/issues/35)) ([9098127](https://github.com/tristan23612/revanced-patches-tristan/commit/9098127057e92e323919b6aab03db668b77fe2bc))
+
 # [1.2.0-dev.1](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.1.2...v1.2.0-dev.1) (2026-08-30)
 
 
