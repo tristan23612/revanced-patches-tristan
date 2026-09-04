@@ -18,11 +18,7 @@ val disablePostPumOptionPatch = bytecodePatch(
     name = "Disable post Pum option",
     description = "Add option to disables the Pum option by default when opening the post write screen.",
 ) {
-    compatibleWith(
-        "com.dcinside.app.android"(
-            "5.3.4"
-        )
-    )
+    compatibleWith("com.dcinside.app.android")
 
     dependsOn(
         sharedExtensionPatch,

@@ -74,45 +74,34 @@ public class ShowUserIdPatch {
 
     private static int extractMemoColorFromView(View view) {
         try {
-            Context context = view.getContext();
-            String packageName = context.getPackageName();
+            int color = extractSpanColor(view, "read_header_user_memo", true);
+            if (color != 0) return color;
 
-            int memoId = context.getResources().getIdentifier(
-                    "read_header_user_memo", "id", packageName
-            );
-            if (memoId != 0) {
-                View memoView = view.findViewById(memoId);
-                if (memoView instanceof TextView memoTextView && !TextUtils.isEmpty(memoTextView.getText())) {
-                    CharSequence text = memoTextView.getText();
-                    if (text instanceof Spanned spanned) {
-                        ForegroundColorSpan[] spans = spanned.getSpans(0, spanned.length(), ForegroundColorSpan.class);
-                        if (spans.length > 0) {
-                            return spans[0].getForegroundColor();
-                        }
-                    }
-                    int color = memoTextView.getCurrentTextColor();
-                    if (color != 0) return color;
-                }
-            }
-            int countsId = context.getResources().getIdentifier(
-                    "post_list_item_counts", "id", packageName
-            );
-            if (countsId != 0) {
-                View countsViewRaw = view.findViewById(countsId);
-                if (countsViewRaw instanceof TextView countsTextView) {
-                    CharSequence text = countsTextView.getText();
-                    if (text instanceof Spanned spanned && spanned.length() > 0 && spanned.charAt(0) == '-') {
-                        ForegroundColorSpan[] spans = spanned.getSpans(0, 1, ForegroundColorSpan.class);
-                        if (spans.length > 0) {
-                            return spans[0].getForegroundColor();
-                        }
-                    }
-                }
-            }
+            return extractSpanColor(view, "post_list_item_counts", false);
         } catch (Exception e) {
             Log.e(TAG, "Error extracting memo color", e);
+            return 0;
         }
-        return 0;
+    }
+
+    private static int extractSpanColor(View view, String idName, boolean requireVisible) {
+        Context context = view.getContext();
+        int id = context.getResources().getIdentifier(idName, "id", context.getPackageName());
+        if (id == 0) return 0;
+
+        View found = view.findViewById(id);
+        if (!(found instanceof TextView textView)) return 0;
+        if (requireVisible && textView.getVisibility() != View.VISIBLE) return 0;
+
+        CharSequence text = textView.getText();
+        if (TextUtils.isEmpty(text) || text.charAt(0) != '-') return 0;
+
+        if (text instanceof Spanned spanned) {
+            ForegroundColorSpan[] spans = spanned.getSpans(0, spanned.length(), ForegroundColorSpan.class);
+            if (spans.length > 0) return spans[0].getForegroundColor();
+        }
+
+        return requireVisible ? textView.getCurrentTextColor() : 0;
     }
 
     private static void setGallScopeUserIdClickListener(View view) {
