@@ -84,10 +84,19 @@ internal val BytecodePatchContext.postReplySetupMethodMatch by composingFirstMet
 internal val BytecodePatchContext.postHistoryRealmSetupMethodMatch by composingFirstMethod {
     parameterTypes("L", "Lcom/dcinside/app/model/PostInfo;")
     returnType("V")
-    instructions(
-        "this.where(T::class.java)"(),
-        "key"(),
-        "this.createObject(T::class.java, primaryKeyValue)"(),
+    strings(
+        "this.where(T::class.java)",
+        "key",
+        "this.createObject(T::class.java, primaryKeyValue)",
+    )
+}
+
+internal val BytecodePatchContext.postHistoryRealmReSetupMethodMatch by composingFirstMethod {
+    strings(
+        "call to 'resume' before 'invoke' with coroutine",
+        "this.where(T::class.java)",
+        "key",
+        "this.createObject(T::class.java, primaryKeyValue)",
     )
 }
 

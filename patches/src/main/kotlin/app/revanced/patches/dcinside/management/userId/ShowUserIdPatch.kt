@@ -3,6 +3,7 @@ package app.revanced.patches.dcinside.management.userId
 import app.revanced.patcher.extensions.addInstructions
 import app.revanced.patcher.extensions.fieldReference
 import app.revanced.patcher.extensions.getInstruction
+import app.revanced.patcher.extensions.instructions
 import app.revanced.patcher.extensions.methodReference
 import app.revanced.patcher.extensions.reference
 import app.revanced.patcher.firstClassDef
@@ -20,9 +21,12 @@ import app.revanced.patches.shared.misc.settings.preference.SwitchPreference
 import app.revanced.util.doRecursively
 import app.revanced.util.getFreeRegisterProvider
 import app.revanced.util.indexOfFirstInstructionOrThrow
+import app.revanced.util.registersUsed
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.Instruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.value.StringEncodedValue
 import org.w3c.dom.Element
 
@@ -327,36 +331,61 @@ val showUserIdPatch = bytecodePatch(
             }
         }
 
-        postHistoryRealmSetupMethodMatch.let {
-            it.method.apply {
-                val postInfoClassDef = firstClassDef(POST_INFO_CLASS_DESCRIPTOR)
+        setOf(
+            postHistoryRealmSetupMethodMatch,
+            postHistoryRealmReSetupMethodMatch
+        ).forEach { methodMatch ->
+            methodMatch.let {
+                it.method.apply {
+                    val postInfoClassDef = firstClassDef(POST_INFO_CLASS_DESCRIPTOR)
 
-                val userIdField = postInfoClassDef.getFieldBySerializedName("user_id")
-                val userIpField = postInfoClassDef.getFieldBySerializedName("ip")
-                val userNameField = postInfoClassDef.getFieldBySerializedName("name")
+                    val userIdField = postInfoClassDef.getFieldBySerializedName("user_id")
+                    val userIpField = postInfoClassDef.getFieldBySerializedName("ip")
+                    val userNameField = postInfoClassDef.getFieldBySerializedName("name")
 
-                val userIdGetterMethodReference = postInfoClassDef.getStringGetterMethod(userIdField.name)
-                val userIpGetterMethodReference = postInfoClassDef.getStringGetterMethod(userIpField.name)
-                val userNameGetterMethodReference = postInfoClassDef.getStringGetterMethod(userNameField.name, it)
+                    val userIdGetterMethodReference = postInfoClassDef.getStringGetterMethod(userIdField.name)
+                    val userIpGetterMethodReference = postInfoClassDef.getStringGetterMethod(userIpField.name)
+                    val userNameGetterMethodReference = postInfoClassDef.getStringGetterMethod(userNameField.name, it)
 
-                val userNameIndex = indexOfFirstInstructionOrThrow {methodReference == userNameGetterMethodReference} + 1
-                val userNameRegister = getInstruction<OneRegisterInstruction>(userNameIndex).registerA
+                    val instructions = it.method.instructions
+                    val lastIndex = instructions.lastIndex
 
-                val registerProvider = getFreeRegisterProvider(userNameIndex, 2, userNameRegister)
-                val userIdRegister = registerProvider.getFreeRegister()
-                val userIpRegister = registerProvider.getFreeRegister()
+                    instructions.reversed().forEachIndexed { reversedIndex, instruction ->
+                        instruction.methodReference?.let { methodReference ->
+                            if (methodReference == userNameGetterMethodReference) {
+                                val index = lastIndex - reversedIndex
 
-                addInstructions(
-                    userNameIndex + 1,
-                    """
-                        invoke-virtual {p2}, $userIdGetterMethodReference
-                        move-result-object v$userIdRegister
-                        invoke-virtual {p2}, $userIpGetterMethodReference
-                        move-result-object v$userIpRegister
-                        invoke-static {v$userNameRegister, v$userIdRegister, v$userIpRegister }, $SHOW_USER_ID_PATCH_EXTENSION_CLASS_DESCRIPTOR->addUserId(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
-                        move-result-object v$userNameRegister
-                    """
-                )
+                                val postInfoIndex = index
+                                val postInfoRegister = getInstruction<Instruction>(postInfoIndex).registersUsed.first()
+
+                                val userNameIndex = index + 1
+                                val userNameRegister = getInstruction<OneRegisterInstruction>(userNameIndex).registerA
+
+                                val registerProvider = getFreeRegisterProvider(userNameIndex, 2, userNameRegister)
+                                val userIdRegister = registerProvider.getFreeRegister()
+                                val userIpRegister = registerProvider.getFreeRegister()
+
+                                addInstructions(
+                                    userNameIndex + 1,
+                                    $$"""
+                                        invoke-static {v$$userNameRegister, v$$userIdRegister, v$$userIpRegister }, $$SHOW_USER_ID_PATCH_EXTENSION_CLASS_DESCRIPTOR->addUserId(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+                                        move-result-object v$$userNameRegister
+                                    """
+                                )
+
+                                addInstructions(
+                                    postInfoIndex,
+                                    $$"""
+                                        invoke-virtual { v$$postInfoRegister }, $$userIdGetterMethodReference
+                                        move-result-object v$$userIdRegister
+                                        invoke-virtual { v$$postInfoRegister }, $$userIpGetterMethodReference
+                                        move-result-object v$$userIpRegister
+                                    """
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }
