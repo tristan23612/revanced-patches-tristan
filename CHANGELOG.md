@@ -1,3 +1,12 @@
+# [1.2.0-dev.3](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.2.0-dev.2...v1.2.0-dev.3) (2026-09-04)
+
+
+### Bug Fixes
+
+* **dcinside - DisablePostPumOptionPatch:** remove version constraint for compatibility ([b193b01](https://github.com/tristan23612/revanced-patches-tristan/commit/b193b01b6c3c7c7d69530fbf9fe1ab3bb0a30465))
+* **dcinside - ShowUserIdPatch:** refactor UserId handling and add support for additional method match ([d9234c4](https://github.com/tristan23612/revanced-patches-tristan/commit/d9234c40362ae2e25cbb2431d4bf5ff87af7db1c))
+* **dcinside - ShowUserIdPatch:** simplify memo color extraction logic ([e310d38](https://github.com/tristan23612/revanced-patches-tristan/commit/e310d386c71b50cd0e3d6899e1f9d76db042156f))
+
 # [1.2.0-dev.2](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.2.0-dev.1...v1.2.0-dev.2) (2026-09-02)
 
 
