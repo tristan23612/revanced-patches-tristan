@@ -324,7 +324,7 @@ Second \"item\" text"</string>
             <string name="revanced_show_gall_scope_button_summary_on">Gall Scope 아이콘이 퀵쓰기 버튼 위에 추가됩니다.</string>
             <string name="revanced_show_gall_scope_button_summary_off">Gall Scope 아이콘이 퀵쓰기 버튼 위에 추가되지 않습니다.</string>
             <string name="revanced_gall_scope_post_header_interaction_guide_title">식별코드 스코프 바로 열기</string>
-            <string name="revanced_gall_scope_post_header_interaction_guide_summary">식별코드 표시 옵션이 켜진 경우 식별코드를 터치해 스코프를 바로 열 수 있습니다.</string>
+            <string name="revanced_gall_scope_post_header_interaction_guide_summary">식별코드 관련 설정에서 식별코드 스코프 바로 열기 설정을 할 수 있습니다.</string>
         </patch>
         <patch id="misc.hook.hookPatch">
             <string name="revanced_hide_administrator_notice_title">운영자 공지 숨기기</string>

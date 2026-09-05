@@ -26,6 +26,12 @@ public class ShowUserIdPatch {
 
     private static final int DEFAULT_USER_ID_COLOR = Color.parseColor("#9E9E9E");
 
+    private static final String[] MEMO_VIEW_CANDIDATES = {
+            "read_header_user_memo",
+            "reply_user_memo",
+            "post_list_item_counts",
+    };
+
     private static final String TAG = "ReVanced_DCInside";
 
     public static void setUserId(View view, String userId) {
@@ -74,24 +80,25 @@ public class ShowUserIdPatch {
 
     private static int extractMemoColorFromView(View view) {
         try {
-            int color = extractSpanColor(view, "read_header_user_memo", true);
-            if (color != 0) return color;
-
-            return extractSpanColor(view, "post_list_item_counts", false);
+            for (String idName : MEMO_VIEW_CANDIDATES) {
+                int color = extractSpanColor(view, idName);
+                if (color != 0) return color;
+            }
+            return 0;
         } catch (Exception e) {
             Log.e(TAG, "Error extracting memo color", e);
             return 0;
         }
     }
 
-    private static int extractSpanColor(View view, String idName, boolean requireVisible) {
+    private static int extractSpanColor(View view, String idName) {
         Context context = view.getContext();
         int id = context.getResources().getIdentifier(idName, "id", context.getPackageName());
         if (id == 0) return 0;
 
         View found = view.findViewById(id);
         if (!(found instanceof TextView textView)) return 0;
-        if (requireVisible && textView.getVisibility() != View.VISIBLE) return 0;
+        if (textView.getVisibility() != View.VISIBLE) return 0;
 
         CharSequence text = textView.getText();
         if (TextUtils.isEmpty(text) || text.charAt(0) != '-') return 0;
@@ -101,7 +108,7 @@ public class ShowUserIdPatch {
             if (spans.length > 0) return spans[0].getForegroundColor();
         }
 
-        return requireVisible ? textView.getCurrentTextColor() : 0;
+        return textView.getCurrentTextColor();
     }
 
     private static void setGallScopeUserIdClickListener(View view) {
