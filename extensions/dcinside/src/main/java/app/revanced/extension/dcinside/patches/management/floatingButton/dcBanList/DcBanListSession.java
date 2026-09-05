@@ -58,6 +58,7 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
     private String identifier = "";
     private List<String> identifierHeaders = new ArrayList<>();
     private List<JSONObject> identifierResults = new ArrayList<>();
+    private String errorMessage = "인증 또는 처리 중 오류가 발생했습니다. 다시 시도해주세요.";
     private String identifierErrorMessage = "시트 데이터를 불러오지 못했습니다.";
 
     /**
@@ -357,7 +358,7 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
                     .setPositiveButton("확인", null);
 
             case ERROR -> builder
-                    .setMessage("인증 또는 처리 중 오류가 발생했습니다. 다시 시도해주세요.")
+                    .setMessage(errorMessage)
                     .setPositiveButton("재시도", (d, w) -> transitionTo(Step.OAUTH_CONFIRMATION))
                     .setNegativeButton("취소", null);
         }
@@ -402,18 +403,18 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
                 GasApiClient.sendPost("", payload.toString(), new Callback() {
                     @Override
                     public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                        Log.w(TAG, "getLastKnownRecord 조회 실패 - 전체 수집으로 진행", e);
-                        lastKnownRecord = null;
-                        transitionTo(Step.PARSING);
+                        Log.e(TAG, "getLastKnownRecord 조회 실패", e);
+                        errorMessage = "이전 업로드 기록을 확인하지 못했습니다.\n(네트워크 오류 또는 응답 지연: " + e.getClass().getSimpleName() + ")";
+                        transitionTo(Step.ERROR);
                     }
 
                     @Override
                     public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                         try (response) {
                             if (!response.isSuccessful()) {
-                                Log.w(TAG, "getLastKnownRecord HTTP 오류: " + response.code() + " - 전체 수집으로 진행");
-                                lastKnownRecord = null;
-                                transitionTo(Step.PARSING);
+                                Log.e(TAG, "getLastKnownRecord HTTP 오류: " + response.code());
+                                errorMessage = "이전 업로드 기록을 확인하지 못했습니다.\n(HTTP " + response.code() + ")";
+                                transitionTo(Step.ERROR);
                                 return;
                             }
 
@@ -423,13 +424,17 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
                             if ("success".equals(jsonResponse.optString("status"))) {
                                 lastKnownRecord = jsonResponse.optJSONObject("lastKnownRecord"); // 최초 기록이 없으면 null일 수 있음 - 정상
                             } else {
-                                Log.w(TAG, "getLastKnownRecord 서버 응답 실패 - 전체 수집으로 진행: "
-                                        + jsonResponse.optString("message"));
-                                lastKnownRecord = null;
+                                String serverMessage = jsonResponse.optString("message", "Unknown Server Error");
+                                Log.e(TAG, "getLastKnownRecord 서버 응답 실패: " + serverMessage);
+                                errorMessage = "이전 업로드 기록을 확인하지 못했습니다.\n(" + serverMessage + ")";
+                                transitionTo(Step.ERROR);
+                                return;
                             }
                         } catch (JSONException e) {
-                            Log.w(TAG, "getLastKnownRecord 응답 파싱 실패 - 전체 수집으로 진행", e);
-                            lastKnownRecord = null;
+                            Log.e(TAG, "getLastKnownRecord 응답 파싱 실패", e);
+                            errorMessage = "이전 업로드 기록 응답을 해석하지 못했습니다.";
+                            transitionTo(Step.ERROR);
+                            return;
                         }
                         if (lastKnownRecord == null || lastKnownRecord.length() == 0) {
                             transitionTo(Step.CREATE_SHEET_CONFIRMATION);
@@ -440,9 +445,9 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
                     }
                 });
             } catch (Exception e) {
-                Log.w(TAG, "getLastKnownRecord 요청 준비 중 예외 - 전체 수집으로 진행", e);
-                lastKnownRecord = null;
-                transitionTo(Step.PARSING);
+                Log.w(TAG, "getLastKnownRecord 요청 준비 중 예외", e);
+                errorMessage = "요청 준비 중 오류가 발생했습니다.\n(" + e.getClass().getSimpleName() + ")";
+                transitionTo(Step.ERROR);
             }
         }).start();
     }
@@ -627,7 +632,7 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 try (response) {
-                    if (!response.isSuccessful() || response.body() == null) {
+                    if (!response.isSuccessful()) {
                         identifierErrorMessage = "시트 데이터를 불러오지 못했습니다. (HTTP " + response.code() + ")";
                         transitionTo(Step.IDENTIFIER_ERROR);
                         return;

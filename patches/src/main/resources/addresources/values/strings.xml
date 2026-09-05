@@ -306,14 +306,27 @@ Second \"item\" text"</string>
             <string name="revanced_show_dc_ban_list_button_title">DC BanList 아이콘 표시하기</string>
             <string name="revanced_show_dc_ban_list_button_summary_on">DC BanList 아이콘이 퀵쓰기 버튼 위에 추가됩니다.</string>
             <string name="revanced_show_dc_ban_list_button_summary_off">DC BanList 아이콘이 퀵쓰기 버튼 위에 추가되지 않습니다.</string>
-            <string name="revanced_enable_dc_ban_list_identifier_search_button_title">DC BanList 식별 코드 검색</string>
-            <string name="revanced_enable_dc_ban_list_identifier_search_button_summary_on">DC BanList 식별 코드 검색 기능이 활성화됩니다.</string>
-            <string name="revanced_enable_dc_ban_list_identifier_search_button_summary_off">DC BanList 식별 코드 검색 기능이 비활성화됩니다.</string>
+            
+            <string name="revanced_dc_ban_list_identifier_search_guide_title">DC BanList 식별코드 검색 안내</string>
+            <string name="revanced_dc_ban_list_identifier_search_guide_summary">"DC BanList 식별코드 검색 기능 진입을 위한 분기가 활성화됩니다.
+
+DC BanList로 생성된 시트에서 특정 식별코드를 검색합니다.
+저장된 시트 id를 이용해 네트워크에서 시트를 다운받아 파싱합니다."</string>
+            <string name="revanced_enable_dc_ban_list_identifier_search_button_title">DC BanList 식별코드 검색</string>
+            <string name="revanced_enable_dc_ban_list_identifier_search_button_summary_on">DC BanList 식별코드 검색 기능이 활성화됩니다.</string>
+            <string name="revanced_enable_dc_ban_list_identifier_search_button_summary_off">DC BanList 식별코드 검색 기능이 비활성화됩니다.</string>
+
+            <string name="revanced_dc_ban_list_ban_list_import_guide_title">DC BanList 업로드 안내</string>
+            <string name="revanced_dc_ban_list_ban_list_import_guide_summary">"DC BanList 업로드 기능 진입을 위한 분기가 활성화됩니다.
+
+차단시트 관리를 위한 분기입니다."</string>
             <string name="revanced_enable_dc_ban_list_ban_list_export_button_title">DC BanList 업로드</string>
             <string name="revanced_enable_dc_ban_list_ban_list_export_button_summary_on">DC BanList 업로드 기능이 활성화됩니다.</string>
             <string name="revanced_enable_dc_ban_list_ban_list_export_button_summary_off">DC BanList 업로드 기능이 비활성화됩니다.</string>
             <string name="revanced_dc_ban_list_sheet_id_map_title">DC BanList 시트 id</string>
-            <string name="revanced_dc_ban_list_sheet_id_map_summary">DC BanList가 저장한 시트 id를 확인합니다.</string>
+            <string name="revanced_dc_ban_list_sheet_id_map_summary">"DC BanList가 저장한 시트 id를 확인합니다.
+개발 디버그용입니다.
+일반 사용자는 버튼을 통해 진입해주세요."</string>
             <string name="revanced_dc_ban_list_gas_authorization_webview_title">GAS 인증하기</string>
             <string name="revanced_dc_ban_list_gas_authorization_webview_summary">GAS 인증을 위한 웹뷰를 엽니다.</string>
             <string name="revanced_dc_ban_list_google_account_manage_webview_title">구글 계정 관리하기</string>
@@ -323,8 +336,8 @@ Second \"item\" text"</string>
             <string name="revanced_show_gall_scope_button_title">Gall Scope 아이콘 표시하기</string>
             <string name="revanced_show_gall_scope_button_summary_on">Gall Scope 아이콘이 퀵쓰기 버튼 위에 추가됩니다.</string>
             <string name="revanced_show_gall_scope_button_summary_off">Gall Scope 아이콘이 퀵쓰기 버튼 위에 추가되지 않습니다.</string>
-            <string name="revanced_gall_scope_post_header_interaction_guide_title">식별코드 스코프 바로 열기</string>
-            <string name="revanced_gall_scope_post_header_interaction_guide_summary">식별코드 표시 옵션이 켜진 경우 식별코드를 터치해 스코프를 바로 열 수 있습니다.</string>
+            <string name="revanced_gall_scope_user_id_interaction_guide_title">식별코드 스코프 바로 열기</string>
+            <string name="revanced_gall_scope_user_id_interaction_guide_summary">식별코드 관련 설정에서 식별코드 스코프 바로 열기 설정을 할 수 있습니다.</string>
         </patch>
         <patch id="misc.hook.hookPatch">
             <string name="revanced_hide_administrator_notice_title">운영자 공지 숨기기</string>
