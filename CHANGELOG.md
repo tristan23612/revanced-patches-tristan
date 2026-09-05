@@ -1,3 +1,12 @@
+# [1.2.0-dev.4](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.2.0-dev.3...v1.2.0-dev.4) (2026-09-05)
+
+
+### Bug Fixes
+
+* **dcinside - DcBanListSession:** improve error handling and messaging consistency ([1aacb11](https://github.com/tristan23612/revanced-patches-tristan/commit/1aacb11e6cf3c0a63ce19f721468618758965b13))
+* **dcinside - FloatingButtonPatch:** enhance setting dependencies and improve string consistency ([cb1e854](https://github.com/tristan23612/revanced-patches-tristan/commit/cb1e85442496a84bd4e5998b8bd0fcb80bf2c0b7))
+* **dcinside - ShowUserIdPatch:** simplify memo view handling and streamline color extraction logic ([2bce9fa](https://github.com/tristan23612/revanced-patches-tristan/commit/2bce9fa86217f2992f81ea4120ec28ed5ebe44ea))
+
 # [1.2.0-dev.3](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.2.0-dev.2...v1.2.0-dev.3) (2026-09-04)
 
 
