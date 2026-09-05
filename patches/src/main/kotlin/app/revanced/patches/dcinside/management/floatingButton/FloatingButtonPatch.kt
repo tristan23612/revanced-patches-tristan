@@ -178,7 +178,10 @@ private data class FloatingButtonDefinition(
 private val floatingButtonDefinitions = listOf(
     FloatingButtonDefinition("dcBanList", "dc_ban_list") { settingId ->
         setOf(
+            SwitchPreference("revanced_show_${settingId}_button"),
+            NonInteractivePreference("revanced_${settingId}_identifier_search_guide"),
             SwitchPreference("revanced_enable_${settingId}_identifier_search_button"),
+            NonInteractivePreference("revanced_${settingId}_ban_list_import_guide"),
             SwitchPreference("revanced_enable_${settingId}_ban_list_export_button"),
             TextPreference(
                 key = "revanced_${settingId}_sheet_id_map",
@@ -198,9 +201,10 @@ private val floatingButtonDefinitions = listOf(
     },
     FloatingButtonDefinition("gallScope", "gall_scope") { settingId ->
         setOf(
+            SwitchPreference("revanced_show_${settingId}_button"),
             NonInteractivePreference(
-                key = "revanced_${settingId}_post_header_interaction_guide"
-            )
+                key = "revanced_${settingId}_user_id_interaction_guide"
+            ),
         )
     },
 )
@@ -242,9 +246,7 @@ val floatingButtonPatch = bytecodePatch(
             PreferenceScreenPreference(
                 key = "revanced_${def.settingId}_screen",
                 sorting = PreferenceScreenPreference.Sorting.UNSORTED,
-                preferences = setOf(
-                    SwitchPreference("revanced_show_${def.settingId}_button"),
-                ) + def.extraPreferences(def.settingId)
+                preferences = def.extraPreferences(def.settingId)
             )
         }.toSet()
 
