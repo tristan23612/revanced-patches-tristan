@@ -40,7 +40,15 @@ final class DcBanListHtmlParser {
         for (int i = 1; i < captions.size(); i++) {
             Element titEl = captions.get(i).selectFirst(".tit");
             Element txtEl = captions.get(i).selectFirst(".txt");
-            if (titEl == null || txtEl == null) continue;
+            if (txtEl == null) continue;
+
+            if (titEl == null) {
+                String txtText = txtEl.text().trim();
+                if (contentTitle.isEmpty() && !txtText.isEmpty()) {
+                    contentTitle = txtText;
+                }
+                continue;
+            }
 
             String label = titEl.text().trim();
             switch (label) {
