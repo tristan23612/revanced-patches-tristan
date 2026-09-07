@@ -1,3 +1,10 @@
+# [1.2.0-dev.5](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.2.0-dev.4...v1.2.0-dev.5) (2026-09-07)
+
+
+### Bug Fixes
+
+* **dcinside - DcBanListHtmlParser:** improve handling of missing title elements ([847e40f](https://github.com/tristan23612/revanced-patches-tristan/commit/847e40f810d0f36d0fcc60347233f1975847dbbe))
+
 # [1.2.0-dev.4](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.2.0-dev.3...v1.2.0-dev.4) (2026-09-05)
 
 
