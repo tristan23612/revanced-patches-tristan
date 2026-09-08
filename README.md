@@ -38,8 +38,6 @@ For an example repository, see [ReVanced Patches](https://github.com/revanced/re
 <details>
 <summary>Patch Details</summary>
 
-<br>
-
 | Patch                                                | Description                                                         |
 |:-----------------------------------------------------|:--------------------------------------------------------------------|
 | **광고**                                             |                                                                     |
@@ -76,6 +74,10 @@ For an example repository, see [ReVanced Patches](https://github.com/revanced/re
 | 운영자 공지 숨기기                                   | 공지 탭에서 운영자 공지가 숨겨집니다.                               |
 | 게시글 목록 상단 공지 숨기기                         | 게시글 목록 상단의 공지가 숨겨집니다.                               |
 | 업데이트 알림 비활성화하기                           | 업데이트 알림이 비활성화 됩니다.                                    |
+
+| Build time Patch           | Description                                        |
+|:---------------------------|:---------------------------------------------------|
+| 디시인사이드 패키지명 변경 | 패키지명 변경을 통해 클론 설치가 가능하도록 합니다. |
 
 </details>
 
