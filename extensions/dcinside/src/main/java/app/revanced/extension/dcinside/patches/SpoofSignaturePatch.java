@@ -20,6 +20,7 @@ import java.util.Map;
 public class SpoofSignaturePatch extends Application {
     static {
         String packageName = "com.dcinside.app.android";
+        String changedPackageName = "com.dcinside.app.android.revanced";
         String certificateData = "MIIFiTCCA3GgAwIBAgIVAK/29kxj016lyXYxZeM/LGWGIuWIMA0GCSqGSIb3DQEB" +
                 "CwUAMHQxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMRYwFAYDVQQH" +
                 "Ew1Nb3VudGFpbiBWaWV3MRQwEgYDVQQKEwtHb29nbGUgSW5jLjEQMA4GA1UECxMH" +
@@ -58,7 +59,7 @@ public class SpoofSignaturePatch extends Application {
             @SuppressWarnings("deprecation")
             public PackageInfo createFromParcel(Parcel source) {
                 PackageInfo packageInfo = originalCreator.createFromParcel(source);
-                if (packageInfo.packageName.equals(packageName)) {
+                if (packageInfo.packageName.equals(packageName) || packageInfo.packageName.equals(changedPackageName)) {
                     if (packageInfo.signatures != null && packageInfo.signatures.length > 0) {
                         packageInfo.signatures[0] = fakeSignature;
                     }
