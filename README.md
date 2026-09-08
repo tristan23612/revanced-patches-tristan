@@ -3,103 +3,81 @@
     <source
       width="256px"
       media="(prefers-color-scheme: dark)"
-      srcset="assets/revanced-headline/revanced-headline-vertical-dark.svg"
+      srcset="assets/tristan23612/tristan23612-logo.png"
     >
     <img 
       width="256px"
-      src="assets/revanced-headline/revanced-headline-vertical-light.svg"
+      src="assets/tristan23612/tristan23612-logo.png"
     >
   </picture>
-  <br>
-  <a href="https://revanced.app/">
-     <picture>
-         <source height="24px" media="(prefers-color-scheme: dark)" srcset="assets/revanced-logo/revanced-logo.svg" />
-         <img height="24px" src="assets/revanced-logo/revanced-logo.svg" />
-     </picture>
-   </a>&nbsp;&nbsp;&nbsp;
-   <a href="https://github.com/ReVanced">
-       <picture>
-           <source height="24px" media="(prefers-color-scheme: dark)" srcset="https://i.ibb.co/dMMmCrW/Git-Hub-Mark.png" />
-           <img height="24px" src="https://i.ibb.co/9wV3HGF/Git-Hub-Mark-Light.png" />
-       </picture>
-   </a>&nbsp;&nbsp;&nbsp;
-   <a href="http://revanced.app/discord">
-       <picture>
-           <source height="24px" media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/13122796/178032563-d4e084b7-244e-4358-af50-26bde6dd4996.png" />
-           <img height="24px" src="https://user-images.githubusercontent.com/13122796/178032563-d4e084b7-244e-4358-af50-26bde6dd4996.png" />
-       </picture>
-   </a>&nbsp;&nbsp;&nbsp;
-   <a href="https://reddit.com/r/revancedapp">
-       <picture>
-           <source height="24px" media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/13122796/178032351-9d9d5619-8ef7-470a-9eec-2744ece54553.png" />
-           <img height="24px" src="https://user-images.githubusercontent.com/13122796/178032351-9d9d5619-8ef7-470a-9eec-2744ece54553.png" />
-       </picture>
-   </a>&nbsp;&nbsp;&nbsp;
-   <a href="https://t.me/app_revanced">
-      <picture>
-         <source height="24px" media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/13122796/178032213-faf25ab8-0bc3-4a94-a730-b524c96df124.png" />
-         <img height="24px" src="https://user-images.githubusercontent.com/13122796/178032213-faf25ab8-0bc3-4a94-a730-b524c96df124.png" />
-      </picture>
-   </a>&nbsp;&nbsp;&nbsp;
-   <a href="https://x.com/revancedapp">
-      <picture>
-         <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/93124920/270180600-7c1b38bf-889b-4d68-bd5e-b9d86f91421a.png">
-         <img height="24px" src="https://user-images.githubusercontent.com/93124920/270108715-d80743fa-b330-4809-b1e6-79fbdc60d09c.png" />
-      </picture>
-   </a>&nbsp;&nbsp;&nbsp;
-   <a href="https://www.youtube.com/@ReVanced">
-      <picture>
-         <source height="24px" media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/13122796/178032714-c51c7492-0666-44ac-99c2-f003a695ab50.png" />
-         <img height="24px" src="https://user-images.githubusercontent.com/13122796/178032714-c51c7492-0666-44ac-99c2-f003a695ab50.png" />
-     </picture>
-   </a>
-   <br>
-   <br>
-   Continuing the legacy of Vanced
 </p>
 
-# 👋🧩 ReVanced Patches template
+# 👋🧩 ReVanced Patches Tristan
 
 ![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/ReVanced/revanced-patches-template/release.yml)
 ![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)
 
-Template repository for ReVanced Patches.
+Repository for ReVanced Patches by Tristan.
+
+This repository is not directly affiliated with ReVanced.
 
 ## ❓ About
 
-This is a template to create a new ReVanced Patches repository.  
-The repository can have multiple patches, and patches from other repositories can be used together.
+This repository contains patches for DCInside.
 
 For an example repository, see [ReVanced Patches](https://github.com/revanced/revanced-patches).
 
-## 🚀 Get started
+## 💪 Features
 
-To start using this template, follow these steps:
+### ✨ DCInside
 
-1. [Create a new repository using this template](https://github.com/new?template_name=revanced-patches-template&template_owner=ReVanced)
-2. Set up the [build.gradle.kts](patches/build.gradle.kts) file (Specifically, the [group of the project](patches/build.gradle.kts#L1),
-and the [About](patches/build.gradle.kts#L5-L11))
-3. Update dependencies in the [libs.versions.toml](gradle/libs.versions.toml) file
-4. [Create a pass-phrased GPG master key and subkey](https://mikeross.xyz/create-gpg-key-pair-with-subkeys/)
-5. Add the following GitHub secrets:
-   1. [GPG_PRIVATE_KEY](.github/workflows/release.yml#L52): The ASCII-armored GPG key
-   2. [GPG_PASSPHRASE](.github/workflows/release.yml#L53): The passphrase for the GPG key
-6. Add the following GitHub variables:
-   1. [GPG_FINGERPRINT](.github/workflows/release.yml#L54): The fingerprint of the GPG key
-7. Set up the [README.md](README.md) file[^1] (e.g, title, description, license, summary of the patches
-that are included in the repository), the [issue templates](.github/ISSUE_TEMPLATE)[^2]  and the [contribution guidelines](CONTRIBUTING.md)[^3]
+#### Supported Latest Version
 
-🎉 You are now ready to start creating patches!
+| 5.3.2 |
+| :---: |
+<details>
+<summary>Patch Details</summary>
 
-[^1]: [Example README.md file](https://github.com/ReVanced/revanced-patches/blob/main/README.md)
-[^2]: [Example issue templates](https://github.com/ReVanced/revanced-patches/tree/main/.github/ISSUE_TEMPLATE)
-[^3]: [Example contribution guidelines](https://github.com/ReVanced/revanced-patches/blob/main/CONTRIBUTING.md)
+<br>
 
-## 🔘 Optional steps
+| Patch                                                | Description                                                         |
+|:-----------------------------------------------------|:--------------------------------------------------------------------|
+| **광고**                                             |                                                                     |
+| 광고 제거                                            | 광고가 표시되지 않습니다.                                           |
+| &nbsp;                                               | &nbsp;                                                              |
+| **피드**                                             |                                                                     |
+| 홈 화면 실시간 베스트 숨기기                         | 홈 화면의 실시간 베스트가 숨겨집니다.                               |
+| 홈 화면 추천 갤러리 숨기기                           | 홈 화면의 추천 갤러리가 숨겨집니다.                                 |
+| 홈 화면 실북갤 리스트 숨기기                         | 홈 화면의 실북갤 리스트가 숨겨집니다.                               |
+| 홈 화면 신규 개설 갤러리 숨기기                      | 홈 화면의 신규 개설 갤러리가 숨겨집니다.                            |
+| 홈 화면 갤러리 바로가기 숨기기                       | 홈 화면의 갤러리 바로가기(최근, 즐겨찾기)가 숨겨집니다.             |
+| &nbsp;                                               | &nbsp;                                                              |
+| **일반**                                             |                                                                     |
+| 게시글 작성 시 펌 금지                               | 게시글 작성 시 펌 금지 옵션이 기본적으로 활성화됩니다.              |
+| 게시글 하단 추천 게시글 목록 숨기기                  | 게시글 하단의 추천 게시글 목록이 숨겨집니다.                        |
+| &nbsp;                                               | &nbsp;                                                              |
+| **갤러리 관리**                                      |                                                                     |
+| 빠른 게시글 관리                                     | 게시글 목록에서 긴 터치를 통해 게시글 차단 및 삭제 팝업을 띄웁니다. |
+| 📁 식별코드                                          |                                                                     |
+| &nbsp;&nbsp;└ 식별코드 표시                          | 반고닉과 고닉 유저의 식별코드가 표시됩니다.                         |
+| &nbsp;&nbsp;└ 식별코드 터치 시 갤스코프 열기         | 식별코드 터치 시 갤스코프가 열립니다.                               |
+| 📁 플로팅 버튼                                       |                                                                     |
+| &nbsp;&nbsp;└ 📁 DC BanList                          |                                                                     |
+| &nbsp;&nbsp;&nbsp;&nbsp;└ DC BanList 아이콘 표시하기 | DC BanList 아이콘이 퀵쓰기 버튼 위에 추가됩니다.                    |
+| &nbsp;&nbsp;&nbsp;&nbsp;└ DC BanList 식별코드 검색   | DC BanList 식별코드 검색 기능이 활성화됩니다.                       |
+| &nbsp;&nbsp;&nbsp;&nbsp;└ DC BanList 업로드          | DC BanList 업로드 기능이 활성화됩니다.                              |
+| &nbsp;&nbsp;&nbsp;&nbsp;└ DC BanList 시트 id         | DC BanList가 저장한 시트 id를 확인합니다.                           |
+| &nbsp;&nbsp;&nbsp;&nbsp;└ GAS 인증하기               | GAS 인증을 위한 웹뷰를 엽니다.                                      |
+| &nbsp;&nbsp;&nbsp;&nbsp;└ 구글 계정 관리하기         | 구글 계정 관리를 위한 웹뷰를 엽니다.                                |
+| &nbsp;&nbsp;└ 📁 Gall Scope                          |                                                                     |
+| &nbsp;&nbsp;&nbsp;&nbsp;└ Gall Scope 아이콘 표시하기 | Gall Scope 아이콘이 퀵쓰기 버튼 위에 추가됩니다.                    |
+| &nbsp;                                               | &nbsp;                                                              |
+| **기타**                                             |                                                                     |
+| 운영자 공지 숨기기                                   | 공지 탭에서 운영자 공지가 숨겨집니다.                               |
+| 게시글 목록 상단 공지 숨기기                         | 게시글 목록 상단의 공지가 숨겨집니다.                               |
+| 업데이트 알림 비활성화하기                           | 업데이트 알림이 비활성화 됩니다.                                    |
 
-You can also add the following things to the repository:
-
-- API documentation, if you want to publish your patches as a library
+</details>
 
 ## 🧑‍💻 Usage
 

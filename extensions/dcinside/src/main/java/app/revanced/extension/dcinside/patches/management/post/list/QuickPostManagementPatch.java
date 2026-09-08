@@ -1,5 +1,6 @@
-package app.revanced.extension.dcinside.patches.post.list;
+package app.revanced.extension.dcinside.patches.management.post.list;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -8,61 +9,44 @@ import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
+import app.revanced.extension.dcinside.patches.hook.json.JsonHookPatch;
+import app.revanced.extension.dcinside.patches.hook.okhttp.CustomNetworkInterceptorPatch;
+import app.revanced.extension.dcinside.settings.Settings;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
-import app.revanced.extension.dcinside.patches.hook.json.JsonHookPatch;
-import app.revanced.extension.dcinside.settings.Settings;
-
+@SuppressLint("DiscouragedApi")
 public class QuickPostManagementPatch {
-    private static String galleryId = "";
-    private static String appId = "";
-    private static String userId = "";
-
-    private static String TAG = "ReVanced_DCInside";
-
-    public static void hookGalleryID(String id) {
-        galleryId = id;
-    }
-
-    public static void hookParam(String key, String value) {
-        if (key == null || value == null) {
-            return;
-        }
-
-        if ("app_id".equals(key)) {
-            appId = value;
-        } else if ("user_id".equals(key) || "confirm_id".equals(key)) {
-            userId = value;
-        }
-    }
+    private static final String TAG = "ReVanced_DCInside";
 
     public static void setLongClickListener(View itemView, int postNo) {
         itemView.setAlpha(1.0f);
         itemView.setClickable(true);
         itemView.setLongClickable(true);
 
-        if (!JsonHookPatch.ManagerSkill || !Settings.ENABLE_QUICK_POST_MANAGEMENT.get()) {
+        if (!JsonHookPatch.managerSkill || !Settings.ENABLE_QUICK_POST_MANAGEMENT.get()) {
             return;
         }
 
         Context context = itemView.getContext();
-        TypedArray typedArray = context.obtainStyledAttributes(
+        Drawable foregroundDrawable;
+        try (TypedArray typedArray = context.obtainStyledAttributes(
                 new int[]{android.R.attr.selectableItemBackground}
-        );
-        Drawable foregroundDrawable = typedArray.getDrawable(0);
-        typedArray.recycle();
+        )) {
+            foregroundDrawable = typedArray.getDrawable(0);
+        }
         itemView.setForeground(foregroundDrawable);
 
         itemView.setOnLongClickListener(view -> {
@@ -71,6 +55,7 @@ public class QuickPostManagementPatch {
         });
     }
 
+    @SuppressLint("DiscouragedApi")
     private static int resolveDialogTheme(Context context) {
         TypedValue typedValue = new TypedValue();
         context.getTheme().resolveAttribute(
@@ -110,7 +95,7 @@ public class QuickPostManagementPatch {
                     try {
                         Intent intent = new Intent(context, Class.forName("com.dcinside.app.manager.MinorExtActivity"));
                         intent.setAction("action_block");
-                        intent.putExtra("com.dcinside.app.extra.GALLERY_ID", galleryId);
+                        intent.putExtra("com.dcinside.app.extra.GALLERY_ID", CustomNetworkInterceptorPatch.galleryId);
                         intent.putExtra("com.dcinside.app.extra.POST_NUMBER", postNo);
 
                         if (context instanceof Activity) {
@@ -152,6 +137,22 @@ public class QuickPostManagementPatch {
         String clientToken = getClientToken(context);
         android.os.Handler mainHandler = new android.os.Handler(android.os.Looper.getMainLooper());
 
+        int targetSpaceId = context.getResources().getIdentifier(
+                "revanced_gallery_data_space", "id", context.getPackageName()
+        );
+
+        View spaceView = itemView.findViewById(targetSpaceId);
+        String galleryId;
+        if (spaceView != null && spaceView.getTag() instanceof Map) {
+            @SuppressWarnings("unchecked")
+            Map<String, String> galleryData = (Map<String, String>) spaceView.getTag();
+
+            galleryId = galleryData.get("gallery_id");
+        } else {
+            Toast.makeText(context, "Cannot find gallery data", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         new Thread(() -> {
             boolean success;
             String errorMessage = null;
@@ -169,30 +170,20 @@ public class QuickPostManagementPatch {
                 );
 
                 StringBuilder body = new StringBuilder();
-                appendParam(body, "user_id", userId);
+                appendParam(body, "user_id", CustomNetworkInterceptorPatch.userId);
                 appendParam(body, "client_token", clientToken);
                 appendParam(body, "id", galleryId);
                 appendParam(body, "no", String.valueOf(postNo));
                 appendParam(body, "mode", "board_del");
-                appendParam(body, "app_id", appId);
+                appendParam(body, "app_id", CustomNetworkInterceptorPatch.appId);
 
                 try (OutputStream os = connection.getOutputStream()) {
-                    os.write(body.toString().getBytes("UTF-8"));
+                    os.write(body.toString().getBytes(StandardCharsets.UTF_8));
                 }
 
                 int responseCode = connection.getResponseCode();
 
-                InputStream is = (responseCode >= 200 && responseCode < 300)
-                        ? connection.getInputStream()
-                        : connection.getErrorStream();
-
-                StringBuilder responseBody = new StringBuilder();
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"))) {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        responseBody.append(line);
-                    }
-                }
+                StringBuilder responseBody = getStringBuilder(responseCode, connection);
 
                 Log.d(TAG, "delete response: " + responseCode + " " + responseBody);
 
@@ -224,14 +215,34 @@ public class QuickPostManagementPatch {
         }).start();
     }
 
+    @NonNull
+    private static StringBuilder getStringBuilder(int responseCode, HttpURLConnection connection) throws IOException {
+        InputStream is = (responseCode >= 200 && responseCode < 300)
+                ? connection.getInputStream()
+                : connection.getErrorStream();
+
+        StringBuilder responseBody = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                responseBody.append(line);
+            }
+        }
+        return responseBody;
+    }
+
     private static void appendParam(StringBuilder body, String key, String value) {
         try {
             if (body.length() > 0) {
                 body.append("&");
             }
-            body.append(URLEncoder.encode(key, "UTF-8"));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                body.append(URLEncoder.encode(key, StandardCharsets.UTF_8));
+            }
             body.append("=");
-            body.append(URLEncoder.encode(value != null ? value : "", "UTF-8"));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                body.append(URLEncoder.encode(value != null ? value : "", StandardCharsets.UTF_8));
+            }
         } catch (Exception e) {
             Log.e(TAG, "appendParam failed", e);
         }

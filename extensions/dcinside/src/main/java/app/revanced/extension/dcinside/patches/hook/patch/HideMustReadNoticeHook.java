@@ -1,9 +1,9 @@
 package app.revanced.extension.dcinside.patches.hook.patch;
 
 import android.util.Log;
+import androidx.annotation.NonNull;
 import app.revanced.extension.dcinside.patches.hook.json.BaseJsonHook;
 import app.revanced.extension.dcinside.settings.Settings;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 public final class HideMustReadNoticeHook extends BaseJsonHook {
@@ -15,25 +15,22 @@ public final class HideMustReadNoticeHook extends BaseJsonHook {
     }
 
     @Override
-    public String apply(String json) {
-        if (json == null || !Settings.HIDE_MUST_READ_NOTICE.get()) return json;
+    public JSONObject apply(@NonNull JSONObject jsonObject) {
+        if (!Settings.HIDE_MUST_READ_NOTICE.get()) return jsonObject;
 
         try {
-            JSONArray root = new JSONArray(json);
-            JSONObject response = root.getJSONObject(0);
+            if (!jsonObject.has("gall_info")) return jsonObject;
 
-            if (!response.has("gall_info")) return json;
-
-            JSONObject gallInfo = response.getJSONArray("gall_info").getJSONObject(0);
+            JSONObject gallInfo = jsonObject.getJSONArray("gall_info").getJSONObject(0);
             if (gallInfo.has("must_read")) {
                 gallInfo.remove("must_read");
                 Log.d(TAG, "HideMustReadNoticeHook: removed must_read=" + gallInfo.optString("must_read"));
             }
 
-            return root.toString();
+            return jsonObject;
         } catch (Exception e) {
             Log.e(TAG, "HideMustReadNoticeHook: failed to parse JSON", e);
-            return json;
+            return jsonObject;
         }
     }
 }
