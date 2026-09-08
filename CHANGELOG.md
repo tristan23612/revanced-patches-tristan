@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.2.0...v1.3.0) (2026-09-08)
+
+
+### Features
+
+* **dcinside - SpoofSignaturePatch:** support alternative package name and add ChangePackageNamePatch ([784e4ec](https://github.com/tristan23612/revanced-patches-tristan/commit/784e4eca0949c6d04f12bfa55767e5c16117f28f))
+
 # [1.2.0](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.1.2...v1.2.0) (2026-09-08)
 
 
