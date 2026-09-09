@@ -1,3 +1,11 @@
+# [1.4.0](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.3.0...v1.4.0) (2026-09-09)
+
+
+### Features
+
+* **dcinside - CustomBrandingPatch:** add support for custom app names and icons ([aabf174](https://github.com/tristan23612/revanced-patches-tristan/commit/aabf1743fa1eba023c622707f5c699c0536da307))
+* **dcinside - CustomBrandingPatch:** update keys and resources for custom branding configuration ([3a352c4](https://github.com/tristan23612/revanced-patches-tristan/commit/3a352c409c9218f77c1ffd4ef20db54c5232ffae))
+
 # [1.4.0-dev.1](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.3.0...v1.4.0-dev.1) (2026-09-09)
 
 
