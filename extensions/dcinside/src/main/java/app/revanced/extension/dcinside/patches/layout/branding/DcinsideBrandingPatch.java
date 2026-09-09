@@ -5,15 +5,34 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import androidx.annotation.Nullable;
+import app.revanced.extension.dcinside.settings.Settings;
 import app.revanced.extension.shared.Logger;
 import app.revanced.extension.shared.ResourceType;
 import app.revanced.extension.shared.Utils;
-import app.revanced.extension.shared.patches.CustomBrandingPatch.BrandingTheme; // shared enum 재사용
-import app.revanced.extension.shared.settings.BaseSettings; // shared 설정 재사용
 import java.util.ArrayList;
 import java.util.Locale;
 
 public class DcinsideBrandingPatch {
+    public enum BrandingTheme {
+        /**
+         * Original unpatched icon.
+         */
+        ORIGINAL,
+        ROUNDED,
+        MINIMAL,
+        SCALED,
+        /**
+         * User provided custom icon.
+         */
+        CUSTOM;
+
+        private String packageAndNameIndexToClassAlias(String packageName, int appIndex) {
+            if (appIndex <= 0) {
+                throw new IllegalArgumentException("App index starts at index 1");
+            }
+            return packageName + ".revanced_" + name().toLowerCase(Locale.US) + '_' + appIndex;
+        }
+    }
 
     @Nullable
     private static Integer notificationSmallIcon;
@@ -48,7 +67,7 @@ public class DcinsideBrandingPatch {
 
     private static int getNotificationSmallIcon() {
         if (notificationSmallIcon == null) {
-            BrandingTheme theme = BaseSettings.CUSTOM_BRANDING_ICON.get();
+            BrandingTheme theme = Settings.CUSTOM_BRANDING_ICON.get();
             if (theme == BrandingTheme.ORIGINAL) {
                 notificationSmallIcon = 0;
                 return 0;
@@ -85,8 +104,8 @@ public class DcinsideBrandingPatch {
             PackageManager pm = context.getPackageManager();
             String packageName = context.getPackageName();
 
-            BrandingTheme currentTheme = BaseSettings.CUSTOM_BRANDING_ICON.get();
-            int currentNameIndex = BaseSettings.CUSTOM_BRANDING_NAME.get();
+            BrandingTheme currentTheme = Settings.CUSTOM_BRANDING_ICON.get();
+            int currentNameIndex = Settings.CUSTOM_BRANDING_NAME.get();
 
             ArrayList<ComponentName> toDisable = new ArrayList<>();
             ComponentName target = null;
@@ -107,8 +126,8 @@ public class DcinsideBrandingPatch {
 
             if (target == null) {
                 Utils.showToastLong("Custom branding reset");
-                BaseSettings.CUSTOM_BRANDING_ICON.resetToDefault();
-                BaseSettings.CUSTOM_BRANDING_NAME.resetToDefault();
+                Settings.CUSTOM_BRANDING_ICON.resetToDefault();
+                Settings.CUSTOM_BRANDING_NAME.resetToDefault();
                 toDisable.remove(fallback);
                 target = fallback;
             }

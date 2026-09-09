@@ -226,10 +226,18 @@ Second \"item\" text"</string>
     </app>
     <app id="dcinside">
         <patch id="layout.branding.customBrandingPatch">
-            <string name="revanced_custom_branding_name_entry_2" translatable="false">디시인사이드 ReVanced</string>
-            <string name="revanced_custom_branding_name_entry_3" translatable="false">DC ReVanced</string>
-            <string name="revanced_custom_branding_name_entry_4" translatable="false">DC</string>
-            <string name="revanced_custom_branding_name_entry_5" translatable="false">커스텀</string>
+            <string name="revanced_dcinside_custom_branding_name_title">앱 이름</string>
+            <string name="revanced_dcinside_custom_branding_name_entry_2" translatable="false">디시인사이드 ReVanced</string>
+            <string name="revanced_dcinside_custom_branding_name_entry_3" translatable="false">DC ReVanced</string>
+            <string name="revanced_dcinside_custom_branding_name_entry_4" translatable="false">DC</string>
+            <string name="revanced_dcinside_custom_branding_name_entry_5">커스텀</string>
+
+            <string name="revanced_dcinside_custom_branding_icon_title">앱 아이콘</string>
+            <string name="revanced_dcinside_custom_branding_icon_entry_1">원본</string>
+            <string name="revanced_dcinside_custom_branding_icon_entry_2" translatable="false">ReVanced</string>
+            <string name="revanced_dcinside_custom_branding_icon_entry_3">ReVanced minimal</string>
+            <string name="revanced_dcinside_custom_branding_icon_entry_4">ReVanced scaled</string>
+            <string name="revanced_dcinside_custom_branding_icon_entry_5">커스텀</string>
         </patch>
         <patch id="misc.settings.settingsPatch">
             <string name="revanced_settings_screen_01_ads_title">광고</string>

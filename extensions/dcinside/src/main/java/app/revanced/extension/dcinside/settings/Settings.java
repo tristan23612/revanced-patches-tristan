@@ -1,9 +1,7 @@
 package app.revanced.extension.dcinside.settings;
 
-import app.revanced.extension.shared.settings.BaseSettings;
-import app.revanced.extension.shared.settings.BooleanSetting;
-import app.revanced.extension.shared.settings.Setting;
-import app.revanced.extension.shared.settings.StringSetting;
+import app.revanced.extension.dcinside.patches.layout.branding.DcinsideBrandingPatch;
+import app.revanced.extension.shared.settings.*;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
@@ -28,6 +26,8 @@ public class Settings extends BaseSettings {
     // GENERAL
     public static final BooleanSetting DISABLE_POST_PUM_OPTION = new BooleanSetting("revanced_disable_post_pum_option", TRUE, FALSE);
     public static final BooleanSetting HIDE_BOTTOM_LIKE_POSTS = new BooleanSetting("revanced_hide_bottom_like_posts", FALSE, FALSE);
+    public static final EnumSetting<DcinsideBrandingPatch.BrandingTheme> CUSTOM_BRANDING_ICON = new EnumSetting<>("revanced_dcinside_custom_branding_icon", DcinsideBrandingPatch.getDefaultIconStyle(), true);
+    public static final IntegerSetting CUSTOM_BRANDING_NAME = new IntegerSetting("revanced_dcinside_custom_branding_name", DcinsideBrandingPatch.getDefaultAppNameIndex(), true);
 
     // MANAGEMENT
     public static final BooleanSetting SHOW_USER_ID = new BooleanSetting("revanced_show_user_id", FALSE, FALSE);

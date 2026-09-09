@@ -99,27 +99,26 @@ val customBrandingPatch = resourcePatch(
         val useCustomIcon = customIcon != null
 
         // shared 쪽 아이콘 엔트리 배열/타이틀 문자열도 함께 로드
-        addResources("shared", "layout.branding.baseCustomBrandingPatch")
         addResources("dcinside", "layout.branding.customBrandingPatch")
 
         PreferenceScreen.GENERAL.addPreferences(
             if (useCustomName) {
                 ListPreference(
-                    key = "revanced_custom_branding_name",
-                    entriesKey = "revanced_custom_branding_name_custom_entries",
-                    entryValuesKey = "revanced_custom_branding_name_custom_entry_values",
+                    key = "revanced_dcinside_custom_branding_name",
+                    entriesKey = "revanced_dcinside_custom_branding_name_custom_entries",
+                    entryValuesKey = "revanced_dcinside_custom_branding_name_custom_entry_values",
                 )
             } else {
-                ListPreference("revanced_custom_branding_name")
+                ListPreference("revanced_dcinside_custom_branding_name")
             },
             if (useCustomIcon) {
                 ListPreference(
-                    key = "revanced_custom_branding_icon",
-                    entriesKey = "revanced_custom_branding_icon_custom_entries",
-                    entryValuesKey = "revanced_custom_branding_icon_custom_entry_values",
+                    key = "revanced_dcinside_custom_branding_icon",
+                    entriesKey = "revanced_dcinside_custom_branding_icon_custom_entries",
+                    entryValuesKey = "revanced_dcinside_custom_branding_icon_custom_entry_values",
                 )
             } else {
-                ListPreference("revanced_custom_branding_icon")
+                ListPreference("revanced_dcinside_custom_branding_icon")
             },
         )
 
@@ -157,7 +156,7 @@ val customBrandingPatch = resourcePatch(
                 val label = when {
                     appIndex == 1 -> "@string/app_name"
                     useCustomName && appIndex == PRESET_APP_NAMES -> customName ?: "Custom"
-                    else -> "@string/revanced_custom_branding_name_entry_$appIndex"
+                    else -> "@string/revanced_dcinside_custom_branding_name_entry_$appIndex"
                 }
 
                 iconStyles.forEach { style ->
