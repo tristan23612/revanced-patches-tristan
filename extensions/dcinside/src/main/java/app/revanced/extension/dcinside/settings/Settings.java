@@ -30,11 +30,11 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting HIDE_BOTTOM_LIKE_POSTS = new BooleanSetting("revanced_hide_bottom_like_posts", FALSE, FALSE);
 
     // MANAGEMENT
-    public static final BooleanSetting SHOW_USER_ID = new BooleanSetting("revanced_show_user_id", TRUE, FALSE);
+    public static final BooleanSetting SHOW_USER_ID = new BooleanSetting("revanced_show_user_id", FALSE, FALSE);
     public static final BooleanSetting ENABLE_USER_ID_GALL_SCOPE = new BooleanSetting("revanced_enable_user_id_gall_scope", FALSE, Setting.parent(SHOW_USER_ID));
     public static final BooleanSetting SHOW_DC_BAN_LIST_BUTTON = new BooleanSetting("revanced_show_dc_ban_list_button", FALSE, FALSE);
-    public static final BooleanSetting ENABLE_DC_BAN_LIST_IDENTIFIER_SEARCH = new BooleanSetting("revanced_enable_dc_ban_list_identifier_search_button", TRUE, Setting.parent(SHOW_DC_BAN_LIST_BUTTON));
-    public static final BooleanSetting ENABLE_DC_BAN_LIST_BAN_LIST_EXPORT = new BooleanSetting("revanced_enable_dc_ban_list_ban_list_export_button", TRUE, Setting.parent(SHOW_DC_BAN_LIST_BUTTON));
+    public static final BooleanSetting ENABLE_DC_BAN_LIST_IDENTIFIER_SEARCH = new BooleanSetting("revanced_enable_dc_ban_list_identifier_search_button", FALSE, Setting.parent(SHOW_DC_BAN_LIST_BUTTON));
+    public static final BooleanSetting ENABLE_DC_BAN_LIST_BAN_LIST_EXPORT = new BooleanSetting("revanced_enable_dc_ban_list_ban_list_export_button", FALSE, Setting.parent(SHOW_DC_BAN_LIST_BUTTON));
     public static final StringSetting DC_BAN_LIST_SHEET_ID_MAP = new StringSetting("revanced_dc_ban_list_sheet_id_map", "");
     public static final StringSetting DC_BAN_LIST_GAS_URL = new StringSetting("revanced_dc_ban_list_gas_url", "https://script.google.com/macros/s/AKfycbwemheJRFnqqM7NAN3kZ_P_3Cc0Q9F4YTXplxChghon3VEm0oLhS_RtsJ57ocfEP2s/exec");
     public static final BooleanSetting SHOW_GALL_SCOPE_BUTTON = new BooleanSetting("revanced_show_gall_scope_button", FALSE, FALSE);

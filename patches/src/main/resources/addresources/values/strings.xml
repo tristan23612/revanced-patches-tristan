@@ -225,6 +225,12 @@ Second \"item\" text"</string>
         </patch>
     </app>
     <app id="dcinside">
+        <patch id="layout.branding.customBrandingPatch">
+            <string name="revanced_custom_branding_name_entry_2" translatable="false">디시인사이드 ReVanced</string>
+            <string name="revanced_custom_branding_name_entry_3" translatable="false">DC ReVanced</string>
+            <string name="revanced_custom_branding_name_entry_4" translatable="false">DC</string>
+            <string name="revanced_custom_branding_name_entry_5" translatable="false">커스텀</string>
+        </patch>
         <patch id="misc.settings.settingsPatch">
             <string name="revanced_settings_screen_01_ads_title">광고</string>
             <string name="revanced_settings_screen_03_feed_title">피드</string>
