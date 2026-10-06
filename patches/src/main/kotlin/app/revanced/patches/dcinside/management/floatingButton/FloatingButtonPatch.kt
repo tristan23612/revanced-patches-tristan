@@ -183,20 +183,8 @@ private val floatingButtonDefinitions = listOf(
             SwitchPreference("revanced_enable_${settingId}_identifier_search_button"),
             NonInteractivePreference("revanced_${settingId}_ban_list_import_guide"),
             SwitchPreference("revanced_enable_${settingId}_ban_list_export_button"),
-            TextPreference(
-                key = "revanced_${settingId}_sheet_id_map",
-                inputType = InputType.TEXT_MULTI_LINE,
-            ),
-            NonInteractivePreference(
-                key = "revanced_${settingId}_gas_authorization_webview",
-                tag = "app.revanced.extension.dcinside.settings.preference.GasAuthorizationWebViewPreference",
-                selectable = true,
-            ),
-            NonInteractivePreference(
-                key = "revanced_${settingId}_google_account_manage_webview",
-                tag = "app.revanced.extension.dcinside.settings.preference.GoogleAccountManageWebViewPreference",
-                selectable = true,
-            ),
+            TextPreference("revanced_${settingId}_cloudflare_worker_url"),
+            TextPreference("revanced_${settingId}_cloudflare_worker_token"),
         )
     },
     FloatingButtonDefinition("gallScope", "gall_scope") { settingId ->

@@ -1,13 +1,11 @@
 package app.revanced.extension.dcinside.patches.management.floatingButton.dcBanList;
 
-import android.webkit.CookieManager;
 import app.revanced.extension.dcinside.settings.Settings;
-import app.revanced.extension.dcinside.settings.preference.GoogleWebViewDialogHelper;
 import okhttp3.*;
 
 import java.util.concurrent.TimeUnit;
 
-public class GasApiClient {
+public class CloudflareWorkerClient {
 
     private static final MediaType JSON_MEDIA_TYPE = MediaType.parse("application/json; charset=utf-8");
 
@@ -18,41 +16,31 @@ public class GasApiClient {
             .followSslRedirects(true)
             .build();
 
-    /**
-     * GET 요청
-     */
-      static void sendGet(String queryString, Callback callback) {
+    static boolean isConfigured() {
+        HttpUrl url = HttpUrl.parse(Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_URL.get().trim());
+        return url != null
+                && url.isHttps()
+                && !Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_TOKEN.get().trim().isEmpty();
+    }
+
+    static void sendGet(String queryString, Callback callback) {
         executeRequest("GET", queryString, null, callback);
     }
 
-    /**
-     * POST 요청
-     */
     public static void sendPost(String queryString, String jsonPayload, Callback callback) {
         executeRequest("POST", queryString, jsonPayload, callback);
     }
 
     private static void executeRequest(String method, String queryString, String jsonPayload, Callback callback) {
-        CookieManager cookieManager = CookieManager.getInstance();
-
-        String googleCookie = cookieManager.getCookie("https://script.google.com");
-        if (googleCookie == null || googleCookie.isEmpty()) {
-            googleCookie = cookieManager.getCookie("https://accounts.google.com");
-        }
-
-        String fullUrl = (queryString != null && !queryString.isEmpty()) ? Settings.DC_BAN_LIST_GAS_URL.get() + queryString : Settings.DC_BAN_LIST_GAS_URL.get();
+        String base = Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_URL.get();
+        String fullUrl = (queryString != null && !queryString.isEmpty()) ? base + queryString : base;
 
         Request.Builder requestBuilder = new Request.Builder()
                 .url(fullUrl)
-                .addHeader("User-Agent", GoogleWebViewDialogHelper.MOBILE_CHROME_USER_AGENT);
-
-        if (googleCookie != null && !googleCookie.isEmpty()) {
-            requestBuilder.addHeader("Cookie", googleCookie);
-        }
+                .header("Authorization", "Bearer " + Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_TOKEN.get().trim());
 
         if ("POST".equalsIgnoreCase(method)) {
-            RequestBody body = RequestBody.create(jsonPayload != null ? jsonPayload : "", JSON_MEDIA_TYPE);
-            requestBuilder.post(body);
+            requestBuilder.post(RequestBody.create(jsonPayload != null ? jsonPayload : "", JSON_MEDIA_TYPE));
         } else {
             requestBuilder.get();
         }

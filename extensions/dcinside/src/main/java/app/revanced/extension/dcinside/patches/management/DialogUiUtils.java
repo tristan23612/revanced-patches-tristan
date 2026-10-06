@@ -7,14 +7,13 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 import androidx.annotation.NonNull;
 
 /**
@@ -99,6 +98,35 @@ public final class DialogUiUtils {
         drawable.setStroke(2, borderColor);
         drawable.setCornerRadius(8);
         return drawable;
+    }
+
+    public static EditText createInputField(Context context, String currentValue, String placeholder, int hintColor) {
+        EditText editText = new EditText(context);
+        boolean hasValue = currentValue != null && !currentValue.isEmpty();
+        editText.setHint(hasValue ? currentValue : placeholder);
+        editText.setHintTextColor(hintColor);
+        editText.setSingleLine(true);
+        editText.setGravity(Gravity.CENTER);
+        return editText;
+    }
+
+    public static LinearLayout createLabeledInputRow(Context context, String labelText, View inputView, int heightPx) {
+        LinearLayout row = new LinearLayout(context);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+
+        TextView labelView = new TextView(context);
+        labelView.setText(labelText);
+        labelView.setSingleLine(true);
+        labelView.setEllipsize(TextUtils.TruncateAt.END); // 공간 부족 시 말줄임 처리
+
+        // 레이블 3.5 : 입력창 6.5 가중치 분배
+        LinearLayout.LayoutParams labelParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 3.5f);
+        LinearLayout.LayoutParams inputParams = new LinearLayout.LayoutParams(0, heightPx, 6.5f);
+
+        row.addView(labelView, labelParams);
+        row.addView(inputView, inputParams);
+        return row;
     }
 
     /**
