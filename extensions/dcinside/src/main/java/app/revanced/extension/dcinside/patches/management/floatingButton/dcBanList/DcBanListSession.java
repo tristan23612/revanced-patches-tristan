@@ -57,6 +57,7 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
     private List<JSONObject> identifierResults = new ArrayList<>();
     private String errorMessage = "인증 또는 처리 중 오류가 발생했습니다. 다시 시도해주세요.";
     private String identifierErrorMessage = "DB 데이터를 불러오지 못했습니다.";
+    private String ingestResultMessage = "차단 내역 업로드가 완료되었습니다.";
 
     /**
      * SHEET_ID_INPUT에서 확인/취소 시 복귀할 Step. SHEET_ID_INPUT으로 전환하는 지점마다
@@ -305,7 +306,7 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
             }
 
             case INGEST_COMPLETE -> builder
-                    .setMessage(banListJsonArray.length() + "건의 신규 차단내역이 성공적으로 업로드되었습니다.")
+                    .setMessage(ingestResultMessage)
                     .setPositiveButton("확인", null);
 
             case INGEST_UNNECESSARY -> builder
@@ -484,7 +485,7 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
                 payload.put("galleryId", CustomNetworkInterceptorPatch.galleryId);
                 payload.put("banList", banListJsonArray);
 
-                CloudflareWorkerClient.sendPost("", payload.toString(), CloudflareWorkerClient.TokenType.INGEST, new Callback() {
+                CloudflareWorkerClient.sendPost("", payload.toString(), CloudflareWorkerClient.TokenType.INGEST, true, new Callback() {
                     @Override
                     public void onFailure(@NonNull Call call, @NonNull IOException e) {
                         Log.e(TAG, "GAS API 전송 실패", e);
@@ -504,6 +505,28 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
                             JSONObject jsonResponse = new JSONObject(responseText);
 
                             if ("success".equals(jsonResponse.optString("status"))) {
+                                JSONObject database = jsonResponse.optJSONObject("database");
+                                JSONObject snapshot = jsonResponse.optJSONObject("snapshot");
+                                int inserted = database != null
+                                        ? database.optInt("inserted", jsonResponse.optInt("inserted", banListJsonArray.length()))
+                                        : jsonResponse.optInt("inserted", banListJsonArray.length());
+
+                                StringBuilder resultMessage = new StringBuilder()
+                                        .append("D1 저장 완료: ").append(inserted).append("건");
+                                if (snapshot == null) {
+                                    resultMessage.append("\nKV 갱신 상태를 응답에서 확인할 수 없습니다.");
+                                } else {
+                                    switch (snapshot.optString("status")) {
+                                        case "updated" -> resultMessage.append("\nKV 스냅샷 갱신 완료: ")
+                                                .append(snapshot.optInt("rows")).append("건");
+                                        case "failed" -> resultMessage.append("\nKV 스냅샷 갱신 실패: ")
+                                                .append(snapshot.optString("message", "알 수 없는 오류"))
+                                                .append("\nD1 저장은 완료됐습니다. 업로드를 다시 시도하지 마세요.");
+                                        case "skipped" -> resultMessage.append("\nKV 스냅샷 갱신은 생략되었습니다.");
+                                        default -> resultMessage.append("\nKV 갱신 상태를 확인할 수 없습니다.");
+                                    }
+                                }
+                                ingestResultMessage = resultMessage.toString();
                                 transitionTo(Step.INGEST_COMPLETE);
                             } else {
                                 String serverMessage = jsonResponse.optString("message", "Unknown Server Error");

@@ -31,7 +31,7 @@ public class CloudflareWorkerClient {
             case INGEST -> Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_INGEST_TOKEN.get();
         };
 
-        executeRequest("GET", queryString, null, token, callback);
+        executeRequest("GET", queryString, null, token, false, callback);
     }
 
     public static void sendPost(
@@ -40,12 +40,22 @@ public class CloudflareWorkerClient {
             TokenType tokenType,
             Callback callback
     ) {
+        sendPost(queryString, jsonPayload, tokenType, false, callback);
+    }
+
+    public static void sendPost(
+            String queryString,
+            String jsonPayload,
+            TokenType tokenType,
+            boolean refreshSnapshot,
+            Callback callback
+    ) {
         String token = switch (tokenType) {
             case VIEW -> Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_VIEW_TOKEN.get();
             case INGEST -> Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_INGEST_TOKEN.get();
         };
 
-        executeRequest("POST", queryString, jsonPayload, token, callback);
+        executeRequest("POST", queryString, jsonPayload, token, refreshSnapshot, callback);
     }
 
     private static void executeRequest(
@@ -53,6 +63,7 @@ public class CloudflareWorkerClient {
             String queryString,
             String jsonPayload,
             String token,
+            boolean refreshSnapshot,
             Callback callback
     ) {
         String base = Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_URL.get();
@@ -61,6 +72,10 @@ public class CloudflareWorkerClient {
         Request.Builder requestBuilder = new Request.Builder()
                 .url(fullUrl)
                 .header("Authorization", "Bearer " + token);
+
+        if (refreshSnapshot) {
+            requestBuilder.header("X-Refresh-Snapshot", "true");
+        }
 
         if ("POST".equalsIgnoreCase(method)) {
             requestBuilder.post(RequestBody.create(jsonPayload != null ? jsonPayload : "", JSON_MEDIA_TYPE));
