@@ -42,10 +42,10 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
         FETCHING_LATEST_DATA,
         CREATE_SHEET_CONFIRMATION,
         PARSING,
-        UPLOAD_CONFIRMATION,
-        UPLOAD_IN_PROGRESS,
-        UPLOAD_COMPLETE,
-        UPLOAD_UNNECESSARY,
+        INGEST_CONFIRMATION,
+        INGEST_IN_PROGRESS,
+        INGEST_COMPLETE,
+        INGEST_UNNECESSARY,
         ERROR
     }
 
@@ -62,7 +62,7 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
      * SHEET_ID_INPUT에서 확인/취소 시 복귀할 Step. SHEET_ID_INPUT으로 전환하는 지점마다
      * 갱신하고, 최초 진입 시에는 생성자에서 resolveActionStep()으로 미리 계산해둔다.
      */
-    private Step cloudflareWorkerInfoReturnStep;
+    private Step cloudflareWorkerInfoReturnStep = null;
 
     DcBanListSession(Context context) {
         super(context, resolveInitialStep());
@@ -73,21 +73,25 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
     }
 
     static boolean hasAnyEnabledAction() {
-        return Settings.ENABLE_DC_BAN_LIST_IDENTIFIER_SEARCH.get() || Settings.ENABLE_DC_BAN_LIST_BAN_LIST_EXPORT.get();
+        return Settings.ENABLE_DC_BAN_LIST_IDENTIFIER_SEARCH.get() || Settings.ENABLE_DC_BAN_LIST_BAN_LIST_INGEST.get();
     }
 
     private static Step resolveActionStep() {
         boolean identifierEnabled = Settings.ENABLE_DC_BAN_LIST_IDENTIFIER_SEARCH.get();
-        boolean exportEnabled = Settings.ENABLE_DC_BAN_LIST_BAN_LIST_EXPORT.get();
+        boolean ingestEnabled = Settings.ENABLE_DC_BAN_LIST_BAN_LIST_INGEST.get();
 
-        if (identifierEnabled && !exportEnabled) {
+        if (identifierEnabled && !ingestEnabled) {
             return Step.IDENTIFIER_INPUT;
         }
         return Step.ACTION_SELECTION;
     }
 
     private static Step resolveInitialStep() {
-        if (Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_URL.get().isEmpty()) {
+        boolean missingCloudflareWorkerUrl = Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_URL.get().isEmpty();
+        boolean missingCloudflareWorkerViewToken = Settings.ENABLE_DC_BAN_LIST_IDENTIFIER_SEARCH.get() && Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_VIEW_TOKEN.get().isEmpty();
+        boolean missingCloudflareWorkerIngestToken = Settings.ENABLE_DC_BAN_LIST_BAN_LIST_INGEST.get() && Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_INGEST_TOKEN.get().isEmpty();
+
+        if ( missingCloudflareWorkerUrl || missingCloudflareWorkerViewToken || missingCloudflareWorkerIngestToken) {
             return Step.CLOUDFLARE_WORKER_INFO_INPUT;
         }
         return resolveActionStep();
@@ -112,35 +116,55 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
 
                 int rowHeightPx = (int) (36 * context.getResources().getDisplayMetrics().density);
 
-                boolean isCloudflareWorkerInfoExisting = !Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_URL.get().isEmpty() && !Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_TOKEN.get().isEmpty();
-
                 String workerUrl = Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_URL.get();
-                String workerToken = Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_TOKEN.get();
+
+                boolean identifierEnabled = Settings.ENABLE_DC_BAN_LIST_IDENTIFIER_SEARCH.get();
+                String workerViewToken = Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_VIEW_TOKEN.get();
+
+                boolean ingestEnabled = Settings.ENABLE_DC_BAN_LIST_BAN_LIST_INGEST.get();
+                String workerIngestToken = Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_INGEST_TOKEN.get();
 
                 EditText urlInput = DialogUiUtils.createInputField(context, "", "URL 입력", secondaryColor);
                 urlInput.setText(workerUrl);
                 LinearLayout urlRow = DialogUiUtils.createLabeledInputRow(context, "Worker URL", urlInput, rowHeightPx);
 
-                EditText tokenInput = DialogUiUtils.createInputField(context, "", "Token 입력", secondaryColor);
-                tokenInput.setText(workerToken);
-                LinearLayout tokenRow = DialogUiUtils.createLabeledInputRow(context, "Worker Token", tokenInput, rowHeightPx);
+                EditText viewTokenInput = DialogUiUtils.createInputField(context, "", "View Token 입력", secondaryColor);
+                viewTokenInput.setText(workerViewToken);
+                LinearLayout viewTokenRow = DialogUiUtils.createLabeledInputRow(context, "View Token", viewTokenInput, rowHeightPx);
+                viewTokenRow.setVisibility(identifierEnabled ? View.VISIBLE : View.GONE);
 
-                LinearLayout container = DialogUiUtils.wrapWithPadding(context, message, urlRow, tokenRow);
+                EditText ingestTokenInput = DialogUiUtils.createInputField(context, "", "Ingest Token 입력", secondaryColor);
+                ingestTokenInput.setText(workerIngestToken);
+                LinearLayout ingestTokenRow = DialogUiUtils.createLabeledInputRow(context, "Ingest Token", ingestTokenInput, rowHeightPx);
+                ingestTokenRow.setVisibility(ingestEnabled ? View.VISIBLE : View.GONE);
+
+                LinearLayout container = DialogUiUtils.wrapWithPadding(context, message, urlRow, viewTokenRow, ingestTokenRow);
 
                 builder.setView(container)
                         .setPositiveButton("확인", (d, w) -> {
                             String newUrl = urlInput.getText().toString().trim();
-                            String newToken = tokenInput.getText().toString().trim();
-                            if (newUrl.isEmpty() || newToken.isEmpty()) {
+                            String newViewToken = viewTokenInput.getText().toString().trim();
+                            String newIngestToken = ingestTokenInput.getText().toString().trim();
+                            if (newUrl.isEmpty() || (identifierEnabled && newViewToken.isEmpty()) || (ingestEnabled && newIngestToken.isEmpty())) {
                                 Toast.makeText(context, "Cloudflare Worker 정보를 입력해주세요.", Toast.LENGTH_SHORT).show();
                                 transitionTo(Step.CLOUDFLARE_WORKER_INFO_INPUT);
                                 return;
                             }
+
                             Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_URL.save(newUrl);
-                            Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_TOKEN.save(newToken);
+                            if (identifierEnabled) {
+                                Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_VIEW_TOKEN.save(newViewToken);
+                            }
+                            if (ingestEnabled) {
+                                Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_INGEST_TOKEN.save(newIngestToken);
+                            }
                             transitionTo(cloudflareWorkerInfoReturnStep);
                         })
-                        .setNegativeButton("취소", isCloudflareWorkerInfoExisting ? (d, w) -> transitionTo(cloudflareWorkerInfoReturnStep) : null);
+                        .setNegativeButton("취소", (d, w) -> {
+                            if (cloudflareWorkerInfoReturnStep != null) {
+                                transitionTo(cloudflareWorkerInfoReturnStep);
+                            }
+                        });
             }
 
             case ACTION_SELECTION -> {
@@ -167,16 +191,16 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
                     buttons.add(identifierSearchButton);
                 }
 
-                if (Settings.ENABLE_DC_BAN_LIST_BAN_LIST_EXPORT.get()) {
-                    Button banListExportButton = new Button(context);
-                    banListExportButton.setText("차단 내역 내보내기");
-                    banListExportButton.setOnClickListener(v -> {
+                if (Settings.ENABLE_DC_BAN_LIST_BAN_LIST_INGEST.get()) {
+                    Button banListIngestButton = new Button(context);
+                    banListIngestButton.setText("차단 내역 내보내기");
+                    banListIngestButton.setOnClickListener(v -> {
                         currentDialog.dismiss();
                         transitionTo(Step.FETCHING_LATEST_DATA);
                     });
-                    banListExportButton.setBackground(DialogUiUtils.createOutlineButtonBackground(secondaryColor));
-                    banListExportButton.setTextColor(textColor);
-                    buttons.add(banListExportButton);
+                    banListIngestButton.setBackground(DialogUiUtils.createOutlineButtonBackground(secondaryColor));
+                    banListIngestButton.setTextColor(textColor);
+                    buttons.add(banListIngestButton);
                 }
 
                 for (int i = 0; i < buttons.size(); i++) {
@@ -270,21 +294,21 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
                 new Thread(this::parseBanList).start();
             }
 
-            case UPLOAD_CONFIRMATION -> builder
+            case INGEST_CONFIRMATION -> builder
                     .setMessage(banListJsonArray.length() + "건의 신규 차단내역을 업로드하시겠습니까?")
-                    .setPositiveButton("확인", (d, w) -> transitionTo(Step.UPLOAD_IN_PROGRESS))
+                    .setPositiveButton("확인", (d, w) -> transitionTo(Step.INGEST_IN_PROGRESS))
                     .setNegativeButton("취소", null);
 
-            case UPLOAD_IN_PROGRESS -> {
+            case INGEST_IN_PROGRESS -> {
                 builder.setMessage("Worker로 데이터를 전송 중입니다...");
-                mainHandler.post(this::executeUploadTask);
+                mainHandler.post(this::executeIngestTask);
             }
 
-            case UPLOAD_COMPLETE -> builder
+            case INGEST_COMPLETE -> builder
                     .setMessage(banListJsonArray.length() + "건의 신규 차단내역이 성공적으로 업로드되었습니다.")
                     .setPositiveButton("확인", null);
 
-            case UPLOAD_UNNECESSARY -> builder
+            case INGEST_UNNECESSARY -> builder
                     .setMessage("0건의 데이터가 수집되었습니다.\n업로드가 필요하지 않습니다.")
                     .setPositiveButton("확인", null);
 
@@ -302,7 +326,7 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
                 payload.put("action", "getLatestData");
                 payload.put("galleryId", CustomNetworkInterceptorPatch.galleryId);
 
-                CloudflareWorkerClient.sendPost("", payload.toString(), new Callback() {
+                CloudflareWorkerClient.sendPost("", payload.toString(), CloudflareWorkerClient.TokenType.VIEW, new Callback() {
                     @Override
                     public void onFailure(@NonNull Call call, @NonNull IOException e) {
                         Log.e(TAG, "getLatestData 조회 실패", e);
@@ -414,12 +438,12 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
 
     private void finishParsing(JSONArray collected) {
         if (collected.length() == 0) {
-            transitionTo(Step.UPLOAD_UNNECESSARY);
+            transitionTo(Step.INGEST_UNNECESSARY);
             return;
         }
 
         banListJsonArray = collected;
-        transitionTo(Step.UPLOAD_CONFIRMATION);
+        transitionTo(Step.INGEST_CONFIRMATION);
     }
 
     /**
@@ -452,15 +476,15 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
         return a.optString(key, "").equals(b.optString(key, ""));
     }
 
-    private void executeUploadTask() {
+    private void executeIngestTask() {
         new Thread(() -> {
             try {
                 JSONObject payload = new JSONObject();
-                payload.put("action", "upload");
+                payload.put("action", "ingest");
                 payload.put("galleryId", CustomNetworkInterceptorPatch.galleryId);
                 payload.put("banList", banListJsonArray);
 
-                CloudflareWorkerClient.sendPost("", payload.toString(), new Callback() {
+                CloudflareWorkerClient.sendPost("", payload.toString(), CloudflareWorkerClient.TokenType.INGEST, new Callback() {
                     @Override
                     public void onFailure(@NonNull Call call, @NonNull IOException e) {
                         Log.e(TAG, "GAS API 전송 실패", e);
@@ -480,7 +504,7 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
                             JSONObject jsonResponse = new JSONObject(responseText);
 
                             if ("success".equals(jsonResponse.optString("status"))) {
-                                transitionTo(Step.UPLOAD_COMPLETE);
+                                transitionTo(Step.INGEST_COMPLETE);
                             } else {
                                 String serverMessage = jsonResponse.optString("message", "Unknown Server Error");
                                 Log.e(TAG, "DB 업데이트 실패: " + serverMessage);
@@ -512,7 +536,7 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
             return;
         }
 
-        CloudflareWorkerClient.sendPost("", payload.toString(), new Callback() {
+        CloudflareWorkerClient.sendPost("", payload.toString(), CloudflareWorkerClient.TokenType.VIEW, new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException error) {
                 identifierErrorMessage = "데이터를 불러오지 못했습니다.";
@@ -578,9 +602,10 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
                     row.setPadding(padding, padding, padding, padding);
                     titleView = new TextView(context);
                     titleView.setTextSize(16);
+                    titleView.setTextColor(textColor);
                     detailView = new TextView(context);
                     detailView.setTextSize(13);
-                    detailView.setTextColor(DialogUiUtils.resolveSecondaryTextColor(context));
+                    detailView.setTextColor(secondaryColor);
                     row.addView(titleView);
                     row.addView(detailView);
                     row.setTag(new View[]{titleView, detailView});

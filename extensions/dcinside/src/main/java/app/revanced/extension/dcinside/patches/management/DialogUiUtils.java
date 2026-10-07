@@ -55,21 +55,6 @@ public final class DialogUiUtils {
     }
 
     /**
-     * 다이얼로그 본문에서 부가 설명용으로 쓰는 보조 텍스트 색상.
-     * {@link #resolveDialogTextColor}에 알파를 입힌 값과 별개로,
-     * 시스템의 textColorSecondary 속성을 직접 쓰고 싶을 때 사용한다.
-     */
-    public static int resolveSecondaryTextColor(Context context) {
-        TypedValue typedValue = new TypedValue();
-        if (context.getTheme().resolveAttribute(android.R.attr.textColorSecondary, typedValue, true)) {
-            return typedValue.resourceId != 0
-                    ? context.getResources().getColor(typedValue.resourceId, context.getTheme())
-                    : typedValue.data;
-        }
-        return 0xFF757575;
-    }
-
-    /**
      * dialogPreferredPadding 속성을 appcompat → framework → 기본값(16dp) 순으로 resolve.
      */
     public static int resolveDialogPreferredPadding(Context context) {

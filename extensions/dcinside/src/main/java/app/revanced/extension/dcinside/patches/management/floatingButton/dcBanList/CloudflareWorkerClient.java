@@ -16,28 +16,51 @@ public class CloudflareWorkerClient {
             .followSslRedirects(true)
             .build();
 
-    static boolean isConfigured() {
-        HttpUrl url = HttpUrl.parse(Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_URL.get().trim());
-        return url != null
-                && url.isHttps()
-                && !Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_TOKEN.get().trim().isEmpty();
+    public enum TokenType {
+        VIEW,
+        INGEST
     }
 
-    static void sendGet(String queryString, Callback callback) {
-        executeRequest("GET", queryString, null, callback);
+    static void sendGet(
+            String queryString,
+            TokenType tokenType,
+            Callback callback
+    ) {
+        String token = switch (tokenType) {
+            case VIEW -> Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_VIEW_TOKEN.get();
+            case INGEST -> Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_INGEST_TOKEN.get();
+        };
+
+        executeRequest("GET", queryString, null, token, callback);
     }
 
-    public static void sendPost(String queryString, String jsonPayload, Callback callback) {
-        executeRequest("POST", queryString, jsonPayload, callback);
+    public static void sendPost(
+            String queryString,
+            String jsonPayload,
+            TokenType tokenType,
+            Callback callback
+    ) {
+        String token = switch (tokenType) {
+            case VIEW -> Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_VIEW_TOKEN.get();
+            case INGEST -> Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_INGEST_TOKEN.get();
+        };
+
+        executeRequest("POST", queryString, jsonPayload, token, callback);
     }
 
-    private static void executeRequest(String method, String queryString, String jsonPayload, Callback callback) {
+    private static void executeRequest(
+            String method,
+            String queryString,
+            String jsonPayload,
+            String token,
+            Callback callback
+    ) {
         String base = Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_URL.get();
         String fullUrl = (queryString != null && !queryString.isEmpty()) ? base + queryString : base;
 
         Request.Builder requestBuilder = new Request.Builder()
                 .url(fullUrl)
-                .header("Authorization", "Bearer " + Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_TOKEN.get().trim());
+                .header("Authorization", "Bearer " + token);
 
         if ("POST".equalsIgnoreCase(method)) {
             requestBuilder.post(RequestBody.create(jsonPayload != null ? jsonPayload : "", JSON_MEDIA_TYPE));

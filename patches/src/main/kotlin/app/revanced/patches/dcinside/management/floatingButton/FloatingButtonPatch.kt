@@ -179,12 +179,11 @@ private val floatingButtonDefinitions = listOf(
     FloatingButtonDefinition("dcBanList", "dc_ban_list") { settingId ->
         setOf(
             SwitchPreference("revanced_show_${settingId}_button"),
-            NonInteractivePreference("revanced_${settingId}_identifier_search_guide"),
             SwitchPreference("revanced_enable_${settingId}_identifier_search_button"),
-            NonInteractivePreference("revanced_${settingId}_ban_list_import_guide"),
-            SwitchPreference("revanced_enable_${settingId}_ban_list_export_button"),
+            TextPreference("revanced_${settingId}_cloudflare_worker_view_token"),
+            SwitchPreference("revanced_enable_${settingId}_ban_list_ingest_button"),
+            TextPreference("revanced_${settingId}_cloudflare_worker_ingest_token"),
             TextPreference("revanced_${settingId}_cloudflare_worker_url"),
-            TextPreference("revanced_${settingId}_cloudflare_worker_token"),
         )
     },
     FloatingButtonDefinition("gallScope", "gall_scope") { settingId ->
