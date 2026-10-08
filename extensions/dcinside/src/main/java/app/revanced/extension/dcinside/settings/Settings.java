@@ -34,9 +34,10 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting ENABLE_USER_ID_GALL_SCOPE = new BooleanSetting("revanced_enable_user_id_gall_scope", FALSE, Setting.parent(SHOW_USER_ID));
     public static final BooleanSetting SHOW_DC_BAN_LIST_BUTTON = new BooleanSetting("revanced_show_dc_ban_list_button", FALSE, FALSE);
     public static final BooleanSetting ENABLE_DC_BAN_LIST_IDENTIFIER_SEARCH = new BooleanSetting("revanced_enable_dc_ban_list_identifier_search_button", FALSE, Setting.parent(SHOW_DC_BAN_LIST_BUTTON));
-    public static final BooleanSetting ENABLE_DC_BAN_LIST_BAN_LIST_EXPORT = new BooleanSetting("revanced_enable_dc_ban_list_ban_list_export_button", FALSE, Setting.parent(SHOW_DC_BAN_LIST_BUTTON));
-    public static final StringSetting DC_BAN_LIST_SHEET_ID_MAP = new StringSetting("revanced_dc_ban_list_sheet_id_map", "");
-    public static final StringSetting DC_BAN_LIST_GAS_URL = new StringSetting("revanced_dc_ban_list_gas_url", "https://script.google.com/macros/s/AKfycbwemheJRFnqqM7NAN3kZ_P_3Cc0Q9F4YTXplxChghon3VEm0oLhS_RtsJ57ocfEP2s/exec");
+    public static final StringSetting DC_BAN_LIST_CLOUDFLARE_WORKER_VIEW_TOKEN = new StringSetting("revanced_dc_ban_list_cloudflare_worker_view_token", "", Setting.parent(ENABLE_DC_BAN_LIST_IDENTIFIER_SEARCH));
+    public static final BooleanSetting ENABLE_DC_BAN_LIST_BAN_LIST_INGEST = new BooleanSetting("revanced_enable_dc_ban_list_ban_list_ingest_button", FALSE, Setting.parent(SHOW_DC_BAN_LIST_BUTTON));
+    public static final StringSetting DC_BAN_LIST_CLOUDFLARE_WORKER_INGEST_TOKEN = new StringSetting("revanced_dc_ban_list_cloudflare_worker_ingest_token", "", Setting.parent(ENABLE_DC_BAN_LIST_BAN_LIST_INGEST));
+    public static final StringSetting DC_BAN_LIST_CLOUDFLARE_WORKER_URL = new StringSetting("revanced_dc_ban_list_cloudflare_worker_url", "");
     public static final BooleanSetting SHOW_GALL_SCOPE_BUTTON = new BooleanSetting("revanced_show_gall_scope_button", FALSE, FALSE);
     public static final BooleanSetting ENABLE_QUICK_POST_MANAGEMENT = new BooleanSetting("revanced_enable_quick_post_management", FALSE, FALSE);
     public static final BooleanSetting SHOW_DUPLICATE_POST_SEARCH_BUTTON = new BooleanSetting("revanced_show_duplicate_post_search_button", FALSE, FALSE);
