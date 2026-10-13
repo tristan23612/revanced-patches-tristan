@@ -111,6 +111,7 @@ final class CommentSearchStrategy implements SearchStrategy {
                             boolean noCommentRows = doc.select(".listwrap2 .search.search_comment").isEmpty();
                             if (noCommentRows) {
                                 // 검색 대상 자체가 없는 페이지 = 사실상 끝
+                                rangeExceeded = true;
                                 finishCommentFetch();
                                 return;
                             }

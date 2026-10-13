@@ -182,6 +182,8 @@ final class GallScopeSession extends DialogSession<GallScopeSession.Step> {
             }
 
             case PAGE_RANGE_INPUT -> {
+                boolean isCommentSearch = searchMode == SearchMode.COMMENT;
+
                 TextView message = new TextView(context);
                 String rangeLabel = "검색할 페이지 범위를 입력하세요.\n(" + targetUserId + "의 " + searchMode + ")";
                 message.setText(rangeLabel);
@@ -191,15 +193,17 @@ final class GallScopeSession extends DialogSession<GallScopeSession.Step> {
                 startInput.setHintTextColor(secondaryColor);
                 startInput.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
                 startInput.setGravity(android.view.Gravity.CENTER);
-                startInput.setText(String.valueOf(endPage > 0 ? endPage + 1 : 1));
+
+                startInput.setText(String.valueOf(1));
+                startInput.setEnabled(!isCommentSearch);
+                startInput.setTextColor(isCommentSearch ? secondaryColor : textColor);
 
                 EditText endInput = new EditText(context);
                 endInput.setHint("끝 페이지");
                 endInput.setHintTextColor(secondaryColor);
                 endInput.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
                 endInput.setGravity(android.view.Gravity.CENTER);
-                endInput.setText(String.valueOf(
-                        (endPage > 0 ? endPage + 1 : 1) + (rangeSize > 0 ? rangeSize - 1 : 9)));
+                endInput.setText(String.valueOf(10));
 
                 TextView tilde = new TextView(context);
                 tilde.setText("~");
@@ -275,10 +279,8 @@ final class GallScopeSession extends DialogSession<GallScopeSession.Step> {
 
                 if (!rangeExceeded) {
                     builder.setPositiveButton("계속 검색", (d, w) -> {
-                        if (searchMode != SearchMode.COMMENT) {
-                            startPage = lastValidPage + 1;
-                            endPage = startPage + rangeSize - 1;
-                        }
+                        startPage = lastValidPage + 1;
+                        endPage = startPage + rangeSize - 1;
                         transitionTo(Step.PARSING);
                     });
                 }
@@ -349,6 +351,7 @@ final class GallScopeSession extends DialogSession<GallScopeSession.Step> {
                     titleView.setSingleLine(true);
                     titleView.setEllipsize(TextUtils.TruncateAt.END);
                     titleView.setTextSize(16);
+                    titleView.setTextColor(textColor);
 
                     subView = new TextView(context);
                     subView.setTextSize(13);
@@ -426,10 +429,25 @@ final class GallScopeSession extends DialogSession<GallScopeSession.Step> {
     private void copyResultsToClipboard(List<JSONObject> snapshot) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(targetUserId).append(" ").append(searchMode).append(" 스코프 결과\n");
-        stringBuilder.append(snapshot.size()).append("개의 결과를 찾았습니다.\n\n");
+
+        int displayEndPage = Math.min(endPage > 0 ? endPage : lastValidPage, lastValidPage);
+        String rangeText = firstSearchedPage + "~" + displayEndPage + "페이지";
+        if (rangeExceeded) {
+            rangeText += " (마지막 페이지 도달)";
+        }
+
+        stringBuilder
+                .append(snapshot.size())
+                .append("건 (")
+                .append(rangeText)
+                .append(")")
+                .append("\n\n")
+        ;
+
         for (JSONObject item : snapshot) {
-            stringBuilder.append(item.optString("date", "")).append("\t")
+            stringBuilder
                     .append(item.optString("title", "")).append("\n")
+                    .append(item.optString("date", "")).append("\n")
                     .append(item.optString("url", "")).append("\n\n");
         }
 
