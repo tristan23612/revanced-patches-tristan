@@ -332,6 +332,12 @@ Second \"item\" text"</string>
             <string name="revanced_dc_ban_list_cloudflare_worker_ingest_token_summary">DC BanList와 연동된 Cloudflare Worker Ingest 토큰을 확인합니다.</string>
             <string name="revanced_dc_ban_list_cloudflare_worker_url_title">Cloudflare Worker 링크</string>
             <string name="revanced_dc_ban_list_cloudflare_worker_url_summary">DC BanList와 연동된 Cloudflare Worker 링크를 확인합니다.</string>
+            <string name="revanced_dc_ban_list_galleries_json_title">DC BanList 연동 갤러리</string>
+            <string name="revanced_dc_ban_list_galleries_json_summary">DC BanList와 연동된 갤러리 json을 확인합니다.</string>
+            <string name="revanced_dc_ban_list_dcinside_user_id_title">DC BanList 계정 ID</string>
+            <string name="revanced_dc_ban_list_dcinside_user_id_summary">DC BanList가 로그인에 사용할 계정 ID를 확인합니다.</string>
+            <string name="revanced_dc_ban_list_dcinside_password_title">DC BanList 계정 PW</string>
+            <string name="revanced_dc_ban_list_dcinside_password_summary">DC BanList가 로그인에 사용할 계정 PW를 확인합니다.</string>
             <string name="revanced_gall_scope_screen_title">Gall Scope</string>
             <string name="revanced_gall_scope_screen_summary">Gall Scope 관련 설정을 할 수 있습니다.</string>
             <string name="revanced_show_gall_scope_button_title">Gall Scope 아이콘 표시하기</string>
