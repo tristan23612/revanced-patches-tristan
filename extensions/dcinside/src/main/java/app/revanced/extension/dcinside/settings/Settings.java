@@ -38,6 +38,9 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting ENABLE_DC_BAN_LIST_BAN_LIST_INGEST = new BooleanSetting("revanced_enable_dc_ban_list_ban_list_ingest_button", FALSE, Setting.parent(SHOW_DC_BAN_LIST_BUTTON));
     public static final StringSetting DC_BAN_LIST_CLOUDFLARE_WORKER_INGEST_TOKEN = new StringSetting("revanced_dc_ban_list_cloudflare_worker_ingest_token", "", Setting.parent(ENABLE_DC_BAN_LIST_BAN_LIST_INGEST));
     public static final StringSetting DC_BAN_LIST_CLOUDFLARE_WORKER_URL = new StringSetting("revanced_dc_ban_list_cloudflare_worker_url", "");
+    public static final StringSetting DC_BAN_LIST_GALLERIES_JSON = new StringSetting("revanced_dc_ban_list_galleries_json", "");
+    public static final StringSetting DC_BAN_LIST_DCINSIDE_USER_ID = new StringSetting("revanced_dc_ban_list_dcinside_user_id", "");
+    public static final StringSetting DC_BAN_LIST_DCINSIDE_PASSWORD = new StringSetting("revanced_dc_ban_list_dcinside_password", "");
     public static final BooleanSetting SHOW_GALL_SCOPE_BUTTON = new BooleanSetting("revanced_show_gall_scope_button", FALSE, FALSE);
     public static final BooleanSetting ENABLE_QUICK_POST_MANAGEMENT = new BooleanSetting("revanced_enable_quick_post_management", FALSE, FALSE);
     public static final BooleanSetting SHOW_DUPLICATE_POST_SEARCH_BUTTON = new BooleanSetting("revanced_show_duplicate_post_search_button", FALSE, FALSE);

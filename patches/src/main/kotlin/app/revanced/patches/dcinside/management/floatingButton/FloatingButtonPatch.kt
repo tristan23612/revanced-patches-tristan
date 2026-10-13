@@ -184,6 +184,9 @@ private val floatingButtonDefinitions = listOf(
             SwitchPreference("revanced_enable_${settingId}_ban_list_ingest_button"),
             TextPreference("revanced_${settingId}_cloudflare_worker_ingest_token"),
             TextPreference("revanced_${settingId}_cloudflare_worker_url"),
+            TextPreference("revanced_${settingId}_galleries_json"),
+            TextPreference("revanced_${settingId}_dcinside_user_id"),
+            TextPreference("revanced_${settingId}_dcinside_password")
         )
     },
     FloatingButtonDefinition("gallScope", "gall_scope") { settingId ->

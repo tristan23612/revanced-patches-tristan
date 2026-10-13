@@ -23,14 +23,9 @@ public class CloudflareWorkerClient {
 
     static void sendGet(
             String queryString,
-            TokenType tokenType,
             Callback callback
     ) {
-        String token = switch (tokenType) {
-            case VIEW -> Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_VIEW_TOKEN.get();
-            case INGEST -> Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_INGEST_TOKEN.get();
-        };
-
+        String token = Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_VIEW_TOKEN.get();
         executeRequest("GET", queryString, null, token, false, callback);
     }
 
@@ -68,10 +63,27 @@ public class CloudflareWorkerClient {
     ) {
         String base = Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_URL.get();
         String fullUrl = (queryString != null && !queryString.isEmpty()) ? base + queryString : base;
+        Request.Builder requestBuilder;
 
-        Request.Builder requestBuilder = new Request.Builder()
-                .url(fullUrl)
-                .header("Authorization", "Bearer " + token);
+        if ("GET".equalsIgnoreCase(method)) {
+            HttpUrl url = HttpUrl.parse(fullUrl);
+            if (url == null) {
+                throw new IllegalArgumentException("Invalid Cloudflare Worker URL");
+            }
+            fullUrl = url.newBuilder()
+                    .removeAllQueryParameters("token")
+                    .addQueryParameter("token", token)
+                    .build()
+                    .toString();
+            requestBuilder = new Request.Builder()
+                    .url(fullUrl)
+                    .header("Accept", "application/json");
+        } else {
+            requestBuilder = new Request.Builder()
+                    .url(fullUrl)
+                    .header("Authorization", "Bearer " + token)
+                    .header("Accept", "application/json");
+        }
 
         if (refreshSnapshot) {
             requestBuilder.header("X-Refresh-Snapshot", "true");

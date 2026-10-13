@@ -3,12 +3,12 @@ package app.revanced.extension.dcinside.patches.management.floatingButton.dcBanL
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import androidx.annotation.NonNull;
-import app.revanced.extension.dcinside.patches.hook.json.JsonHookPatch;
 import app.revanced.extension.dcinside.patches.hook.okhttp.CustomNetworkInterceptorPatch;
 import app.revanced.extension.dcinside.patches.management.DialogSession;
 import app.revanced.extension.dcinside.patches.management.DialogUiUtils;
@@ -19,7 +19,6 @@ import okhttp3.Response;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
@@ -34,13 +33,14 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
 
     enum Step {
         CLOUDFLARE_WORKER_INFO_INPUT,
+        DCINSIDE_SETTINGS_INPUT,
         ACTION_SELECTION,
         IDENTIFIER_INPUT,
         IDENTIFIER_FETCHING,
         IDENTIFIER_RESULT,
         IDENTIFIER_ERROR,
         FETCHING_LATEST_DATA,
-        CREATE_SHEET_CONFIRMATION,
+        INITIAL_INGEST_CONFIRMATION,
         PARSING,
         INGEST_CONFIRMATION,
         INGEST_IN_PROGRESS,
@@ -60,7 +60,7 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
     private String ingestResultMessage = "차단 내역 업로드가 완료되었습니다.";
 
     /**
-     * SHEET_ID_INPUT에서 확인/취소 시 복귀할 Step. SHEET_ID_INPUT으로 전환하는 지점마다
+     * Worker 정보 입력에서 확인/취소 시 복귀할 Step. 입력 단계로 전환하는 지점마다
      * 갱신하고, 최초 진입 시에는 생성자에서 resolveActionStep()으로 미리 계산해둔다.
      */
     private Step cloudflareWorkerInfoReturnStep = null;
@@ -92,10 +92,27 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
         boolean missingCloudflareWorkerViewToken = Settings.ENABLE_DC_BAN_LIST_IDENTIFIER_SEARCH.get() && Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_VIEW_TOKEN.get().isEmpty();
         boolean missingCloudflareWorkerIngestToken = Settings.ENABLE_DC_BAN_LIST_BAN_LIST_INGEST.get() && Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_INGEST_TOKEN.get().isEmpty();
 
-        if ( missingCloudflareWorkerUrl || missingCloudflareWorkerViewToken || missingCloudflareWorkerIngestToken) {
+        if (missingCloudflareWorkerUrl || missingCloudflareWorkerViewToken || missingCloudflareWorkerIngestToken) {
             return Step.CLOUDFLARE_WORKER_INFO_INPUT;
         }
+        if (areDcInsideSettingsMissing()) return Step.DCINSIDE_SETTINGS_INPUT;
         return resolveActionStep();
+    }
+
+    private static boolean areDcInsideSettingsMissing() {
+        if (!Settings.ENABLE_DC_BAN_LIST_BAN_LIST_INGEST.get()) return false;
+        return Settings.DC_BAN_LIST_GALLERIES_JSON.get().trim().isEmpty()
+                || Settings.DC_BAN_LIST_DCINSIDE_USER_ID.get().trim().isEmpty()
+                || Settings.DC_BAN_LIST_DCINSIDE_PASSWORD.get().isEmpty();
+    }
+
+    private Step resolveCloudflareWorkerInfoReturnStep() {
+        Step returnStep = cloudflareWorkerInfoReturnStep == null
+                ? resolveActionStep()
+                : cloudflareWorkerInfoReturnStep;
+        return returnStep == Step.ACTION_SELECTION && areDcInsideSettingsMissing()
+                ? Step.DCINSIDE_SETTINGS_INPUT
+                : returnStep;
     }
 
     @Override
@@ -159,13 +176,66 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
                             if (ingestEnabled) {
                                 Settings.DC_BAN_LIST_CLOUDFLARE_WORKER_INGEST_TOKEN.save(newIngestToken);
                             }
-                            transitionTo(cloudflareWorkerInfoReturnStep);
+                            transitionTo(resolveCloudflareWorkerInfoReturnStep());
                         })
                         .setNegativeButton("취소", (d, w) -> {
                             if (cloudflareWorkerInfoReturnStep != null) {
                                 transitionTo(cloudflareWorkerInfoReturnStep);
                             }
                         });
+            }
+
+            case DCINSIDE_SETTINGS_INPUT -> {
+                TextView message = new TextView(context);
+                message.setText("앱에서 PC 차단 목록을 수집하기 위한 정보를 입력하세요.\n갤러리 JSON 예: [{\"id\":\"onshinproject\",\"path\":\"mgallery\"}]");
+
+                int rowHeightPx = (int) (36 * context.getResources().getDisplayMetrics().density);
+                int galleryRowHeightPx = (int) (72 * context.getResources().getDisplayMetrics().density);
+
+                EditText galleriesInput = DialogUiUtils.createInputField(context, "", "갤러리 설정 JSON", secondaryColor);
+                galleriesInput.setSingleLine(false);
+                galleriesInput.setMinLines(2);
+                galleriesInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+                galleriesInput.setText(Settings.DC_BAN_LIST_GALLERIES_JSON.get());
+                LinearLayout galleriesRow = DialogUiUtils.createLabeledInputRow(context, "Galleries", galleriesInput, galleryRowHeightPx);
+
+                EditText userIdInput = DialogUiUtils.createInputField(context, "", "DCInside ID", secondaryColor);
+                userIdInput.setSingleLine(true);
+                userIdInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                userIdInput.setText(Settings.DC_BAN_LIST_DCINSIDE_USER_ID.get());
+                LinearLayout userIdRow = DialogUiUtils.createLabeledInputRow(context, "DCInside ID", userIdInput, rowHeightPx);
+
+                EditText passwordInput = DialogUiUtils.createInputField(context, "", "DCInside 비밀번호", secondaryColor);
+                passwordInput.setSingleLine(true);
+                passwordInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                passwordInput.setText(Settings.DC_BAN_LIST_DCINSIDE_PASSWORD.get());
+                LinearLayout passwordRow = DialogUiUtils.createLabeledInputRow(context, "비밀번호", passwordInput, rowHeightPx);
+
+                LinearLayout container = DialogUiUtils.wrapWithPadding(context, message, galleriesRow, userIdRow, passwordRow);
+                builder.setView(container)
+                        .setPositiveButton("확인", (d, w) -> {
+                            String galleriesJson = galleriesInput.getText().toString().trim();
+                            String userId = userIdInput.getText().toString().trim();
+                            String password = passwordInput.getText().toString();
+                            if (galleriesJson.isEmpty() || userId.isEmpty() || password.isEmpty()) {
+                                Toast.makeText(context, "갤러리 JSON과 DCInside 계정 정보를 입력해주세요.", Toast.LENGTH_SHORT).show();
+                                transitionTo(Step.DCINSIDE_SETTINGS_INPUT);
+                                return;
+                            }
+                            try {
+                                DcBanListApiClient.resolveGalleryPath(galleriesJson, CustomNetworkInterceptorPatch.galleryId);
+                            } catch (JSONException e) {
+                                Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
+                                transitionTo(Step.DCINSIDE_SETTINGS_INPUT);
+                                return;
+                            }
+
+                            Settings.DC_BAN_LIST_GALLERIES_JSON.save(galleriesJson);
+                            Settings.DC_BAN_LIST_DCINSIDE_USER_ID.save(userId);
+                            Settings.DC_BAN_LIST_DCINSIDE_PASSWORD.save(password);
+                            transitionTo(resolveActionStep());
+                        })
+                        .setNegativeButton("취소", null);
             }
 
             case ACTION_SELECTION -> {
@@ -285,8 +355,8 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
                 fetchLatestData();
             }
 
-            case CREATE_SHEET_CONFIRMATION -> builder
-                    .setMessage("새로운 시트로 차단 내역을 업로드하시겠습니까?")
+            case INITIAL_INGEST_CONFIRMATION -> builder
+                    .setMessage("DB에 기존 기록이 없습니다. 차단 목록 전체를 수집해 업로드하시겠습니까?")
                     .setPositiveButton("확인", (d, w) -> transitionTo(Step.PARSING))
                     .setNegativeButton("취소", null);
 
@@ -364,7 +434,7 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
                             return;
                         }
                         if (latestData == null || latestData.length() == 0) {
-                            transitionTo(Step.CREATE_SHEET_CONFIRMATION);
+                            transitionTo(Step.INITIAL_INGEST_CONFIRMATION);
                         }
                         else {
                             transitionTo(Step.PARSING);
@@ -379,60 +449,49 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
         }).start();
     }
 
-    /**
-     * 디시인사이드 모바일 차단내역 페이지를 순차적으로 요청/파싱
-     */
+    /** 앱에서 DCInside PC 차단내역 페이지를 로그인 후 순차적으로 요청/파싱 */
     private void parseBanList() {
-        String galleryType = JsonHookPatch.galleryType;
         String galleryId = CustomNetworkInterceptorPatch.galleryId;
 
         JSONArray collected = new JSONArray();
 
         try {
-            // 1페이지 요청
-            Response firstResponse = DcBanListApiClient.fetchBanListPageSync(galleryType, galleryId, 1);
-            String firstHtml;
-            try (firstResponse) {
-                if (!firstResponse.isSuccessful()) {
-                    Log.e(TAG, "차단내역 1페이지 요청 실패. code=" + firstResponse.code());
-                    transitionTo(Step.ERROR);
-                    return;
-                }
-                firstHtml = firstResponse.body().string();
-            }
+            String galleryPath = DcBanListApiClient.resolveGalleryPath(
+                    Settings.DC_BAN_LIST_GALLERIES_JSON.get(), galleryId);
+            DcBanListApiClient.AuthenticatedSession session = DcBanListApiClient.login(
+                    Settings.DC_BAN_LIST_DCINSIDE_USER_ID.get(),
+                    Settings.DC_BAN_LIST_DCINSIDE_PASSWORD.get());
 
-            Document firstDoc = Jsoup.parse(firstHtml);
-            int totalPages = DcBanListHtmlParser.extractTotalPages(firstDoc);
-
-            boolean shouldStop = appendRecordsUntilDuplicate(collected, DcBanListHtmlParser.parsePage(firstDoc));
-            if (shouldStop || totalPages <= 1) {
+            Document firstPage = DcBanListApiClient.fetchBanListPageSync(session, galleryPath, galleryId, 1);
+            int lastPage = DcBanListPcHtmlParser.extractLastPage(firstPage, 1);
+            boolean shouldStop = appendRecordsUntilDuplicate(
+                    collected, DcBanListPcHtmlParser.parsePage(firstPage));
+            if (shouldStop || lastPage <= 1) {
                 finishParsing(collected);
                 return;
             }
 
-            for (int page = 2; page <= totalPages; page++) {
-                Response response = DcBanListApiClient.fetchBanListPageSync(galleryType, galleryId, page);
-                String html;
-                try (response) {
-                    if (!response.isSuccessful()) {
-                        Log.e(TAG, "차단내역 " + page + "페이지 요청 실패. code=" + response.code());
-                        transitionTo(Step.ERROR);
-                        return;
-                    }
-                    html = response.body().string();
-                }
-
-                Document doc = Jsoup.parse(html);
-                shouldStop = appendRecordsUntilDuplicate(collected, DcBanListHtmlParser.parsePage(doc));
+            for (int page = 2; page <= lastPage; page++) {
+                Document document = DcBanListApiClient.fetchBanListPageSync(
+                        session, galleryPath, galleryId, page);
+                lastPage = Math.max(lastPage, DcBanListPcHtmlParser.extractLastPage(document, page));
+                shouldStop = appendRecordsUntilDuplicate(
+                        collected, DcBanListPcHtmlParser.parsePage(document));
                 if (shouldStop) break;
             }
 
             finishParsing(collected);
         } catch (IOException e) {
-            Log.e(TAG, "차단내역 수집 중 네트워크 오류", e);
+            Log.e(TAG, "PC 차단내역 수집 중 네트워크 오류", e);
+            errorMessage = "PC 차단내역을 수집하지 못했습니다.\n(" + e.getMessage() + ")";
+            transitionTo(Step.ERROR);
+        } catch (JSONException e) {
+            Log.e(TAG, "갤러리 설정 또는 PC 차단내역 파싱 오류", e);
+            errorMessage = "갤러리 설정을 읽거나 PC 차단내역을 파싱하지 못했습니다.\n(" + e.getMessage() + ")";
             transitionTo(Step.ERROR);
         } catch (Exception e) {
-            Log.e(TAG, "차단내역 파싱 중 예외 발생", e);
+            Log.e(TAG, "PC 차단내역 파싱 중 예외 발생", e);
+            errorMessage = "PC 차단내역 처리 중 오류가 발생했습니다.\n(" + e.getClass().getSimpleName() + ")";
             transitionTo(Step.ERROR);
         }
     }
@@ -488,7 +547,7 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
                 CloudflareWorkerClient.sendPost("", payload.toString(), CloudflareWorkerClient.TokenType.INGEST, true, new Callback() {
                     @Override
                     public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                        Log.e(TAG, "GAS API 전송 실패", e);
+                        Log.e(TAG, "Cloudflare Worker 업로드 요청 실패", e);
                         transitionTo(Step.ERROR);
                     }
 
@@ -496,7 +555,7 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
                     public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                         try (response) {
                             if (!response.isSuccessful()) {
-                                Log.e(TAG, "GAS HTTP 응답 에러 코드: " + response.code());
+                                Log.e(TAG, "Cloudflare Worker HTTP 오류: " + response.code());
                                 transitionTo(Step.ERROR);
                                 return;
                             }
@@ -517,8 +576,15 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
                                     resultMessage.append("\nKV 갱신 상태를 응답에서 확인할 수 없습니다.");
                                 } else {
                                     switch (snapshot.optString("status")) {
-                                        case "updated" -> resultMessage.append("\nKV 스냅샷 갱신 완료: ")
-                                                .append(snapshot.optInt("rows")).append("건");
+                                        case "updated" -> {
+                                            resultMessage.append("\nKV 스냅샷 갱신 완료: ")
+                                                    .append(snapshot.optInt("rows")).append("건");
+                                            if (!snapshot.optBoolean("cachePurged", true)) {
+                                                resultMessage.append("\n단, CDN 캐시 비우기에 실패했습니다: ")
+                                                        .append(snapshot.optString("message", "알 수 없는 오류"))
+                                                        .append("\nD1 저장은 완료됐으므로 업로드를 다시 시도하지 마세요.");
+                                            }
+                                        }
                                         case "failed" -> resultMessage.append("\nKV 스냅샷 갱신 실패: ")
                                                 .append(snapshot.optString("message", "알 수 없는 오류"))
                                                 .append("\nD1 저장은 완료됐습니다. 업로드를 다시 시도하지 마세요.");
@@ -530,7 +596,8 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
                                 transitionTo(Step.INGEST_COMPLETE);
                             } else {
                                 String serverMessage = jsonResponse.optString("message", "Unknown Server Error");
-                                Log.e(TAG, "DB 업데이트 실패: " + serverMessage);
+                                Log.e(TAG, "Cloudflare Worker 업로드 실패: " + serverMessage);
+                                errorMessage = "Cloudflare Worker 업로드에 실패했습니다.\n(" + serverMessage + ")";
                                 transitionTo(Step.ERROR);
                             }
                         } catch (JSONException e) {
