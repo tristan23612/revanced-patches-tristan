@@ -148,7 +148,7 @@ final class DuplicatePostSearchSession extends DialogSession<DuplicatePostSearch
 
                     subView = new TextView(context);
                     subView.setTextSize(13);
-                    subView.setTextColor(DialogUiUtils.resolveSecondaryTextColor(context));
+                    subView.setTextColor(secondaryColor);
 
                     row.addView(titleView);
                     row.addView(contentView);

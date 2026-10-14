@@ -1,3 +1,22 @@
+# [1.5.0-dev.2](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.5.0-dev.1...v1.5.0-dev.2) (2026-10-14)
+
+
+### Features
+
+* update supported version to 5.3.8 ([0e41950](https://github.com/tristan23612/revanced-patches-tristan/commit/0e419501b6e1af182c6fc27fc09eb00ff5db4cd5))
+
+# [1.5.0-dev.1](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.4.0...v1.5.0-dev.1) (2026-10-13)
+
+
+### Features
+
+* **dcinside - BanList:** add detailed snapshot refresh handling and improve ingest result messaging ([809494d](https://github.com/tristan23612/revanced-patches-tristan/commit/809494d0e1ae5dc0bbe45b533df5386ff86e6709))
+* **dcinside - BanList:** add strings for gallery JSON and login configuration display ([b86d6d8](https://github.com/tristan23612/revanced-patches-tristan/commit/b86d6d86cad95d7f366ae62d651874bdd70e955e))
+* **dcinside - BanList:** refactor BanList handling to support ingest/view tokens and update Cloudflare Worker integration ([a13224e](https://github.com/tristan23612/revanced-patches-tristan/commit/a13224e2bb8a12a349940e65502604010ba2fe23))
+* **dcinside - BanList:** refactor parsing and API handling for PC ban list integration ([a1ab46c](https://github.com/tristan23612/revanced-patches-tristan/commit/a1ab46c549d595f6db0583b920eadfcb77c617b8))
+* **dcinside - BanList:** remove legacy code for CSV/GAS integration and migrate to Cloudflare Worker-based handling ([0df79b5](https://github.com/tristan23612/revanced-patches-tristan/commit/0df79b5a8b31732416c6dc8e918a41db024882d0))
+* **dcinside - GallScope:** enhance comment search behavior and UI improvements for page range handling ([723b39e](https://github.com/tristan23612/revanced-patches-tristan/commit/723b39e4981885f964a27798572101b2ca7af22d))
+
 # [1.4.0](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.3.0...v1.4.0) (2026-09-09)
 
 
