@@ -1,3 +1,10 @@
+# [1.5.0-dev.2](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.5.0-dev.1...v1.5.0-dev.2) (2026-10-14)
+
+
+### Features
+
+* update supported version to 5.3.8 ([0e41950](https://github.com/tristan23612/revanced-patches-tristan/commit/0e419501b6e1af182c6fc27fc09eb00ff5db4cd5))
+
 # [1.5.0-dev.1](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.4.0...v1.5.0-dev.1) (2026-10-13)
 
 
