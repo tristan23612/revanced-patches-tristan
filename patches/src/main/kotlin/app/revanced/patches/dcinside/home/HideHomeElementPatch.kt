@@ -1,6 +1,7 @@
 package app.revanced.patches.dcinside.home
 
 import app.revanced.patcher.extensions.addInstructions
+import app.revanced.patcher.extensions.fieldReference
 import app.revanced.patcher.extensions.getInstruction
 import app.revanced.patcher.patch.bytecodePatch
 import app.revanced.patcher.patch.resourcePatch
@@ -53,10 +54,11 @@ val hideHomeElementPatch = bytecodePatch(
 
         mainBestFilterMethodMatch.let {
             it.method.apply {
+                val itemViewFieldReference = getInstruction(it[1]).fieldReference
                 addInstructions(
                     it[-1],
                     $$"""
-                        iget-object v0, p0, Landroidx/recyclerview/widget/RecyclerView$ViewHolder;->itemView:Landroid/view/View;
+                        iget-object v0, p0, $$itemViewFieldReference
                         invoke-static {v0}, $$EXTENSION_CLASS_DESCRIPTOR->hideDcbestView(Landroid/view/View;)V
                     """
                 )
@@ -65,10 +67,11 @@ val hideHomeElementPatch = bytecodePatch(
 
         liveBestItemMethodMatch.let {
             it.method.apply {
+                val itemViewFieldReference = getInstruction(it[1]).fieldReference
                 addInstructions(
                     it[-1],
                     $$"""
-                        iget-object v0, p0, Landroidx/recyclerview/widget/RecyclerView$ViewHolder;->itemView:Landroid/view/View;
+                        iget-object v0, p0, $$itemViewFieldReference
                         invoke-static { v0 }, $$EXTENSION_CLASS_DESCRIPTOR->hideDcbestView(Landroid/view/View;)V
                     """
                 )

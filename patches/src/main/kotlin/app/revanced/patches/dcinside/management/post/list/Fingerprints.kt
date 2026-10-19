@@ -9,6 +9,10 @@ internal val BytecodePatchContext.postItemBindMethodMatch by composingFirstMetho
     accessFlags(AccessFlags.PRIVATE, AccessFlags.FINAL)
     returnType("V")
     instructions(
+        allOf(
+            Opcode.IGET_OBJECT(),
+            field { definingClass == $$"Landroidx/recyclerview/widget/RecyclerView$ViewHolder;" && type == "Landroid/view/View;" }
+        ),
         method { returnType == "Lcom/dcinside/app/response/PostItem;" },
         after(
             Opcode.MOVE_RESULT_OBJECT(),

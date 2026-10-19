@@ -226,17 +226,20 @@ val showUserIdPatch = bytecodePatch(
         val postInfoUserIdField = postInfoClassDef.getFieldBySerializedName("user_id")
         val postInfoUserIdGetterMethodReference = postInfoClassDef.getStringGetterMethod(postInfoUserIdField.name)
 
-        postSearchItemOnBindViewHolderMethodMatch(normalPostItemBindMethodMatch).let {
+        postItemBindMethodMatch.let {
             it.method.apply {
-                val insertIndex = it[2]
-                val insertSmali = $$"""
-                    invoke-virtual { p0, p2 }, $$definingClass->getItem(I)Lcom/dcinside/app/response/PostItem;
-                    move-result-object v0
+                val itemViewFieldReference = getInstruction(it[0]).fieldReference
+
+                val postItemIndex = it[2]
+                val postItemRegister = getInstruction<OneRegisterInstruction>(postItemIndex).registerA
+
+                val insertIndex = it[-1]
+                val insertSmali = $$"""                    
+                    move-object/from16 v0, p1
+                    iget-object v0, v0, $$itemViewFieldReference
                     
-                    invoke-virtual { v0 }, $$postItemUserIdGetterMethodReference
+                    invoke-virtual { v$$postItemRegister }, $$postItemUserIdGetterMethodReference
                     move-result-object v1
-                    
-                    iget-object v0, p1, Landroidx/recyclerview/widget/RecyclerView$ViewHolder;->itemView:Landroid/view/View;
                     
                     invoke-static { v0, v1 }, $$SHOW_USER_ID_PATCH_EXTENSION_CLASS_DESCRIPTOR->setUserId(Landroid/view/View;Ljava/lang/String;)V
                 """
@@ -250,13 +253,15 @@ val showUserIdPatch = bytecodePatch(
 
         postSearchItemBindMethodMatch.let {
             it.method.apply {
-                val postItemIndex = it[1]
+                val itemViewFieldReference = getInstruction(it[0]).fieldReference
+
+                val postItemIndex = it[2]
                 val postItemRegister = getInstruction<OneRegisterInstruction>(postItemIndex).registerA
 
                 val insertIndex = it[-1]
                 val insertSmali = $$"""
                     move-object/from16 v0, p1
-                    iget-object v0, v0, Landroidx/recyclerview/widget/RecyclerView$ViewHolder;->itemView:Landroid/view/View;
+                    iget-object v0, v0, $$itemViewFieldReference
                     
                     invoke-virtual { v$$postItemRegister }, $$postItemUserIdGetterMethodReference
                     move-result-object v1

@@ -33,8 +33,8 @@ For an example repository, see [ReVanced Patches](https://github.com/revanced/re
 
 #### Supported Latest Version
 
-| 5.3.8 |
-|:-----:|
+| 5.3.10 |
+|:------:|
 <details>
 <summary>Patch Details</summary>
 
@@ -65,10 +65,13 @@ For an example repository, see [ReVanced Patches](https://github.com/revanced/re
 | &nbsp;&nbsp;└ 📁 DC BanList                          |                                                                     |
 | &nbsp;&nbsp;&nbsp;&nbsp;└ DC BanList 아이콘 표시하기 | DC BanList 아이콘이 퀵쓰기 버튼 위에 추가됩니다.                    |
 | &nbsp;&nbsp;&nbsp;&nbsp;└ DC BanList 식별코드 검색   | DC BanList 식별코드 검색 기능이 활성화됩니다.                       |
+| &nbsp;&nbsp;&nbsp;&nbsp;└ Cloudflare Worker View 토큰| DC BanList와 연동된 Cloudflare Worker View 토큰을 확인합니다.       |
 | &nbsp;&nbsp;&nbsp;&nbsp;└ DC BanList 업로드          | DC BanList 업로드 기능이 활성화됩니다.                              |
-| &nbsp;&nbsp;&nbsp;&nbsp;└ DC BanList 시트 id         | DC BanList가 저장한 시트 id를 확인합니다.                           |
-| &nbsp;&nbsp;&nbsp;&nbsp;└ GAS 인증하기               | GAS 인증을 위한 웹뷰를 엽니다.                                      |
-| &nbsp;&nbsp;&nbsp;&nbsp;└ 구글 계정 관리하기         | 구글 계정 관리를 위한 웹뷰를 엽니다.                                |
+| &nbsp;&nbsp;&nbsp;&nbsp;└ Cloudflare Worker Ingest 토큰| DC BanList와 연동된 Cloudflare Worker Ingest 토큰을 확인합니다.   |
+| &nbsp;&nbsp;&nbsp;&nbsp;└ Cloudflare Worker 링크     | DC BanList와 연동된 Cloudflare Worker 링크를 확인합니다.            |
+| &nbsp;&nbsp;&nbsp;&nbsp;└ DC BanList 연동 갤러리     | DC BanList와 연동된 갤러리 json을 확인합니다.                       |
+| &nbsp;&nbsp;&nbsp;&nbsp;└ DC BanList 계정 ID         | DC BanList가 로그인에 사용할 계정 ID를 확인합니다.                  |
+| &nbsp;&nbsp;&nbsp;&nbsp;└ DC BanList 계정 PW         | DC BanList가 로그인에 사용할 계정 PW를 확인합니다.                  |
 | &nbsp;&nbsp;└ 📁 Gall Scope                          |                                                                     |
 | &nbsp;&nbsp;&nbsp;&nbsp;└ Gall Scope 아이콘 표시하기 | Gall Scope 아이콘이 퀵쓰기 버튼 위에 추가됩니다.                    |
 | &nbsp;                                               | &nbsp;                                                              |
