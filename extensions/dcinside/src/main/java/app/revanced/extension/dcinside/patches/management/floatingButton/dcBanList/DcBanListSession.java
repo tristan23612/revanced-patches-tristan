@@ -543,6 +543,7 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
                 payload.put("action", "ingest");
                 payload.put("galleryId", CustomNetworkInterceptorPatch.galleryId);
                 payload.put("banList", banListJsonArray);
+                payload.put("updateRefreshStatus", true);
 
                 CloudflareWorkerClient.sendPost("", payload.toString(), CloudflareWorkerClient.TokenType.INGEST, true, new Callback() {
                     @Override
@@ -556,6 +557,14 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
                         try (response) {
                             if (!response.isSuccessful()) {
                                 Log.e(TAG, "Cloudflare Worker HTTP 오류: " + response.code());
+                                String responseText = response.body() == null ? "" : response.body().string();
+                                String serverMessage = "HTTP " + response.code();
+                                try {
+                                    serverMessage = new JSONObject(responseText).optString("message", serverMessage);
+                                } catch (JSONException ignored) {
+                                    // 응답 본문이 JSON이 아니면 HTTP 상태 코드를 표시한다.
+                                }
+                                errorMessage = "Cloudflare Worker가 업로드를 시작하지 않았습니다.\n(" + serverMessage + ")";
                                 transitionTo(Step.ERROR);
                                 return;
                             }
@@ -591,6 +600,15 @@ final class DcBanListSession extends DialogSession<DcBanListSession.Step> {
                                         case "skipped" -> resultMessage.append("\nKV 스냅샷 갱신은 생략되었습니다.");
                                         default -> resultMessage.append("\nKV 갱신 상태를 확인할 수 없습니다.");
                                     }
+                                }
+                                JSONObject refreshStatus = jsonResponse.optJSONObject("refreshStatus");
+                                if (refreshStatus == null) {
+                                    resultMessage.append("\n웹 갱신 상태를 업데이트했는지 확인할 수 없습니다.");
+                                } else if (refreshStatus.optBoolean("updated")) {
+                                    resultMessage.append("\n웹 갱신 상태도 업데이트했습니다.");
+                                } else {
+                                    resultMessage.append("\n웹 갱신 상태는 업데이트하지 않았습니다: ")
+                                            .append(refreshStatus.optString("message", "알 수 없는 오류"));
                                 }
                                 ingestResultMessage = resultMessage.toString();
                                 transitionTo(Step.INGEST_COMPLETE);
