@@ -1,3 +1,12 @@
+# [1.6.0-dev.1](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.5.0...v1.6.0-dev.1) (2026-10-19)
+
+
+### Features
+
+* **dcinside - HideHomeElement:** replace hardcoded field reference with dynamic resolution via `fieldReference` extension to support 5.3.10 ([fc21f45](https://github.com/tristan23612/revanced-patches-tristan/commit/fc21f45cb197e177d98e420ba8ebda427536dcee))
+* **dcinside - QuickPostManagement:** replace hardcoded field reference with dynamic resolution via `fieldReference` extension and update fingerprints to support 5.3.10 ([c82432d](https://github.com/tristan23612/revanced-patches-tristan/commit/c82432dd3dcdfbced55dbfd811a455d04010d380))
+* **dcinside - ShowUserId:** refactor to use `fieldReference` for dynamic resolution and update fingerprints to support 5.3.10 ([d0548dc](https://github.com/tristan23612/revanced-patches-tristan/commit/d0548dcfcee0a16de1e79ae8595c156b62266356))
+
 # [1.5.0](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.4.0...v1.5.0) (2026-10-14)
 
 
