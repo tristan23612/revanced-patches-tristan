@@ -1,6 +1,7 @@
 package app.revanced.patches.dcinside.management.post.list
 
 import app.revanced.patcher.extensions.addInstructions
+import app.revanced.patcher.extensions.fieldReference
 import app.revanced.patcher.extensions.getInstruction
 import app.revanced.patcher.extensions.methodReference
 import app.revanced.patcher.patch.bytecodePatch
@@ -38,15 +39,17 @@ val quickPostManagementPatch = bytecodePatch(
 
         postItemBindMethodMatch.let {
             it.method.apply {
-                val postItemIndex = it[1]
+                val itemViewFieldReference = getInstruction(it[0]).fieldReference
+
+                val postItemIndex = it[2]
                 val postItemRegister = getInstruction<OneRegisterInstruction>(postItemIndex).registerA
 
-                val postNoMethodReference = getInstruction(it[3]).methodReference
+                val postNoMethodReference = getInstruction(it[4]).methodReference
 
                 val insertIndex = it[-1]
                 var insertSmali = $$"""
                     move-object/from16 v0, p1
-                    iget-object v0, v0, Landroidx/recyclerview/widget/RecyclerView$ViewHolder;->itemView:Landroid/view/View;
+                    iget-object v0, v0, $$itemViewFieldReference
                     
                     invoke-virtual { v$$postItemRegister }, $$postNoMethodReference
                     move-result v1
