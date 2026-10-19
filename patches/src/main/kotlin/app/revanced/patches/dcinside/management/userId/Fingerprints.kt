@@ -8,33 +8,33 @@ import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.ClassDef
 
-internal fun BytecodePatchContext.postSearchItemOnBindViewHolderMethodMatch(targetMethodMatch: CompositeMatch) = firstMethodComposite {
-    definingClass("Lcom/dcinside/app/post/fragments/")
-    parameterTypes($$"Landroidx/recyclerview/widget/RecyclerView$ViewHolder;", "I")
-    accessFlags(AccessFlags.PUBLIC)
-    name("onBindViewHolder")
-    instructions(
-        "viewHolder"(),
-        method {
-            targetMethodMatch.method.definingClass == definingClass && targetMethodMatch.method.name == name
-        },
-        after(
-            Opcode.RETURN_VOID(),
-        )
-    )
-}
-
-internal val BytecodePatchContext.normalPostItemBindMethodMatch by composingFirstMethod {
+internal val BytecodePatchContext.postItemBindMethodMatch by composingFirstMethod {
+    accessFlags(AccessFlags.PRIVATE, AccessFlags.FINAL)
     returnType("V")
-    strings(
-        "null cannot be cast to non-null type com.dcinside.app.post.fragments.PostListItemHolder",
-        "dcbest",
+    instructions(
+        allOf(
+            Opcode.IGET_OBJECT(),
+            field { definingClass == $$"Landroidx/recyclerview/widget/RecyclerView$ViewHolder;" && type == "Landroid/view/View;" }
+        ),
+        method { returnType == "Lcom/dcinside/app/response/PostItem;" },
+        after(
+            Opcode.MOVE_RESULT_OBJECT(),
+        ),
+        "null cannot be cast to non-null type com.dcinside.app.post.fragments.PostListItemHolder"(),
+        method {
+            parameterTypes.isEmpty() && returnType == "I" && definingClass == "Lcom/dcinside/app/response/PostItem;"
+        },
+        Opcode.RETURN_VOID(),
     )
 }
 
 internal val BytecodePatchContext.postSearchItemBindMethodMatch by composingFirstMethod {
     returnType("V")
     instructions(
+        allOf(
+            Opcode.IGET_OBJECT(),
+            field { definingClass == $$"Landroidx/recyclerview/widget/RecyclerView$ViewHolder;" && type == "Landroid/view/View;" }
+        ),
         method { returnType == POST_ITEM_CLASS_DESCRIPTOR },
         after(
             Opcode.MOVE_RESULT_OBJECT(),
