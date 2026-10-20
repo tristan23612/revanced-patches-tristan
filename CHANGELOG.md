@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.6.0...v1.7.0) (2026-10-20)
+
+
+### Features
+
+* **dcinside - BanList:** improve refresh status handling and error reporting ([f81d5f0](https://github.com/tristan23612/revanced-patches-tristan/commit/f81d5f093f2ffcf64f4217608dd37318851b93d9))
+
 # [1.7.0-dev.1](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.6.0...v1.7.0-dev.1) (2026-10-20)
 
 
