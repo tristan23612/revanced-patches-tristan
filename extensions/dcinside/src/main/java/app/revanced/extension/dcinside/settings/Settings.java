@@ -49,4 +49,5 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting HIDE_ADMINISTRATOR_NOTICE = new BooleanSetting("revanced_hide_administrator_notice", FALSE, FALSE);
     public static final BooleanSetting HIDE_MUST_READ_NOTICE = new BooleanSetting("revanced_hide_must_read_notice", FALSE, FALSE);
     public static final BooleanSetting DISABLE_UPDATE_CHECK = new BooleanSetting("revanced_disable_update_check", FALSE, FALSE);
+    public static final BooleanSetting ENABLE_ONESTORE_FEATURES = new BooleanSetting("revanced_enable_onestore_features", FALSE, TRUE);
 }
