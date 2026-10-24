@@ -1,3 +1,11 @@
+# [1.8.0-dev.1](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.7.0...v1.8.0-dev.1) (2026-10-24)
+
+
+### Features
+
+* **dcinside - EnableOneStoreFeatures:** add patch to control OneStore-specific features ([5827591](https://github.com/tristan23612/revanced-patches-tristan/commit/5827591d9544674382e9ee15b3423cef5b2e0851))
+* **dcinside - HideHomeElementPatch:** add support for hiding "Best Pick" and enhance dimension adjustments ([a982c01](https://github.com/tristan23612/revanced-patches-tristan/commit/a982c01402dff13e642a2ed9807fba60dd71d41c))
+
 # [1.7.0](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.6.0...v1.7.0) (2026-10-20)
 
 
