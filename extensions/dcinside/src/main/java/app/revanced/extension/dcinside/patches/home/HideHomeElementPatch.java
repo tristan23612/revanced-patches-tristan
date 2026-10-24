@@ -8,6 +8,22 @@ import java.util.Collections;
 import java.util.List;
 
 public class HideHomeElementPatch {
+    public static int adjustDimension(int originalDimension, String dimensionName) {
+        if ((Settings.HIDE_DCBEST.get() && Settings.ENABLE_ONESTORE_FEATURES.get()) || (Settings.HIDE_BEST_PICK.get() && !Settings.ENABLE_ONESTORE_FEATURES.get())) {
+            if (dimensionName.equals("main_space_divide5") || dimensionName.equals("main_space_end")) return 0;
+        }
+        if (Settings.HIDE_CROWD.get()) {
+            if (dimensionName.equals("main_space_divide4")) return 0;
+        }
+        return originalDimension;
+    }
+
+    public static void hideBestPickView(View view) {
+        if (view == null || !Settings.HIDE_BEST_PICK.get()) {
+            return;
+        }
+        hideView(view);
+    }
 
     public static void hideDcbestView(View view) {
         if (view == null || !Settings.HIDE_DCBEST.get()) {

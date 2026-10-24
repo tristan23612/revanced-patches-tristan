@@ -3,6 +3,8 @@ package app.revanced.patches.dcinside.home
 import app.revanced.patcher.extensions.addInstructions
 import app.revanced.patcher.extensions.fieldReference
 import app.revanced.patcher.extensions.getInstruction
+import app.revanced.patcher.extensions.instructions
+import app.revanced.patcher.matchIndexed
 import app.revanced.patcher.patch.bytecodePatch
 import app.revanced.patcher.patch.resourcePatch
 import app.revanced.patches.all.misc.resources.addResources
@@ -12,6 +14,11 @@ import app.revanced.patches.dcinside.misc.settings.PreferenceScreen
 import app.revanced.patches.dcinside.misc.settings.settingsPatch
 import app.revanced.patches.shared.misc.settings.preference.SwitchPreference
 import app.revanced.util.findElementByAttributeValueOrThrow
+import app.revanced.util.findFreeRegister
+import app.revanced.util.indexOfFirstInstructionOrThrow
+import app.revanced.util.registersUsed
+import com.android.tools.smali.dexlib2.Opcode
+import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 
 private const val EXTENSION_CLASS_DESCRIPTOR = "Lapp/revanced/extension/dcinside/patches/home/HideHomeElementPatch;"
@@ -45,6 +52,7 @@ val hideHomeElementPatch = bytecodePatch(
         addResources("dcinside", "home.hideHomeElementPatch")
 
         PreferenceScreen.FEED.addPreferences(
+            SwitchPreference("revanced_hide_best_pick"),
             SwitchPreference("revanced_hide_dcbest"),
             SwitchPreference("revanced_hide_recommended_galleries"),
             SwitchPreference("revanced_hide_crowd"),
@@ -52,29 +60,68 @@ val hideHomeElementPatch = bytecodePatch(
             SwitchPreference("revanced_hide_recent"),
         )
 
-        mainBestFilterMethodMatch.let {
+        setOf(
+            "main_space_divide4",
+            "main_space_divide5",
+        ).forEach { dimensionName ->
+            getMainSpaceDimensionMethodMatch(dimensionName).let {
+                it.method.apply {
+                    val dimensionRegister = getInstruction<OneRegisterInstruction>(it[-1]).registerA
+                    val dimensionStringRegister = findFreeRegister(it[-1] + 1)
+                    addInstructions(
+                        it[-1] + 1,
+                        $$"""
+                            const-string v$$dimensionStringRegister, "$$dimensionName"
+                            invoke-static { v$$dimensionRegister, v$$dimensionStringRegister }, $$EXTENSION_CLASS_DESCRIPTOR->adjustDimension(ILjava/lang/String;)I
+                            move-result v$$dimensionRegister
+                        """
+                    )
+                }
+            }
+        }
+
+        bestPickItemMethodMatch.let {
             it.method.apply {
                 val itemViewFieldReference = getInstruction(it[1]).fieldReference
                 addInstructions(
                     it[-1],
                     $$"""
                         iget-object v0, p0, $$itemViewFieldReference
-                        invoke-static {v0}, $$EXTENSION_CLASS_DESCRIPTOR->hideDcbestView(Landroid/view/View;)V
+                        invoke-static {v0}, $$EXTENSION_CLASS_DESCRIPTOR->hideBestPickView(Landroid/view/View;)V
                     """
                 )
             }
         }
 
-        liveBestItemMethodMatch.let {
+        mainBestPickTitleMethodMatch.let {
             it.method.apply {
-                val itemViewFieldReference = getInstruction(it[1]).fieldReference
+                val viewIndex = it[-1]
+                val viewRegister = getInstruction<OneRegisterInstruction>(viewIndex).registerA
+
                 addInstructions(
-                    it[-1],
+                    viewIndex + 1,
                     $$"""
+                        invoke-static/range { v$$viewRegister .. v$$viewRegister }, $$EXTENSION_CLASS_DESCRIPTOR->hideBestPickView(Landroid/view/View;)V
+                    """
+                )
+            }
+        }
+
+        setOf(
+            mainBestFilterMethodMatch,
+            liveBestItemMethodMatch
+        ).forEach { methodMatch ->
+            methodMatch.let {
+                it.method.apply {
+                    val itemViewFieldReference = getInstruction(it[1]).fieldReference
+                    addInstructions(
+                        it[-1],
+                        $$"""
                         iget-object v0, p0, $$itemViewFieldReference
                         invoke-static { v0 }, $$EXTENSION_CLASS_DESCRIPTOR->hideDcbestView(Landroid/view/View;)V
                     """
-                )
+                    )
+                }
             }
         }
 
