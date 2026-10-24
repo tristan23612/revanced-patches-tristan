@@ -6,6 +6,42 @@ import app.revanced.patches.shared.misc.mapping.ResourceType
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 
+internal fun BytecodePatchContext.getMainSpaceDimensionMethodMatch(dimensionName: String) = firstMethodComposite {
+    instructions(
+        ResourceType.DIMEN(dimensionName),
+        allOf(
+            Opcode.INVOKE_STATIC(),
+            method { parameterTypes.size == 1 && parameterTypes[0] == "I" && returnType == "I" },
+        ),
+        after(
+            Opcode.MOVE_RESULT(),
+        ),
+    )
+}
+
+internal val BytecodePatchContext.bestPickItemMethodMatch by composingFirstMethod {
+    instructions(
+        ResourceType.LAYOUT("view_best_pick_item"),
+        allOf(
+            Opcode.IGET_OBJECT(),
+            field { definingClass == $$"Landroidx/recyclerview/widget/RecyclerView$ViewHolder;" && type == "Landroid/view/View;" }
+        ),
+        Opcode.RETURN_VOID(),
+    )
+}
+
+internal val BytecodePatchContext.mainBestPickTitleMethodMatch by composingFirstMethod {
+    instructions(
+        ResourceType.LAYOUT("view_main_best_pick_title"),
+        after(
+            method { name == "inflate" }
+        ),
+        after(
+            Opcode.MOVE_RESULT_OBJECT(),
+        ),
+    )
+}
+
 internal val BytecodePatchContext.mainBestFilterMethodMatch by composingFirstMethod {
     instructions(
         ResourceType.LAYOUT("view_main_best_filter"),
@@ -36,13 +72,7 @@ internal val BytecodePatchContext.mainLiveBestMoreMethodMatch by composingFirstM
         ),
         after(
             Opcode.MOVE_RESULT_OBJECT(),
-        )
-    )
-}
-
-internal val BytecodePatchContext.mainBottomMethodMatch by composingFirstMethod {
-    instructions(
-        ResourceType.LAYOUT("view_main_bottom"),
+        ),
     )
 }
 
@@ -54,7 +84,7 @@ internal val BytecodePatchContext.mainRecommendGalleriesMethodMatch by composing
         ),
         after(
             Opcode.MOVE_RESULT_OBJECT(),
-        )
+        ),
     )
 }
 

@@ -38,51 +38,52 @@ For an example repository, see [ReVanced Patches](https://github.com/revanced/re
 <details>
 <summary>Patch Details</summary>
 
-| Patch                                                   | Description                                                                   |
-|:--------------------------------------------------------|:------------------------------------------------------------------------------|
-| **광고**                                                |                                                                               |
-| 광고 제거                                               | 광고가 표시되지 않습니다.                                                     |
-| &nbsp;                                                  | &nbsp;                                                                        |
-| **피드**                                                |                                                                               |
-| 홈 화면 실시간 베스트 숨기기                            | 홈 화면의 실시간 베스트가 숨겨집니다.                                         |
-| 홈 화면 추천 갤러리 숨기기                              | 홈 화면의 추천 갤러리가 숨겨집니다.                                           |
-| 홈 화면 실북갤 리스트 숨기기                            | 홈 화면의 실북갤 리스트가 숨겨집니다.                                         |
-| 홈 화면 신규 개설 갤러리 숨기기                         | 홈 화면의 신규 개설 갤러리가 숨겨집니다.                                      |
-| 홈 화면 갤러리 바로가기 숨기기                          | 홈 화면의 갤러리 바로가기(최근, 즐겨찾기)가 숨겨집니다.                       |
-| &nbsp;                                                  | &nbsp;                                                                        |
-| **일반**                                                |                                                                               |
-| 게시글 작성 시 펌 금지                                  | 게시글 작성 시 펌 금지 옵션이 기본적으로 활성화됩니다.                        |
-| 게시글 하단 추천 게시글 목록 숨기기                     | 게시글 하단의 추천 게시글 목록이 숨겨집니다.                                  |
-| 앱 아이콘                                               | 앱 아이콘을 선택할 수 있습니다.                                               |
-| 앱 이름                                                 | 앱 이름을 선택할 수 있습니다.                                                 |
-| &nbsp;                                                  | &nbsp;                                                                        |
-| **갤러리 관리**                                         |                                                                               |
-| 빠른 게시글 관리                                        | 게시글 목록에서 긴 터치를 통해 게시글 차단 및 삭제 팝업을 띄웁니다.           |
-| 📁 식별코드                                             |                                                                               |
-| &nbsp;&nbsp;└ 식별코드 표시                             | 반고닉과 고닉 유저의 식별코드가 표시됩니다.                                   |
-| &nbsp;&nbsp;└ 식별코드 터치 시 갤스코프 열기            | 식별코드 터치 시 갤스코프가 열립니다.                                         |
-| 📁 플로팅 버튼                                          |                                                                               |
-| &nbsp;&nbsp;└ 📁 DC BanList                             |                                                                               |
-| &nbsp;&nbsp;&nbsp;&nbsp;└ DC BanList 아이콘 표시하기    | DC BanList 아이콘이 퀵쓰기 버튼 위에 추가됩니다.                              |
-| &nbsp;&nbsp;&nbsp;&nbsp;└ DC BanList 식별코드 검색      | DC BanList 식별코드 검색 기능이 활성화됩니다.                                 |
-| &nbsp;&nbsp;&nbsp;&nbsp;└ Cloudflare Worker View 토큰   | DC BanList와 연동된 Cloudflare Worker View 토큰을 확인합니다.                 |
-| &nbsp;&nbsp;&nbsp;&nbsp;└ DC BanList 업로드             | DC BanList 업로드 기능이 활성화됩니다.                                        |
-| &nbsp;&nbsp;&nbsp;&nbsp;└ Cloudflare Worker Ingest 토큰 | DC BanList와 연동된 Cloudflare Worker Ingest 토큰을 확인합니다.               |
-| &nbsp;&nbsp;&nbsp;&nbsp;└ Cloudflare Worker 링크        | DC BanList와 연동된 Cloudflare Worker 링크를 확인합니다.                      |
-| &nbsp;&nbsp;&nbsp;&nbsp;└ DC BanList 연동 갤러리        | DC BanList와 연동된 갤러리 json을 확인합니다.                                 |
-| &nbsp;&nbsp;&nbsp;&nbsp;└ DC BanList 계정 ID            | DC BanList가 로그인에 사용할 계정 ID를 확인합니다.                            |
-| &nbsp;&nbsp;&nbsp;&nbsp;└ DC BanList 계정 PW            | DC BanList가 로그인에 사용할 계정 PW를 확인합니다.                            |
-| &nbsp;&nbsp;└ 📁 Gall Scope                             |                                                                               |
-| &nbsp;&nbsp;&nbsp;&nbsp;└ Gall Scope 아이콘 표시하기    | Gall Scope 아이콘이 퀵쓰기 버튼 위에 추가됩니다.                              |
-| &nbsp;                                                  | &nbsp;                                                                        |
-| **기타**                                                |                                                                               |
-| 운영자 공지 숨기기                                      | 공지 탭에서 운영자 공지가 숨겨집니다.                                         |
-| 게시글 목록 상단 공지 숨기기                            | 게시글 목록 상단의 공지가 숨겨집니다.                                         |
-| 업데이트 알림 비활성화하기                              | 업데이트 알림이 비활성화 됩니다.                                              |
-| 원스토어 기능 활성화하기                                | 원스토어와 관련된 기능(주로 실시간 베스트)이 활성화됩니다.                    |
+| Patch                                                   | Description                                                         |
+|:--------------------------------------------------------|:--------------------------------------------------------------------|
+| **광고**                                                |                                                                     |
+| 광고 제거                                               | 광고가 표시되지 않습니다.                                           |
+| &nbsp;                                                  | &nbsp;                                                              |
+| **피드**                                                |                                                                     |
+| 홈 화면 추천 게시물 숨기기                              | 홈 화면의 추천 게시물이 숨겨집니다.                                 |
+| 홈 화면 실시간 베스트 숨기기                            | 홈 화면의 실시간 베스트가 숨겨집니다.                               |
+| 홈 화면 추천 갤러리 숨기기                              | 홈 화면의 추천 갤러리가 숨겨집니다.                                 |
+| 홈 화면 실북갤 리스트 숨기기                            | 홈 화면의 실북갤 리스트가 숨겨집니다.                               |
+| 홈 화면 신규 개설 갤러리 숨기기                         | 홈 화면의 신규 개설 갤러리가 숨겨집니다.                            |
+| 홈 화면 갤러리 바로가기 숨기기                          | 홈 화면의 갤러리 바로가기(최근, 즐겨찾기)가 숨겨집니다.             |
+| &nbsp;                                                  | &nbsp;                                                              |
+| **일반**                                                |                                                                     |
+| 게시글 작성 시 펌 금지                                  | 게시글 작성 시 펌 금지 옵션이 기본적으로 활성화됩니다.              |
+| 게시글 하단 추천 게시글 목록 숨기기                     | 게시글 하단의 추천 게시글 목록이 숨겨집니다.                        |
+| 앱 아이콘                                               | 앱 아이콘을 선택할 수 있습니다.                                     |
+| 앱 이름                                                 | 앱 이름을 선택할 수 있습니다.                                       |
+| &nbsp;                                                  | &nbsp;                                                              |
+| **갤러리 관리**                                         |                                                                     |
+| 빠른 게시글 관리                                        | 게시글 목록에서 긴 터치를 통해 게시글 차단 및 삭제 팝업을 띄웁니다. |
+| 📁 식별코드                                             |                                                                     |
+| &nbsp;&nbsp;└ 식별코드 표시                             | 반고닉과 고닉 유저의 식별코드가 표시됩니다.                         |
+| &nbsp;&nbsp;└ 식별코드 터치 시 갤스코프 열기            | 식별코드 터치 시 갤스코프가 열립니다.                               |
+| 📁 플로팅 버튼                                          |                                                                     |
+| &nbsp;&nbsp;└ 📁 DC BanList                             |                                                                     |
+| &nbsp;&nbsp;&nbsp;&nbsp;└ DC BanList 아이콘 표시하기    | DC BanList 아이콘이 퀵쓰기 버튼 위에 추가됩니다.                    |
+| &nbsp;&nbsp;&nbsp;&nbsp;└ DC BanList 식별코드 검색      | DC BanList 식별코드 검색 기능이 활성화됩니다.                       |
+| &nbsp;&nbsp;&nbsp;&nbsp;└ Cloudflare Worker View 토큰   | DC BanList와 연동된 Cloudflare Worker View 토큰을 확인합니다.       |
+| &nbsp;&nbsp;&nbsp;&nbsp;└ DC BanList 업로드             | DC BanList 업로드 기능이 활성화됩니다.                              |
+| &nbsp;&nbsp;&nbsp;&nbsp;└ Cloudflare Worker Ingest 토큰 | DC BanList와 연동된 Cloudflare Worker Ingest 토큰을 확인합니다.     |
+| &nbsp;&nbsp;&nbsp;&nbsp;└ Cloudflare Worker 링크        | DC BanList와 연동된 Cloudflare Worker 링크를 확인합니다.            |
+| &nbsp;&nbsp;&nbsp;&nbsp;└ DC BanList 연동 갤러리        | DC BanList와 연동된 갤러리 json을 확인합니다.                       |
+| &nbsp;&nbsp;&nbsp;&nbsp;└ DC BanList 계정 ID            | DC BanList가 로그인에 사용할 계정 ID를 확인합니다.                  |
+| &nbsp;&nbsp;&nbsp;&nbsp;└ DC BanList 계정 PW            | DC BanList가 로그인에 사용할 계정 PW를 확인합니다.                  |
+| &nbsp;&nbsp;└ 📁 Gall Scope                             |                                                                     |
+| &nbsp;&nbsp;&nbsp;&nbsp;└ Gall Scope 아이콘 표시하기    | Gall Scope 아이콘이 퀵쓰기 버튼 위에 추가됩니다.                    |
+| &nbsp;                                                  | &nbsp;                                                              |
+| **기타**                                                |                                                                     |
+| 운영자 공지 숨기기                                      | 공지 탭에서 운영자 공지가 숨겨집니다.                               |
+| 게시글 목록 상단 공지 숨기기                            | 게시글 목록 상단의 공지가 숨겨집니다.                               |
+| 업데이트 알림 비활성화하기                              | 업데이트 알림이 비활성화 됩니다.                                    |
+| 원스토어 기능 활성화하기                                | 원스토어와 관련된 기능(주로 실시간 베스트)이 활성화됩니다.          |
 
-| Build time Patch           | Description                                        |
-|:---------------------------|:---------------------------------------------------|
+| Build time Patch           | Description                                         |
+|:---------------------------|:----------------------------------------------------|
 | 디시인사이드 패키지명 변경 | 패키지명 변경을 통해 클론 설치가 가능하도록 합니다. |
 
 </details>

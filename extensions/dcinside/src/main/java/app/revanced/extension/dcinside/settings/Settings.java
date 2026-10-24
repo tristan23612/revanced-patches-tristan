@@ -17,6 +17,7 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting HIDE_ADS = new BooleanSetting("revanced_hide_ads", TRUE, TRUE);
 
     // FEED
+    public static final BooleanSetting HIDE_BEST_PICK = new BooleanSetting("revanced_hide_best_pick", FALSE, TRUE);
     public static final BooleanSetting HIDE_DCBEST = new BooleanSetting("revanced_hide_dcbest", FALSE, TRUE);
     public static final BooleanSetting HIDE_RECOMMENDED_GALLERIES = new BooleanSetting("revanced_hide_recommended_galleries", FALSE, TRUE);
     public static final BooleanSetting HIDE_CROWD = new BooleanSetting("revanced_hide_crowd", FALSE, TRUE);

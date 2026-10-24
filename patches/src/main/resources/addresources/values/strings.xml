@@ -252,7 +252,10 @@ Second \"item\" text"</string>
             <string name="revanced_hide_ads_summary_off">광고가 표시됩니다.</string>
         </patch>
         <patch id="home.hideHomeElementPatch">
-            <string name="revanced_hide_dcbest_title">홈 화면 실시간 베스트 숨기기</string>
+            <string name="revanced_hide_best_pick_title">홈 화면 추천 게시물 숨기기(기타-원스토어 기능 비활성화시 표시됨)</string>
+            <string name="revanced_hide_best_pick_summary_on">홈 화면의 추천 게시물이 숨겨집니다.</string>
+            <string name="revanced_hide_best_pick_summary_off">홈 화면 추천 게시물이 숨겨지지 않습니다.</string>
+            <string name="revanced_hide_dcbest_title">홈 화면 실시간 베스트 숨기기(기타-원스토어 기능 활성화시 표시됨)</string>
             <string name="revanced_hide_dcbest_summary_on">홈 화면의 실시간 베스트가 숨겨집니다.</string>
             <string name="revanced_hide_dcbest_summary_off">홈 화면의 실시간 베스트가 숨겨지지 않습니다.</string>
             <string name="revanced_hide_recommended_galleries_title">홈 화면 추천 갤러리 숨기기</string>
