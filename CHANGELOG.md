@@ -1,3 +1,10 @@
+# [1.9.0-dev.2](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.9.0-dev.1...v1.9.0-dev.2) (2026-11-02)
+
+
+### Features
+
+* **README - dcinside:** update supported version to 5.3.21 ([78b1449](https://github.com/tristan23612/revanced-patches-tristan/commit/78b14494d3c818c9e3d39afa6c148e4e17c4a38c))
+
 # [1.9.0-dev.1](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.8.0...v1.9.0-dev.1) (2026-11-02)
 
 
