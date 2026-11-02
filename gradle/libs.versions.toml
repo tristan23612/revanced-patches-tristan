@@ -14,7 +14,7 @@ apksig = "9.0.1"
 protobuf = "0.10.0"
 protoc = "4.35.1"
 shadow = "9.4.0"
-hiddenapibypass = "6.1"
+hiddenapibypass = "6.2"
 jsoup = "1.17.2"
 
 [libraries]
