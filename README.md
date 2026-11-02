@@ -88,6 +88,21 @@ For an example repository, see [ReVanced Patches](https://github.com/revanced/re
 
 </details>
 
+### ✨ Xodo
+
+#### Supported Latest Version
+
+| 11.3.1 |
+|:------:|
+<details>
+<summary>Patch Details</summary>
+
+| Patch    | Description               |
+|:---------|:--------------------------|
+| **프로** | 프로 기능을 활성화합니다. |
+
+</details>
+
 ## 🧑‍💻 Usage
 
 To develop and release ReVanced Patches using this template, some things need to be considered:
