@@ -33,7 +33,7 @@ For an example repository, see [ReVanced Patches](https://github.com/revanced/re
 
 #### Supported Latest Version
 
-| 5.3.20 |
+| 5.3.21 |
 |:------:|
 <details>
 <summary>Patch Details</summary>
@@ -85,6 +85,21 @@ For an example repository, see [ReVanced Patches](https://github.com/revanced/re
 | Build time Patch           | Description                                         |
 |:---------------------------|:----------------------------------------------------|
 | 디시인사이드 패키지명 변경 | 패키지명 변경을 통해 클론 설치가 가능하도록 합니다. |
+
+</details>
+
+### ✨ Xodo
+
+#### Supported Latest Version
+
+| 11.3.1 |
+|:------:|
+<details>
+<summary>Patch Details</summary>
+
+| Patch    | Description               |
+|:---------|:--------------------------|
+| **프로** | 프로 기능을 활성화합니다. |
 
 </details>
 
