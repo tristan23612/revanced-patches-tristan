@@ -33,7 +33,7 @@ For an example repository, see [ReVanced Patches](https://github.com/revanced/re
 
 #### Supported Latest Version
 
-| 5.3.20 |
+| 5.3.21 |
 |:------:|
 <details>
 <summary>Patch Details</summary>
