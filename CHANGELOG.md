@@ -1,3 +1,10 @@
+# [1.9.0-dev.1](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.8.0...v1.9.0-dev.1) (2026-11-02)
+
+
+### Features
+
+* **xodo:** add patches for enabling Pro and debugging features ([c76e651](https://github.com/tristan23612/revanced-patches-tristan/commit/c76e651521aaeebce295747f5fa8be2d59ab6e41))
+
 # [1.8.0](https://github.com/tristan23612/revanced-patches-tristan/compare/v1.7.0...v1.8.0) (2026-10-24)
 
 
